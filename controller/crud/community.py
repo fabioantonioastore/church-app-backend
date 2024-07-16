@@ -30,17 +30,18 @@ class CommunityCrud:
                 statement = select(Community).filter(Community.id == new_community['id'])
                 community = await session.execute(statement)
                 community = community.scalars().one()
-                match new_community.keys():
-                    case 'name':
-                        community.name = new_community['name']
-                    case 'patron':
-                        community.patron = new_community['patron']
-                    case 'email':
-                        community.email = new_community['email']
-                    case 'image':
-                        community.image = new_community['image']
-                    case 'location':
-                        community.location = new_community['location']
+                for key in new_community.keys():
+                    match key:
+                        case 'name':
+                            community.name = new_community['name']
+                        case 'patron':
+                            community.patron = new_community['patron']
+                        case 'email':
+                            community.email = new_community['email']
+                        case 'image':
+                            community.image = new_community['image']
+                        case 'location':
+                            community.location = new_community['location']
                 await session.commit()
                 return community
             except DatabaseError as database_error:

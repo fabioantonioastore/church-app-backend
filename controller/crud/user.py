@@ -40,17 +40,18 @@ class UserCrud:
                 statement = select(User).filter(User.id == new_user['id'])
                 user = await session.execute(statement)
                 user = user.scalars().one()
-                match new_user.keys():
-                    case 'name':
-                        user.name = new_user['name']
-                    case 'birthday':
-                        user.birthday = new_user['birthday']
-                    case 'email':
-                        user.email = new_user['email']
-                    case 'community_id':
-                        user.community_id = new_user['community_id']
-                    case 'image':
-                        user.image = new_user['image']
+                for key in new_user.keys():
+                    match key:
+                        case 'name':
+                            user.name = new_user['name']
+                        case 'birthday':
+                            user.birthday = new_user['birthday']
+                        case 'email':
+                            user.email = new_user['email']
+                        case 'community_id':
+                            user.community_id = new_user['community_id']
+                        case 'image':
+                            user.image = new_user['image']
                 await session.commit()
                 return user
             except DatabaseError as database_error:

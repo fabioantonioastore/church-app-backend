@@ -48,6 +48,8 @@ class WarningCrud:
                             warning.title = new_warning['title']
                         case 'description':
                             warning.description = new_warning['description']
+                        case 'edited_in':
+                            warning.edited_in = new_warning['edited_in']
                 await session.commit()
                 return warning
             except DatabaseError as database_error:

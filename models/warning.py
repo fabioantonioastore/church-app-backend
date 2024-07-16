@@ -1,5 +1,6 @@
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import String, Text, ForeignKey, Integer
+from sqlalchemy import String, Text, ForeignKey, Integer, DateTime
+from datetime import datetime
 from database.db import Base
 
 class Warning(Base):
@@ -9,4 +10,6 @@ class Warning(Base):
     scope = mapped_column(Integer)
     title = mapped_column(String)
     description = mapped_column(Text)
+    posted_in = mapped_column(DateTime, default=datetime.now)
+    edited_in = mapped_column(DateTime, nullable=True)
     community_id = mapped_column(String, ForeignKey('communities.id'))

@@ -10,6 +10,6 @@ class Warning(Base):
     scope = mapped_column(Integer)
     title = mapped_column(String)
     description = mapped_column(Text)
-    posted_in = mapped_column(DateTime, default=datetime.now)
-    edited_in = mapped_column(DateTime, nullable=True)
+    posted_at = mapped_column(DateTime, default=datetime.now)
+    edited_at = mapped_column(DateTime, nullable=True)
     community_id = mapped_column(String, ForeignKey('communities.id'))

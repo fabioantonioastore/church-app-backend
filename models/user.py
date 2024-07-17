@@ -10,6 +10,7 @@ class User(Base):
     name = mapped_column(String)
     birthday = mapped_column(Date)
     email = mapped_column(String, unique=True, nullable=True)
+    position = mapped_column(String, default='user')
     image = mapped_column(LargeBinary, nullable=True)
     community_id = mapped_column(String, ForeignKey('communities.id'))
     payments = relationship('Payment')

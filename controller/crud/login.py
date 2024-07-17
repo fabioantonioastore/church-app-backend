@@ -44,8 +44,8 @@ class LoginCrud:
                     match key:
                         case 'password':
                             login.password = new_login['password']
-                        case 'profile':
-                            login.profile = new_login['profile']
+                        case 'position':
+                            login.profile = new_login['position']
                 await session.commit()
                 return login
             except DatabaseError as database_error:

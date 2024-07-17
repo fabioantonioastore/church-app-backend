@@ -1,0 +1,2 @@
+class SignValidator:
+    pass

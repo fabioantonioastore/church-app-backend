@@ -8,4 +8,4 @@ class Login(Base):
     id = mapped_column(String, primary_key=True)
     cpf = mapped_column(String, ForeignKey('users.cpf'), unique=True)
     password = mapped_column(String)
-    position = mapped_column(String)
+    position = mapped_column(String, nullable=True)

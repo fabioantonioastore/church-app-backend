@@ -6,6 +6,7 @@ class Community(Base):
     __tablename__ = 'communities'
 
     id = mapped_column(String, primary_key=True)
+    name = mapped_column(String)
     patron = mapped_column(String)
     location = mapped_column(String)
     email = mapped_column(String, unique=True)

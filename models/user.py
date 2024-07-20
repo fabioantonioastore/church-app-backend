@@ -1,5 +1,5 @@
 from sqlalchemy.orm import mapped_column, relationship
-from sqlalchemy import String, Date, LargeBinary, ForeignKey
+from sqlalchemy import String, Date, LargeBinary
 from database.db import Base
 
 class User(Base):
@@ -10,7 +10,7 @@ class User(Base):
     name = mapped_column(String)
     birthday = mapped_column(Date)
     email = mapped_column(String, unique=True, nullable=True)
-    position = mapped_column(String, default='user')
+    position = mapped_column(String, nullable=True)
     image = mapped_column(LargeBinary, nullable=True)
-    community_id = mapped_column(String, ForeignKey('communities.id'))
+    community_id = mapped_column(String, nullable=True)
     payments = relationship('Payment')

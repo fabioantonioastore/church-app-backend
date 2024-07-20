@@ -1,12 +1,14 @@
 from fastapi import FastAPI
 import routers.user
 import routers.community
+import routers.login
 from controller.auth import jwt
 
 app = FastAPI()
 
 app.include_router(routers.user.router)
 app.include_router(routers.community.router)
+app.include_router(routers.login.router)
 
 @app.get("/")
 async def root():

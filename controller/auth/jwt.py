@@ -12,7 +12,7 @@ SECRET_KEY = getenv('SECRET_KEY')
 ALGORITHM = getenv('ALGORITHM')
 EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="signin")
-def create_access_token(cpf: str, position: str):
+def create_access_token(cpf: str, position: str = None):
     expire = datetime.now(timezone.utc) + timedelta(minutes=EXPIRE_MINUTES)
     jwt_data = {"sub_cpf": cpf, "sub_position": position, "exp": expire}
     encoded_jwt = jwt.encode(jwt_data, key=SECRET_KEY, algorithm=ALGORITHM)

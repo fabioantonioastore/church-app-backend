@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-class LogginModel(BaseModel):
+class LoginModel(BaseModel):
     id: str
     cpf: str
     password: str

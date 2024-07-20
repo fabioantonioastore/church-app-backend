@@ -33,6 +33,7 @@ class SignUp(BaseModel):
     name: str
     password: str
     birthday: str
+    community: str
 
     model_config = ConfigDict(
         from_attributes=True,
@@ -41,7 +42,8 @@ class SignUp(BaseModel):
                 "cpf": "cpf of the user",
                 "name": "name of the user",
                 "password": "password of the user",
-                "birthday": "birthday of the user"
+                "birthday": "birthday of the user",
+                "community": "community name"
             }
         }
     )

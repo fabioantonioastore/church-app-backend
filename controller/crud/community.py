@@ -4,6 +4,24 @@ from models.community import Community
 from controller.errors.database_error import DatabaseError
 
 class CommunityCrud:
+    async def get_community_by_name(self, async_session: async_sessionmaker[AsyncSession], community_name: str):
+        async with async_session() as session:
+            try:
+                statement = select(Community).filter(Community.name == community_name)
+                community = await session.execute(statement)
+                return community.scalars().one()
+            except DatabaseError as database_error:
+                await session.rollback()
+                raise database_error
+    async def get_community_by_location(self, async_session: async_sessionmaker[AsyncSession], community_location: str):
+        async with async_session() as session:
+            try:
+                statement = select(Community).filter(Community.location == community_location)
+                community = await session.execute(statement)
+                return community.scalars().one()
+            except DatabaseError as database_error:
+                await session.rollback()
+                raise database_error
     async def get_community_by_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str):
         async with async_session() as session:
             try:

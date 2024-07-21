@@ -1,2 +1,0 @@
-class DateError(Exception):
-    pass

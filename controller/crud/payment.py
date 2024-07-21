@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select
 from models.payment import Payment
-from controller.errors.database_error import DatabaseError
+from controller.errors.http.exceptions import internal_server_error
 
 class PaymentCrud:
     async def get_payment_by_id(self, async_session: async_sessionmaker[AsyncSession], payment_id: str):
@@ -10,9 +10,9 @@ class PaymentCrud:
                 statement = select(Payment).filter(Payment.id == payment_id)
                 payment = await session.execute(statement)
                 return payment.scalars().one()
-            except DatabaseError as database_error:
+            except:
                 await session.rollback()
-                raise database_error
+                raise internal_server_error("A error occurs during CRUD")
 
     async def get_payment_by_user_cpf(self, async_session: async_sessionmaker[AsyncSession], user_cpf: str, total_payments=10):
         async with async_session() as session:
@@ -20,9 +20,9 @@ class PaymentCrud:
                 statement = select(Payment).filter(Payment.user_cpf == user_cpf)
                 payments = await session.execute(statement)
                 return payments.scalars().all().count(total_payments)
-            except DatabaseError as database_error:
+            except:
                 await session.rollback()
-                raise database_error
+                raise internal_server_error("A error occurs during CRUD")
 
     async def create_payment(self, async_session: async_sessionmaker[AsyncSession], payment: Payment):
         async with async_session() as session:
@@ -30,9 +30,9 @@ class PaymentCrud:
                 session.add(payment)
                 await session.commit()
                 return payment
-            except DatabaseError as database_error:
+            except:
                 await session.rollback()
-                raise database_error
+                raise internal_server_error("A error occurs during CRUD")
 
     async def update_payment(self, async_session: async_sessionmaker[AsyncSession], new_payment: dict):
         async with async_session() as session:
@@ -52,9 +52,9 @@ class PaymentCrud:
                             payment.status = new_payment['status']
                 await session.commit()
                 return payment
-            except DatabaseError as database_error:
+            except:
                 await session.rollback()
-                raise database_error
+                raise internal_server_error("A error occurs during CRUD")
 
     async def delete_payment(self, async_session: async_sessionmaker[AsyncSession], payment: Payment):
         async with async_session() as session:
@@ -62,9 +62,9 @@ class PaymentCrud:
                 await session.delete(payment)
                 await session.commit()
                 return f"{payment} deleted with succesfull"
-            except DatabaseError as database_error:
+            except:
                 await session.rollback()
-                raise database_error
+                raise internal_server_error("A error occurs during CRUD")
 
     async def delete_payment_by_id(self, async_session: async_sessionmaker[AsyncSession], payment_id: str):
         async with async_session() as session:
@@ -75,6 +75,6 @@ class PaymentCrud:
                 await session.delete(payment)
                 await session.commit()
                 return f"{payment} deleted with succesfull"
-            except DatabaseError as database_error:
+            except:
                 await session.rollback()
-                raise database_error
+                raise internal_server_error("A error occurs during CRUD")

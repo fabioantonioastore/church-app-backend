@@ -1,5 +1,5 @@
 import re
-from controller.errors.name_error import NameError
+from controller.errors.http.exceptions import bad_request
 
 class NameValidator:
     def __init__(self, name: str):
@@ -9,10 +9,10 @@ class NameValidator:
         self.is_sort_name()
 
     def has_number(self) -> None:
-        if re.search(r'[0-9]', self.name): raise NameError("Invalid name, name has number")
+        if re.search(r'[0-9]', self.name): raise bad_request("Invalid name, name has number")
 
     def has_special_character(self) -> None:
-        if re.search(r'[!@#$%^&*(),.?|<>";]', self.name): raise NameError("Invalid name, name has special character")
+        if re.search(r'[!@#$%^&*(),.?|<>";]', self.name): raise bad_request("Invalid name, name has special character")
 
     def is_sort_name(self) -> None:
-        if len(self.name) < 3: raise NameError("This name is too short to be a name")
+        if len(self.name) < 3: raise bad_request("This name is too short to be a name")

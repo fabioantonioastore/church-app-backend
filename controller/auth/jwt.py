@@ -7,7 +7,7 @@ from fastapi import Depends
 from typing import Annotated
 from controller.crud.user import UserCrud
 from database.session import session
-from controller.errors.crud_error import CrudError
+from controller.errors.http.exceptions import unauthorized
 
 load_dotenv()
 
@@ -30,9 +30,4 @@ def decode_token(token: Annotated[str, Depends(oauth2_scheme)]) -> dict:
         position = payload.get("sub_position")
         return {"cpf": cpf, "position": position}
     except:
-        raise ExpiredSignatureError
-
-async def get_user(token: Annotated[str, Depends(oauth2_scheme)]) -> dict:
-    payload = decode_token(token)
-    user = await user_crud.get_user_by_cpf(session, payload['cpf'])
-    return dict(user)
+        raise unauthorized("Token expired or invalid")

@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select
 from models.warning import Warning
-from controller.errors.database_error import DatabaseError
+from controller.errors.http.exceptions import internal_server_error
 
 class WarningCrud:
     async def get_warning_by_id(self, async_session: async_sessionmaker[AsyncSession], warning_id: str):
@@ -10,9 +10,9 @@ class WarningCrud:
                 statement = select(Warning).filter(Warning.id == warning_id)
                 warning = await session.execute(statement)
                 return warning.scalars().one()
-            except DatabaseError as database_error:
+            except:
                 await session.rollback()
-                raise database_error
+                raise internal_server_error("A error occurs during CRUD")
 
     async def get_warning_by_community_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str, total_warnings=10):
         async with async_session() as session:
@@ -20,9 +20,9 @@ class WarningCrud:
                 statement = select(Warning).filter(Warning.community_id == community_id)
                 warnings = await session.execute(statement)
                 return warnings.scalars().all().count(total_warnings)
-            except DatabaseError as database_error:
+            except:
                 await session.rollback()
-                raise database_error
+                raise internal_server_error("A error occurs during CRUD")
 
     async def create_warning(self, async_session: async_sessionmaker[AsyncSession], warning: Warning):
         async with async_session() as session:
@@ -30,9 +30,9 @@ class WarningCrud:
                 session.add(warning)
                 await session.commit()
                 return warning
-            except DatabaseError as database_error:
+            except:
                 await session.rollback()
-                raise database_error
+                raise internal_server_error("A error occurs during CRUD")
 
     async def update_warning(self, async_session: async_sessionmaker[AsyncSession], new_warning: dict):
         async with async_session() as session:
@@ -52,9 +52,9 @@ class WarningCrud:
                             warning.edited_in = new_warning['edited_at']
                 await session.commit()
                 return warning
-            except DatabaseError as database_error:
+            except:
                 await session.rollback()
-                raise database_error
+                raise internal_server_error("A error occurs during CRUD")
 
     async def delete_warning(self, async_session: async_sessionmaker[AsyncSession], warning: Warning):
         async with async_session() as session:
@@ -62,9 +62,9 @@ class WarningCrud:
                 await session.delete(warning)
                 await session.commit()
                 return f"{warning} deleted with succesfull"
-            except DatabaseError as database_error:
+            except:
                 await session.rollback()
-                raise database_error
+                raise internal_server_error("A error occurs during CRUD")
 
     async def delete_warning_by_id(self, async_session: async_sessionmaker[AsyncSession], warning_id: str):
         async with async_session() as session:
@@ -75,6 +75,6 @@ class WarningCrud:
                 await session.delete(warning)
                 await session.commit()
                 return f"{warning} deleted with succesfull"
-            except DatabaseError as database_error:
+            except:
                 await session.rollback()
-                raise database_error
+                raise internal_server_error("A error occurs during CRUD")

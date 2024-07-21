@@ -13,5 +13,6 @@ class SignUpValidator:
         CommunityValidator(data['community'])
 
 class SignInValidator:
-    def __int__(self):
-        pass
+    def __int__(self, data: dict):
+        CPFValidator(data['cpf'])
+        PasswordValidator(data['password'])

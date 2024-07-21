@@ -10,7 +10,7 @@ from models.community import Community
 from controller.crud.community import CommunityCrud
 from database.session import session
 from controller.crud.user import UserCrud
-from controller.auth.cpf_hash import hash_cpf
+from controller.auth.cpf_cryptography import get_crypted_cpf
 
 community_crud = CommunityCrud()
 user_crud = UserCrud()
@@ -44,4 +44,4 @@ async def create_community():
 
 @app.get("/users")
 async def get_all_users():
-    return await user_crud.get_user_by_cpf(session, hash_cpf("13184791777"))
+    return await user_crud.get_user_by_cpf(session, get_crypted_cpf("13184791777"))

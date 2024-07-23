@@ -17,14 +17,14 @@ user_crud = UserCrud()
 async def signin(sign_data: SignIn):
     sign_data = dict(sign_data)
     if await verify_user_login(sign_data):
-        return {"token": jwt.create_access_token(sign_data['cpf'])}
+        return {"access_token": jwt.create_access_token(sign_data['cpf'])}
     return bad_request("Password or CPF is not correct")
 
 @router.post("/admin/sign", status_code=status.HTTP_200_OK)
 async def sign_in_admin(sign_data: SignInAdmin):
     sign_data = dict(sign_data)
     if await verify_admin_login(sign_data):
-        return {"token": jwt.create_access_token(sign_data['cpf'], sign_data['position'])}
+        return {"access_token": jwt.create_access_token(sign_data['cpf'], sign_data['position'])}
     return bad_request("Password or CPF is not correct")
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
@@ -43,4 +43,4 @@ async def signup(sign_data: SignUp):
     except:
         raise bad_request("User already exist")
 
-    return {"token": jwt.create_access_token(user.cpf)}
+    return {"access_token": jwt.create_access_token(user.cpf)}

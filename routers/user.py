@@ -14,7 +14,7 @@ async def verify_user_access_token(request: Request) -> dict:
     return user
 
 @router.get('/me', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
-async def get_user_data(request: Request, user: dict = Depends(verify_user_access_token)):
+async def get_user_data(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, get_crypted_cpf(user['cpf']))
     user = await get_user_client_data(user)
     return user

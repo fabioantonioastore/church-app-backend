@@ -10,7 +10,7 @@ class DateValidator:
     def is_correct_format(self) -> None:
         try:
             datetime.strptime(self.date, "%Y/%m/%d")
-        except DateError as date_error: raise bad_request("Invalid format of date, must be \"%Y-%m-%d\"")
+        except: raise bad_request("Invalid format of date, must be \"%Y-%m-%d\"")
 
     def is_actual_date(self) -> None:
         self.date = datetime.strptime(self.date, "%Y/%m/%d").date()

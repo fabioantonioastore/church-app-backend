@@ -13,7 +13,7 @@ class DateValidator:
         except: raise bad_request("Invalid format of date, must be \"%Y-%m-%d\"")
 
     def is_actual_date(self) -> None:
-        self.date = datetime.strptime(self.date, "%Y/%m/%d").date()
+        self.date = datetime.strptime(self.date, "%Y-%m-%d").date()
         today = date.today()
         age = today.year - self.date.year - ((today.month, today.day) < (self.date.month, self.date.day))
         if age > 120: raise bad_request("Invalid birthday")

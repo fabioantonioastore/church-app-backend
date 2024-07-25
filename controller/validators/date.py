@@ -16,4 +16,5 @@ class DateValidator:
         self.date = datetime.strptime(self.date, "%Y-%m-%d").date()
         today = date.today()
         age = today.year - self.date.year - ((today.month, today.day) < (self.date.month, self.date.day))
+        if age < 18: raise bad_request("Your age is lower than 18")
         if age > 120: raise bad_request("Invalid birthday")

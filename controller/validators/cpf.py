@@ -18,7 +18,7 @@ class CPFValidator():
         digit_one = 11 - (sum % 11)
         if digit_one > 9: digit_one = 0
 
-        if int(self.cpf[9]) != digit_one: raise bad_request("First verificator digit is wrong")
+        if int(self.cpf[9]) != digit_one: raise bad_request("Invalid CPF: First verificator digit is wrong")
 
     def verify_second_verificator_digit(self) -> None:
         sum = 0
@@ -29,4 +29,4 @@ class CPFValidator():
         digit_two = 11 - (sum % 11)
         if digit_two > 9: digit_two = 0
 
-        if int(self.cpf[10]) != digit_two: raise bad_request("Second verificator digit is wrong")
+        if int(self.cpf[10]) != digit_two: raise bad_request("Invalid CPF: Second verificator digit is wrong")

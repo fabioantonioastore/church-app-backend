@@ -1,6 +1,6 @@
 import uuid
-
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 import routers.user
 import routers.community
 import routers.login
@@ -14,6 +14,13 @@ community_crud = CommunityCrud()
 user_crud = UserCrud()
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 app.include_router(routers.user.router)
 app.include_router(routers.community.router)

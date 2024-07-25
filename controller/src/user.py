@@ -23,7 +23,7 @@ async def create_user(user_data: dict) -> User:
             case "position":
                 user.position = user_data['position']
             case "birthday":
-                user.birthday = datetime.strptime(user_data['birthday'], "%Y/%m/%d")
+                user.birthday = datetime.strptime(user_data['birthday'], "%Y-%m-%d")
             case "email":
                 user.email = user_data['email']
             case "image":

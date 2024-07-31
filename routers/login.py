@@ -7,6 +7,7 @@ from database.session import session
 from controller.crud.user import UserCrud
 from controller.src.user import create_user
 from controller.auth import jwt
+from controller.auth.cpf_cryptography import get_plain_cpf
 from controller.errors.http.exceptions import internal_server_error, bad_request
 
 router = APIRouter()
@@ -42,4 +43,4 @@ async def signup(sign_data: SignUp):
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
-    return {"access_token": jwt.create_access_token(user.cpf)}
+    return {"access_token": jwt.create_access_token(get_plain_cpf(user.cpf))}

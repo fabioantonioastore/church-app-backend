@@ -8,8 +8,8 @@ from controller.auth.cpf_cryptography import get_crypted_cpf, get_plain_cpf
 
 community_crud = CommunityCrud()
 
-async def get_community_id(community_name: str) -> str:
-    community = await community_crud.get_community_by_name(session, community_name)
+async def get_community_id(community_patron: str) -> str:
+    community = await community_crud.get_community_by_patron(session, community_patron)
     return community.id
 
 async def create_user(user_data: dict) -> User:
@@ -34,9 +34,9 @@ async def create_user(user_data: dict) -> User:
     user.id = str(uuid4())
     return user
 
-async def get_community_name(community_id: str) -> str:
+async def get_community_patron(community_id: str) -> str:
     community = await community_crud.get_community_by_id(session, community_id)
-    return community.name
+    return community.patron
 
 async def get_user_client_data(user: User) -> dict:
     user_data = {}
@@ -44,7 +44,7 @@ async def get_user_client_data(user: User) -> dict:
     user_data['birthday'] = user.birthday
     user_data['position'] = user.position
     user_data['image'] = user.image
-    user_data['community'] = await get_community_name(user.community_id)
+    user_data['community'] = await get_community_patron(user.community_id)
     user_data['email'] = user.email
     user_data['cpf'] = get_plain_cpf(user.cpf)
 

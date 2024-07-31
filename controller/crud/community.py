@@ -4,10 +4,10 @@ from models.community import Community
 from controller.errors.http.exceptions import internal_server_error
 
 class CommunityCrud:
-    async def get_community_by_name(self, async_session: async_sessionmaker[AsyncSession], community_name: str):
+    async def get_community_by_patron(self, async_session: async_sessionmaker[AsyncSession], community_patron: str):
         async with async_session() as session:
             try:
-                statement = select(Community).filter(Community.name == community_name)
+                statement = select(Community).filter(Community.patron == community_patron)
                 community = await session.execute(statement)
                 return community.scalars().one()
             except:

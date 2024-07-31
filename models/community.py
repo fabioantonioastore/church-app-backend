@@ -7,8 +7,7 @@ class Community(Base):
     __tablename__ = 'communities'
 
     id = mapped_column(String, primary_key=True)
-    name = mapped_column(String, unique=True)
-    patron = mapped_column(String)
+    patron = mapped_column(String, unique=True)
     location = mapped_column(String, unique=True)
     email = mapped_column(String, unique=True)
     image = mapped_column(LargeBinary)

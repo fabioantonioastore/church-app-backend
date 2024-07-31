@@ -43,7 +43,7 @@ class SignUp(BaseModel):
                 "name": "name of the user",
                 "password": "password of the user",
                 "birthday": "birthday of the user",
-                "community": "community name"
+                "community": "community patron"
             }
         }
     )

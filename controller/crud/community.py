@@ -4,6 +4,15 @@ from models.community import Community
 from controller.errors.http.exceptions import internal_server_error
 
 class CommunityCrud:
+    async def get_all_communities(self, async_session: async_sessionmaker[AsyncSession]):
+        async with async_session() as session:
+            try:
+                statement = select(Community)
+                communities = await session.execute(statement)
+                return communities.scalars().all()
+            except Exception as error:
+                await session.rollback()
+                raise internal_server_error("A error occurs during CRUD")
     async def get_community_by_patron(self, async_session: async_sessionmaker[AsyncSession], community_patron: str):
         async with async_session() as session:
             try:

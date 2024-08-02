@@ -8,8 +8,15 @@ from controller.auth.cpf_cryptography import get_crypted_cpf, get_plain_cpf
 from models.login import Login
 from controller.src.login import upgrade_login_position
 from typing import NamedTuple
+from controller.validators.date import DateValidator
+from controller.validators.cpf import CPFValidator
+from controller.validators.email import EmailValidator
+from controller.validators.password import PasswordValidator
+from controller.crud.login import LoginCrud
+from controller.auth.password import hash_pasword
 
 community_crud = CommunityCrud()
+login_crud = LoginCrud()
 
 async def get_community_id(community_patron: str) -> str:
     community = await community_crud.get_community_by_patron(session, community_patron)
@@ -60,42 +67,10 @@ async def is_parish_leader(position: str) -> bool:
     return position == "parish leader"
 
 def convert_user_to_dict(user: User) -> dict:
-    new_user = {}
-    new_user['id'] = user.id
-    new_user['name'] = user.name
-    new_user['image'] = user.image
-    new_user['position'] = user.position
-    new_user['community_id'] = user.community_id
-    new_user['birthday'] = user.birthday
-    new_user['cpf'] = user.cpf
-    new_user['email'] = user.email
-    new_user['active'] = user.active
+    new_user = {'id': user.id, 'name': user.name, 'image': user.image, 'position': user.position,
+                'community_id': user.community_id, 'birthday': user.birthday, 'cpf': user.cpf, 'email': user.email,
+                'active': user.active}
     return new_user
-
-def update_user_name(user: User, name: str) -> dict:
-    user = convert_user_to_dict(user)
-    user['name'] = name
-    return user
-
-def update_user_email(user: User, email: str) -> dict:
-    user = convert_user_to_dict(user)
-    user['email'] = email
-    return user
-
-def update_user_community(user: User, community_id: str) -> dict:
-    user = convert_user_to_dict(user)
-    user['community_id'] = community_id
-    return user
-
-def update_user_image(user: User, image: str) -> dict:
-    user = convert_user_to_dict(user)
-    user['image'] = image
-    return user
-
-def update_user_birthday(user: User, birthday: str) -> dict:
-    user = convert_user_to_dict(user)
-    user['birthday'] = datetime.strptime(birthday, "%Y-%m-%d")
-    return user
 
 def upgrade_user_position(user: User, login: Login, position: str):
     class Data(NamedTuple):
@@ -107,3 +82,26 @@ def upgrade_user_position(user: User, login: Login, position: str):
     login = upgrade_login_position(login, position)
 
     return Data(user=user, login=login)
+
+async def get_update_data(user: User, update_data: dict) -> dict:
+    for key in update_data:
+        match key:
+            case "name":
+                user.name = update_data['name']
+            case "birthday":
+                DateValidator(update_data['birthday'])
+                user.birthday = datetime.strptime(update_data['birthday'], "%Y-%m-%d")
+            case "cpf":
+                CPFValidator(update_data['cpf'])
+                user.cpf = get_crypted_cpf(update_data['cpf'])
+            case "email":
+                EmailValidator(update_data['email'])
+                user.email = update_data['email']
+            case "password":
+                PasswordValidator(update_data['password'])
+                login = await login_crud.get_login_by_cpf(session, get_crypted_cpf(user.cpf))
+                login.password = hash_pasword(update_data['password'])
+            case "community":
+                community = await community_crud.get_community_by_patron(session, update_data['community'])
+                user.community_id = community.id
+        return convert_user_to_dict(user)

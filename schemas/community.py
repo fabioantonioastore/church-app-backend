@@ -36,10 +36,10 @@ class UpdateCommunityModel(BaseModel):
         from_attributes=True,
         json_schema_extra={
             "example": {
-                "patron": "patron of the community or None",
-                "location": "loation of the community or None",
-                "email": "email of the community or None",
-                "image": "image of the community or None"
+                "patron": "new patron of the community or None",
+                "location": "new loation of the community or None",
+                "email": "new email of the community or None",
+                "image": "new image of the community or None"
             }
         }
     )
@@ -54,54 +54,6 @@ class DeleteCommunityModel(BaseModel):
             "example": {
                 "patron": "patron of the community or None",
                 "id": "id of the community or None"
-            }
-        }
-    )
-
-class UpdateCommunityPatron(BaseModel):
-    patron: str
-
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "patron": "new patron of the community"
-            }
-        }
-    )
-
-class UpdateCommunityLocation(BaseModel):
-    location: str
-
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "location": "new location of the community"
-            }
-        }
-    )
-
-class UpdateCommunityEmail(BaseModel):
-    email: str
-
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "email": "new email of the community"
-            }
-        }
-    )
-
-class UpdateCommunityImage(BaseModel):
-    image: str
-
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "image": "new image of the community"
             }
         }
     )

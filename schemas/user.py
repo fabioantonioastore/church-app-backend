@@ -14,73 +14,23 @@ class UserModel(BaseModel):
 class CreateUserModel(UserModel):
     pass
 
-class UpdateUserPassword(BaseModel):
-    password: str
-
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "password": "new password of the user"
-            }
-        }
-    )
-
-class UpdateUserName(BaseModel):
-    name: str
-
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "name": "new name of the user"
-            }
-        }
-    )
-
-class UpdateUserEmail(BaseModel):
+class UpdateUserModel(UserModel):
+    cpf: str
     email: str
-
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "email": "new email of the user"
-            }
-        }
-    )
-
-class UpdateUserCommunity(BaseModel):
-    patron: str
-
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "patron": "patron of the new community"
-            }
-        }
-    )
-
-class UpdateUserImage(BaseModel):
-    image: str
-
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "image": "new user image"
-            }
-        }
-    )
-
-class UpdateUserBirthday(BaseModel):
+    name: str
+    community_patron: str
+    password: str
     birthday: str
 
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={
-            "example": {
+            "extra": {
+                "cpf": "new cpf of the user",
+                "email": "new email of the user",
+                "name": "new name of the user",
+                "community_patron": "new community of the user",
+                "password": "new password of the user",
                 "birthday": "new birthday of the user"
             }
         }

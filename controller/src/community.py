@@ -28,3 +28,16 @@ def get_community_client_data(community: Community) -> dict:
     community_data = {'patron': community.patron, 'location': community.location, 'email': community.email,
                       'image': community.image, 'active': community.active}
     return community_data
+
+def update_community_data(community: Community, data: dict) -> dict:
+    for key in data:
+        match key:
+            case "patron":
+                community.patron = data['patron']
+            case "email":
+                community.email = data['email']
+            case "location":
+                community.location = data['location']
+            case "image":
+                community.image = data['image']
+    return convert_to_dict(community)

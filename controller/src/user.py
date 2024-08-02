@@ -59,10 +59,10 @@ async def is_council_member(position: str) -> bool:
 async def is_parish_leader(position: str) -> bool:
     return position == "parish leader"
 
-def update_user_name(user: User, name: str) -> dict:
+def convert_user_to_dict(user: User) -> dict:
     new_user = {}
     new_user['id'] = user.id
-    new_user['name'] = name
+    new_user['name'] = user.name
     new_user['image'] = user.image
     new_user['position'] = user.position
     new_user['community_id'] = user.community_id
@@ -70,69 +70,39 @@ def update_user_name(user: User, name: str) -> dict:
     new_user['cpf'] = user.cpf
     new_user['email'] = user.email
     return new_user
+
+def update_user_name(user: User, name: str) -> dict:
+    user = convert_user_to_dict(user)
+    user['name'] = name
+    return user
 
 def update_user_email(user: User, email: str) -> dict:
-    new_user = {}
-    new_user['id'] = user.id
-    new_user['name'] = user.name
-    new_user['image'] = user.image
-    new_user['position'] = user.position
-    new_user['community_id'] = user.community_id
-    new_user['birthday'] = user.birthday
-    new_user['cpf'] = user.cpf
-    new_user['email'] = email
-    return new_user
+    user = convert_user_to_dict(user)
+    user['email'] = email
+    return user
 
 def update_user_community(user: User, community_id: str) -> dict:
-    new_user = {}
-    new_user['id'] = user.id
-    new_user['name'] = user.name
-    new_user['image'] = user.image
-    new_user['position'] = user.position
-    new_user['community_id'] = community_id
-    new_user['birthday'] = user.birthday
-    new_user['cpf'] = user.cpf
-    new_user['email'] = user.email
-    return new_user
+    user = convert_user_to_dict(user)
+    user['community_id'] = community_id
+    return user
 
 def update_user_image(user: User, image: str) -> dict:
-    new_user = {}
-    new_user['id'] = user.id
-    new_user['name'] = user.name
-    new_user['image'] = image
-    new_user['position'] = user.position
-    new_user['community_id'] = user.community_id
-    new_user['birthday'] = user.birthday
-    new_user['cpf'] = user.cpf
-    new_user['email'] = user.email
-    return new_user
+    user = convert_user_to_dict(user)
+    user['image'] = image
+    return user
 
 def update_user_birthday(user: User, birthday: str) -> dict:
-    new_user = {}
-    new_user['id'] = user.id
-    new_user['name'] = user.name
-    new_user['image'] = user.image
-    new_user['position'] = user.position
-    new_user['community_id'] = user.community_id
-    new_user['birthday'] = datetime.strptime(birthday, "%Y-%m-%d")
-    new_user['cpf'] = user.cpf
-    new_user['email'] = user.email
-    return new_user
+    user = convert_user_to_dict(user)
+    user['birthday'] = datetime.strptime(birthday, "%Y-%m-%d")
+    return user
 
 def upgrade_user_position(user: User, login: Login, position: str):
     class Data(NamedTuple):
         user: dict
         login: dict
 
-    new_user = {}
-    new_user['id'] = user.id
-    new_user['name'] = user.name
-    new_user['image'] = user.image
-    new_user['position'] = position
-    new_user['cpf'] = user.cpf
-    new_user['birthday'] = user.birthday
-    new_user['email'] = user.email
-    new_user['community_id'] = user.community_id
-    new_login = upgrade_login_position(login, position)
+    user = convert_user_to_dict(user)
+    user['position'] = position
+    login = upgrade_login_position(login, position)
 
-    return Data(user=new_user, login=new_login)
+    return Data(user=user, login=login)

@@ -31,15 +31,19 @@ async def verify_admin_login(login_data: dict) -> bool:
             return verify_hashed_password(login_data['password'], login.password)
     return False
 
-def update_login_password(login: Login, password: str) -> dict:
-    new_login = {}
-    new_login['id'] = login.id
-    new_login['password'] = hash_pasword(password)
-    return new_login
-
-def upgrade_login_position(login: Login, position: str) -> dict:
+def convert_to_dict(login: Login) -> dict:
     new_login = {}
     new_login['id'] = login.id
     new_login['password'] = login.password
-    new_login['position'] = position
+    new_login['position'] = login.position
     return new_login
+
+def update_login_password(login: Login, password: str) -> dict:
+    login = convert_to_dict(login)
+    login['password'] = hash_pasword(password)
+    return login
+
+def upgrade_login_position(login: Login, position: str) -> dict:
+    login = convert_to_dict(login)
+    login['position'] = position
+    return login

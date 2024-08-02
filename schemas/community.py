@@ -6,6 +6,7 @@ class CommunityModel(BaseModel):
     location: str
     email: str
     image: str
+    active: bool
 
 class CreateCommunityModel(BaseModel):
     patron: str

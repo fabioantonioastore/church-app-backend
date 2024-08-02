@@ -9,6 +9,7 @@ class UserModel(BaseModel):
     position: str
     image: str
     community_id: str
+    active: bool
 
 class CreateUserModel(UserModel):
     pass

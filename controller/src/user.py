@@ -84,32 +84,30 @@ def upgrade_user_position(user: User, login: Login, position: str):
     return Data(user=user, login=login)
 
 async def get_update_data(user: User, update_data: dict) -> dict:
-    print(update_data)
-    for key in update_data:
-        match key:
-            case "name":
-                if update_data['name'] != None:
-                    user.name = update_data['name']
-            case "birthday":
-                if update_data['birthday'] != None:
-                    DateValidator(update_data['birthday'])
-                    user.birthday = datetime.strptime(update_data['birthday'], "%Y-%m-%d")
-            case "cpf":
-                if update_data['cpf'] != None:
-                    CPFValidator(update_data['cpf'])
-                    user.cpf = get_crypted_cpf(update_data['cpf'])
-            case "email":
-                if update_data['email'] != None:
-                    EmailValidator(update_data['email'])
-                    user.email = update_data['email']
-            case "password":
-                if update_data['password'] != None:
-                    PasswordValidator(update_data['password'])
-                    login = await login_crud.get_login_by_cpf(session, get_crypted_cpf(user.cpf))
-                    login.password = hash_pasword(update_data['password'])
-                    await login_crud.update_login(session, login)
-            case "community":
-                if update_data['community'] != None:
-                    community = await community_crud.get_community_by_patron(session, update_data['community'])
-                    user.community_id = community.id
-        return convert_user_to_dict(user)
+    CPFValidator(update_data['cpf'])
+    EmailValidator(update_data['email'])
+    DateValidator(update_data['birthday'])
+    PasswordValidator(update_data['password'])
+    if update_data.get('email'):
+        user.email = update_data['email']
+    if update_data.get('name'):
+        user.name = update_data['name']
+    if update_data.get('image'):
+        user.image = update_data['image'].encode('utf-8')
+    if update_data.get('birthday'):
+        user.birthday = datetime.strptime(update_data['birthday'], "%Y-%m-%d")
+    if update_data.get('community_patron'):
+        community = await community_crud.get_community_by_patron(session, update_data['community_patron'])
+        user.community_id = community.id
+    if update_data.get('password'):
+        login = await login_crud.get_login_by_cpf(session, user.cpf)
+        login.password = hash_pasword(update_data['password'])
+        login = {"id": login.id, "position": login.position, "password": login.password, "cpf": login.cpf}
+        await login_crud.update_login(session, login)
+    if update_data.get('cpf'):
+        login = await login_crud.get_login_by_cpf(session, user.cpf)
+        login.cpf = get_crypted_cpf(update_data['cpf'])
+        login = {"id": login.id, "position": login.position, "password": login.password, "cpf": login.cpf}
+        user.cpf = get_crypted_cpf(update_data['cpf'])
+        await login_crud.update_login(session, login)
+    return convert_user_to_dict(user)

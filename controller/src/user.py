@@ -135,4 +135,4 @@ def upgrade_user_position(user: User, login: Login, position: str):
     new_user['community_id'] = user.community_id
     new_login = upgrade_login_position(login, position)
 
-    return Data(new_user, new_login)
+    return Data(user=new_user, login=new_login)

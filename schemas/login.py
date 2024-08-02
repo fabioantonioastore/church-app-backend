@@ -12,8 +12,7 @@ class LoginModel(BaseModel):
             "example": {
                 "id": "uuid4",
                 "cpf": "cpf of the user",
-                "password": "password of the user",
-                "position": "position of the user"
+                "password": "password of the user"
             }
         }
     )

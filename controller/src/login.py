@@ -30,3 +30,9 @@ async def verify_admin_login(login_data: dict) -> bool:
         if login.position == login_data['position']:
             return verify_hashed_password(login_data['password'], login.password)
     return False
+
+def update_login_password(login: Login, password: str) -> dict:
+    new_login = {}
+    new_login['id'] = login.id
+    new_login['password'] = hash_pasword(password)
+    return new_login

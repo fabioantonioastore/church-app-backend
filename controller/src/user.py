@@ -49,3 +49,9 @@ async def get_user_client_data(user: User) -> dict:
     user_data['cpf'] = get_plain_cpf(user.cpf)
 
     return user_data
+
+async def is_council_member(position: str) -> bool:
+    return position == "council member"
+
+async def is_parish_leader(position: str) -> bool:
+    return position == "parish leader"

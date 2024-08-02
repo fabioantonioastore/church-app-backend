@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select
 from models.login import Login
-from controller.errors.http.exceptions import internal_server_error
+from controller.errors.http.exceptions import not_found
 
 class LoginCrud:
     async def get_login_by_id(self, async_session: async_sessionmaker[AsyncSession], login_id: str):
@@ -10,9 +10,9 @@ class LoginCrud:
                 statement = select(Login).filter(Login.id == login_id)
                 login = await session.execute(statement)
                 return login.scalars().one()
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def get_login_by_cpf(self, async_session: async_sessionmaker[AsyncSession], login_cpf: str):
         async with async_session() as session:
@@ -20,9 +20,9 @@ class LoginCrud:
                 statement = select(Login).filter(Login.cpf == login_cpf)
                 login = await session.execute(statement)
                 return login.scalars().one()
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def create_login(self, async_session: async_sessionmaker[AsyncSession], login: Login):
         async with async_session() as session:
@@ -30,9 +30,9 @@ class LoginCrud:
                 session.add(login)
                 await session.commit()
                 return login
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def update_login(self, async_session: async_sessionmaker[AsyncSession], new_login: dict):
         async with async_session() as session:
@@ -48,9 +48,9 @@ class LoginCrud:
                             login.profile = new_login['position']
                 await session.commit()
                 return login
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def delete_login(self, async_session: async_sessionmaker[AsyncSession], login: Login):
         async with async_session() as session:
@@ -58,9 +58,9 @@ class LoginCrud:
                 await session.delete(login)
                 await session.commit()
                 return f"{login} deleted with succesfull"
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def delete_login_by_id(self, async_session: async_sessionmaker[AsyncSession], login_id: str):
         async with async_session() as session:
@@ -71,6 +71,6 @@ class LoginCrud:
                 await session.delete(login)
                 await session.commit()
                 return f"{login} deleted with succesfull"
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")

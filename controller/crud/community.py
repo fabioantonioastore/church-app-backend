@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select
 from models.community import Community
-from controller.errors.http.exceptions import internal_server_error
+from controller.errors.http.exceptions import not_found
 
 class CommunityCrud:
     async def get_all_communities(self, async_session: async_sessionmaker[AsyncSession]):
@@ -12,34 +12,34 @@ class CommunityCrud:
                 return communities.scalars().all()
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
     async def get_community_by_patron(self, async_session: async_sessionmaker[AsyncSession], community_patron: str):
         async with async_session() as session:
             try:
                 statement = select(Community).filter(Community.patron == community_patron)
                 community = await session.execute(statement)
                 return community.scalars().one()
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
     async def get_community_by_location(self, async_session: async_sessionmaker[AsyncSession], community_location: str):
         async with async_session() as session:
             try:
                 statement = select(Community).filter(Community.location == community_location)
                 community = await session.execute(statement)
                 return community.scalars().one()
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
     async def get_community_by_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str):
         async with async_session() as session:
             try:
                 statement = select(Community).filter(Community.id == community_id)
                 community = await session.execute(statement)
                 return community.scalars().one()
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def create_community(self, async_session: async_sessionmaker[AsyncSession], community: Community):
         async with async_session() as session:
@@ -47,9 +47,9 @@ class CommunityCrud:
                 session.add(community)
                 await session.commit()
                 return community
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def update_community(self, async_session: async_sessionmaker[AsyncSession], new_community: dict):
         async with async_session() as session:
@@ -71,19 +71,19 @@ class CommunityCrud:
                             community.location = new_community['location']
                 await session.commit()
                 return community
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def delete_community(self, async_session: async_sessionmaker[AsyncSession], community: Community):
         async with async_session() as session:
             try:
                 await session.delete(community)
                 await session.commit()
-                return f"{community} deleted with succesfull"
+                return f"{community} deleted with successfull"
             except:
                 await session.rollback()
-                raise internal_server_error(f"A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def delete_community_by_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str):
         async with async_session() as session:
@@ -94,6 +94,6 @@ class CommunityCrud:
                 await session.delete(community)
                 await session.commit()
                 return f"{community} deleted with succesfull"
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")

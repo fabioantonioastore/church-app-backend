@@ -48,7 +48,7 @@ def too_many_requests(message: str = None):
     raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=message)
 
 def internal_server_error(message: str = None):
-    raise HTTPException(status_code=status.WS_1011_INTERNAL_ERROR, detail=message)
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=message)
 
 def not_implemented(message: str = None):
     raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail=message)

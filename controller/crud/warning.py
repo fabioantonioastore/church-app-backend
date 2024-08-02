@@ -1,7 +1,8 @@
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select
 from models.warning import Warning
-from controller.errors.http.exceptions import internal_server_error
+from controller.errors.http.exceptions import not_found
+from datetime import datetime
 
 class WarningCrud:
     async def get_warning_by_id(self, async_session: async_sessionmaker[AsyncSession], warning_id: str):
@@ -10,19 +11,19 @@ class WarningCrud:
                 statement = select(Warning).filter(Warning.id == warning_id)
                 warning = await session.execute(statement)
                 return warning.scalars().one()
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_warning_by_community_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str, total_warnings=10):
+    async def get_warning_by_community_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str, total_warnings: int = 10):
         async with async_session() as session:
             try:
-                statement = select(Warning).filter(Warning.community_id == community_id)
+                statement = select(Warning).filter(Warning.community_id == community_id).limit(total_warnings)
                 warnings = await session.execute(statement)
-                return warnings.scalars().all().count(total_warnings)
-            except:
+                return warnings.scalars().all()
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def create_warning(self, async_session: async_sessionmaker[AsyncSession], warning: Warning):
         async with async_session() as session:
@@ -30,9 +31,9 @@ class WarningCrud:
                 session.add(warning)
                 await session.commit()
                 return warning
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def update_warning(self, async_session: async_sessionmaker[AsyncSession], new_warning: dict):
         async with async_session() as session:
@@ -48,13 +49,12 @@ class WarningCrud:
                             warning.title = new_warning['title']
                         case 'description':
                             warning.description = new_warning['description']
-                        case 'edited_at':
-                            warning.edited_in = new_warning['edited_at']
+                warning.edited_at = datetime.now()
                 await session.commit()
                 return warning
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def delete_warning(self, async_session: async_sessionmaker[AsyncSession], warning: Warning):
         async with async_session() as session:
@@ -62,9 +62,9 @@ class WarningCrud:
                 await session.delete(warning)
                 await session.commit()
                 return f"{warning} deleted with succesfull"
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def delete_warning_by_id(self, async_session: async_sessionmaker[AsyncSession], warning_id: str):
         async with async_session() as session:
@@ -75,6 +75,6 @@ class WarningCrud:
                 await session.delete(warning)
                 await session.commit()
                 return f"{warning} deleted with succesfull"
-            except:
+            except Exception as error:
                 await session.rollback()
-                raise internal_server_error("A error occurs during CRUD")
+                raise not_found(f"A error occurs during CRUD: {error!r}")

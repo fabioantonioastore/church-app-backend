@@ -69,6 +69,7 @@ def convert_user_to_dict(user: User) -> dict:
     new_user['birthday'] = user.birthday
     new_user['cpf'] = user.cpf
     new_user['email'] = user.email
+    new_user['active'] = user.active
     return new_user
 
 def update_user_name(user: User, name: str) -> dict:

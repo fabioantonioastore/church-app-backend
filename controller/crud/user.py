@@ -52,9 +52,11 @@ class UserCrud:
                             user.community_id = new_user['community_id']
                         case 'image':
                             user.image = new_user['image']
+                        case 'active':
+                            user.active = new_user['active']
                 await session.commit()
                 return user
-            except:
+            except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 

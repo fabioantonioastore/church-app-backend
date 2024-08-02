@@ -6,7 +6,7 @@ from controller.crud.community import CommunityCrud
 from database.session import session
 from controller.src.user import (get_user_client_data, update_user_name, update_user_email,
                                  update_user_community, update_user_birthday, update_user_image,
-                                 is_parish_leader, upgrade_user_position)
+                                 is_parish_leader, upgrade_user_position, convert_user_to_dict)
 from controller.auth.cpf_cryptography import get_crypted_cpf
 from schemas.user import (UpdateUserPassword, UpdateUserName, UpdateUserEmail,
                           UpdateUserCommunity, UpdateUserImage, UpdateUserBirthday, UpgradeUserPosition)
@@ -93,3 +93,11 @@ async def patch_upgrade_user_position(position_data: UpgradeUserPosition, user: 
             return {"position upgraded"}
         else: raise bad_request(f"Rule {position_data.position} doesn't exist")
     raise unauthorized(f"You can't upgrade user position")
+
+@router.delete('/me/deactivate', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+async def deactivate_user_account(user: dict = Depends(verify_user_access_token)):
+    user = await user_crud.get_user_by_cpf(session, get_crypted_cpf(user['cpf']))
+    user.active = False
+    user = convert_user_to_dict(user)
+    await user_crud.update_user(session, user)
+    return {"user account deactivate, do login again to activate"}

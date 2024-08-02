@@ -61,6 +61,8 @@ class CommunityCrud:
                             community.image = new_community['image']
                         case 'location':
                             community.location = new_community['location']
+                        case 'active':
+                            community.active = new_community['active']
                 await session.commit()
                 return community
             except Exception as error:

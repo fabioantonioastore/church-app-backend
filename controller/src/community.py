@@ -21,10 +21,10 @@ def create_community_data(community_data: dict) -> Community:
 
 def convert_to_dict(community: Community) -> dict:
     new_community = {'id': community.id, 'patron': community.patron, 'email': community.email, 'image': community.image,
-                     'location': community.location}
+                     'location': community.location, 'active': community.active}
     return new_community
 
 def get_community_client_data(community: Community) -> dict:
     community_data = {'patron': community.patron, 'location': community.location, 'email': community.email,
-                      'image': community.image}
+                      'image': community.image, 'active': community.active}
     return community_data

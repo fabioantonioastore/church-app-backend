@@ -84,3 +84,17 @@ class UpdateUserBirthday(BaseModel):
             }
         }
     )
+
+class UpgradeUserPosition(BaseModel):
+    cpf: str
+    position: str
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "cpf": "cpf of the user",
+                "position": "new position of the user"
+            }
+        }
+    )

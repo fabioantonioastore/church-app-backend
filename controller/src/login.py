@@ -36,3 +36,10 @@ def update_login_password(login: Login, password: str) -> dict:
     new_login['id'] = login.id
     new_login['password'] = hash_pasword(password)
     return new_login
+
+def upgrade_login_position(login: Login, position: str) -> dict:
+    new_login = {}
+    new_login['id'] = login.id
+    new_login['password'] = login.password
+    new_login['position'] = position
+    return new_login

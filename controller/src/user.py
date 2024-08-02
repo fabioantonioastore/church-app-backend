@@ -5,6 +5,9 @@ from datetime import datetime
 from controller.crud.community import CommunityCrud
 from database.session import session
 from controller.auth.cpf_cryptography import get_crypted_cpf, get_plain_cpf
+from models.login import Login
+from controller.src.login import upgrade_login_position
+from typing import NamedTuple
 
 community_crud = CommunityCrud()
 
@@ -115,3 +118,21 @@ def update_user_birthday(user: User, birthday: str) -> dict:
     new_user['cpf'] = user.cpf
     new_user['email'] = user.email
     return new_user
+
+def upgrade_user_position(user: User, login: Login, position: str):
+    class Data(NamedTuple):
+        user: dict
+        login: dict
+
+    new_user = {}
+    new_user['id'] = user.id
+    new_user['name'] = user.name
+    new_user['image'] = user.image
+    new_user['position'] = position
+    new_user['cpf'] = user.cpf
+    new_user['birthday'] = user.birthday
+    new_user['email'] = user.email
+    new_user['community_id'] = user.community_id
+    new_login = upgrade_login_position(login, position)
+
+    return Data(new_user, new_login)

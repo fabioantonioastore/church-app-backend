@@ -15,23 +15,23 @@ class CreateUserModel(UserModel):
     pass
 
 class UpdateUserModel(BaseModel):
-    cpf: str
-    email: str
-    name: str
-    community_patron: str
-    password: str
-    birthday: str
+    cpf: str | None = None
+    email: str | None = None
+    name: str | None = None
+    community_patron: str | None = None
+    password: str | None = None
+    birthday: str | None = None
 
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={
             "extra": {
-                "cpf": "new cpf of the user",
-                "email": "new email of the user",
-                "name": "new name of the user",
-                "community_patron": "new community of the user",
-                "password": "new password of the user",
-                "birthday": "new birthday of the user"
+                "cpf": "new cpf of the user or None",
+                "email": "new email of the user or None",
+                "name": "new name of the user or None",
+                "community_patron": "new community of the user or None",
+                "password": "new password of the user or None",
+                "birthday": "new birthday of the user or None"
             }
         }
     )

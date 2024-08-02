@@ -14,7 +14,7 @@ class UserModel(BaseModel):
 class CreateUserModel(UserModel):
     pass
 
-class UpdateUserModel(UserModel):
+class UpdateUserModel(BaseModel):
     cpf: str
     email: str
     name: str

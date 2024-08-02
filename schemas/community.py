@@ -37,7 +37,7 @@ class UpdateCommunityModel(BaseModel):
         json_schema_extra={
             "example": {
                 "patron": "new patron of the community or None",
-                "location": "new loation of the community or None",
+                "location": "new location of the community or None",
                 "email": "new email of the community or None",
                 "image": "new image of the community or None"
             }

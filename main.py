@@ -40,7 +40,7 @@ async def root():
     access_token = jwt.create_access_token("hello@gmail.com")
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.post("/community")
+@app.post("/community/root")
 async def create_community():
     a = Community()
     a.id = str(uuid.uuid4())

@@ -8,7 +8,7 @@ class Community(Base):
 
     id = mapped_column(String, primary_key=True)
     patron = mapped_column(String, unique=True)
-    location = mapped_column(String, unique=True)
+    location = mapped_column(String)
     email = mapped_column(String, unique=True)
     image = mapped_column(LargeBinary)
     warnings = relationship('Warning', cascade='all, delete-orphan')

@@ -56,3 +56,51 @@ class DeleteCommunityModel(BaseModel):
             }
         }
     )
+
+class UpdateCommunityPatron(BaseModel):
+    patron: str
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "patron": "new patron of the community"
+            }
+        }
+    )
+
+class UpdateCommunityLocation(BaseModel):
+    location: str
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "location": "new location of the community"
+            }
+        }
+    )
+
+class UpdateCommunityEmail(BaseModel):
+    email: str
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "email": "new email of the community"
+            }
+        }
+    )
+
+class UpdateCommunityImage(BaseModel):
+    image: str
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "image": "new image of the community"
+            }
+        }
+    )

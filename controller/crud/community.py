@@ -22,15 +22,7 @@ class CommunityCrud:
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
-    async def get_community_by_location(self, async_session: async_sessionmaker[AsyncSession], community_location: str):
-        async with async_session() as session:
-            try:
-                statement = select(Community).filter(Community.location == community_location)
-                community = await session.execute(statement)
-                return community.scalars().one()
-            except Exception as error:
-                await session.rollback()
-                raise not_found(f"A error occurs during CRUD: {error!r}")
+
     async def get_community_by_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str):
         async with async_session() as session:
             try:

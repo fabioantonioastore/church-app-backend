@@ -6,7 +6,6 @@ from controller.crud.community import CommunityCrud
 from database.session import session
 from controller.src.user import (get_user_client_data, get_update_data,
                                  is_parish_leader, upgrade_user_position, convert_user_to_dict)
-from controller.auth.cpf_cryptography import get_crypted_cpf
 from schemas.user import UpdateUserModel, UpgradeUserPosition
 from controller.errors.http.exceptions import unauthorized, bad_request, internal_server_error
 
@@ -17,14 +16,14 @@ community_crud = CommunityCrud()
 
 @router.get('/me', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_user_data(user: dict = Depends(verify_user_access_token)):
-    user = await user_crud.get_user_by_cpf(session, get_crypted_cpf(user['cpf']))
+    user = await user_crud.get_user_by_cpf(session, user['cpf'])
     user = await get_user_client_data(user)
     return user
 
 @router.put("/me", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
-    user = await user_crud.get_user_by_cpf(session, get_crypted_cpf(user['cpf']))
+    user = await user_crud.get_user_by_cpf(session, user['cpf'])
     user = await user_crud.update_user(session, await get_update_data(user, user_data))
     return {"user updated"}
 
@@ -32,8 +31,8 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
 async def patch_upgrade_user_position(position_data: UpgradeUserPosition, user: dict = Depends(verify_user_access_token)):
     if is_parish_leader(user['position']):
         if position_data.position == "user" or position_data.position == "council member":
-            user = await user_crud.get_user_by_cpf(session, get_crypted_cpf(position_data.cpf))
-            login = await login_crud.get_login_by_cpf(session, get_crypted_cpf(position_data.cpf))
+            user = await user_crud.get_user_by_cpf(session, position_data.cpf)
+            login = await login_crud.get_login_by_cpf(session, position_data.cpf)
             data = upgrade_user_position(user, login, position_data.position)
             try:
                 await user_crud.update_user(session, data.user)
@@ -49,7 +48,7 @@ async def patch_upgrade_user_position(position_data: UpgradeUserPosition, user: 
 
 @router.delete('/me/deactivate', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def deactivate_user_account(user: dict = Depends(verify_user_access_token)):
-    user = await user_crud.get_user_by_cpf(session, get_crypted_cpf(user['cpf']))
+    user = await user_crud.get_user_by_cpf(session, user['cpf'])
     user.active = False
     user = convert_user_to_dict(user)
     await user_crud.update_user(session, user)

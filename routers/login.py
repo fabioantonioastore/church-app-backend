@@ -7,7 +7,6 @@ from database.session import session
 from controller.crud.user import UserCrud
 from controller.src.user import create_user
 from controller.auth import jwt
-from controller.auth.cpf_cryptography import get_plain_cpf, get_crypted_cpf
 from controller.errors.http.exceptions import internal_server_error, bad_request
 from controller.src.user import convert_user_to_dict
 
@@ -19,7 +18,7 @@ user_crud = UserCrud()
 async def signin(sign_data: SignIn):
     sign_data = dict(sign_data)
     if await verify_user_login(sign_data):
-        user = await user_crud.get_user_by_cpf(session, get_crypted_cpf(sign_data['cpf']))
+        user = await user_crud.get_user_by_cpf(session, sign_data['cpf'])
         if not(user.active):
             user.active = True
             user = convert_user_to_dict(user)
@@ -31,7 +30,7 @@ async def signin(sign_data: SignIn):
 async def sign_in_admin(sign_data: SignInAdmin):
     sign_data = dict(sign_data)
     if await verify_admin_login(sign_data):
-        user = await user_crud.get_user_by_cpf(session, get_crypted_cpf(sign_data['cpf']))
+        user = await user_crud.get_user_by_cpf(session, sign_data['cpf'])
         if not(user.active):
             user.active = True
             user = convert_user_to_dict(user)
@@ -54,4 +53,4 @@ async def signup(sign_data: SignUp):
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
-    return {"access_token": jwt.create_access_token(get_plain_cpf(user.cpf))}
+    return {"access_token": jwt.create_access_token(user.cpf)}

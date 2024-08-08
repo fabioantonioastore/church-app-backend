@@ -14,7 +14,6 @@ from models.user import User
 from schemas.sign import SignUp
 from controller.errors.http.exceptions import internal_server_error, bad_request
 from controller.validators.sign_validator import SignUpValidator
-from controller.src.user import create_user, get_crypted_cpf, get_plain_cpf
 from controller.crud.login import LoginCrud
 from controller.src.login import create_login
 

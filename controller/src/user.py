@@ -4,7 +4,6 @@ from uuid import uuid4
 from datetime import datetime
 from controller.crud.community import CommunityCrud
 from database.session import session
-from controller.auth.cpf_cryptography import get_crypted_cpf, get_plain_cpf
 from models.login import Login
 from controller.src.login import upgrade_login_position
 from typing import NamedTuple
@@ -29,7 +28,7 @@ async def create_user(user_data: dict) -> User:
             case "name":
                 user.name = user_data['name']
             case "cpf":
-                user.cpf = get_crypted_cpf(user_data['cpf'])
+                user.cpf = user_data['cpf']
             case "position":
                 user.position = user_data['position']
             case "birthday":
@@ -56,7 +55,7 @@ async def get_user_client_data(user: User) -> dict:
     user_data['image'] = user.image
     user_data['community'] = await get_community_patron(user.community_id)
     user_data['email'] = user.email
-    user_data['cpf'] = get_plain_cpf(user.cpf)
+    user_data['cpf'] = user.cpf
 
     return user_data
 
@@ -106,8 +105,8 @@ async def get_update_data(user: User, update_data: dict) -> dict:
         await login_crud.update_login(session, login)
     if update_data.get('cpf'):
         login = await login_crud.get_login_by_cpf(session, user.cpf)
-        login.cpf = get_crypted_cpf(update_data['cpf'])
+        login.cpf = update_data['cpf']
         login = {"id": login.id, "position": login.position, "password": login.password, "cpf": login.cpf}
-        user.cpf = get_crypted_cpf(update_data['cpf'])
+        user.cpf = update_data['cpf']
         await login_crud.update_login(session, login)
     return convert_user_to_dict(user)

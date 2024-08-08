@@ -42,6 +42,8 @@ class UserCrud:
                 user = user.scalars().one()
                 for key in new_user.keys():
                     match key:
+                        case 'cpf':
+                            user.cpf = new_user['cpf']
                         case 'name':
                             user.name = new_user['name']
                         case 'birthday':

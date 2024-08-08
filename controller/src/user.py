@@ -9,6 +9,7 @@ from controller.src.login import upgrade_login_position
 from typing import NamedTuple
 from controller.validators.date import DateValidator
 from controller.validators.cpf import CPFValidator
+from controller.validators.name import NameValidator
 from controller.validators.email import EmailValidator
 from controller.validators.password import PasswordValidator
 from controller.crud.login import LoginCrud
@@ -83,26 +84,27 @@ def upgrade_user_position(user: User, login: Login, position: str):
     return Data(user=user, login=login)
 
 async def get_update_data(user: User, update_data: dict) -> dict:
-    CPFValidator(update_data['cpf'])
-    EmailValidator(update_data['email'])
-    DateValidator(update_data['birthday'])
-    PasswordValidator(update_data['password'])
     if update_data.get('email'):
+        EmailValidator(update_data['email'])
         user.email = update_data['email']
     if update_data.get('name'):
+        NameValidator(update_data['name'])
         user.name = update_data['name']
     if update_data.get('image'):
         user.image = update_data['image'].encode('utf-8')
     if update_data.get('birthday'):
+        DateValidator(update_data['birthday'])
         user.birthday = datetime.strptime(update_data['birthday'], "%Y-%m-%d")
     if update_data.get('community_patron'):
         community = await community_crud.get_community_by_patron(session, update_data['community_patron'])
         user.community_id = community.id
     if update_data.get('password'):
+        PasswordValidator(update_data['password'])
         login = await login_crud.get_login_by_cpf(session, user.cpf)
         login.password = hash_pasword(update_data['password'])
         login = {"id": login.id, "position": login.position, "password": login.password, "cpf": login.cpf}
         await login_crud.update_login(session, login)
     if update_data.get('cpf'):
+        CPFValidator(user['cpf'])
         user.cpf = update_data['cpf']
     return convert_user_to_dict(user)

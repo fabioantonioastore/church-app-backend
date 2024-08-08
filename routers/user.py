@@ -17,14 +17,17 @@ community_crud = CommunityCrud()
 @router.get('/me', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_user_data(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
-    user = await get_user_client_data(user)
     return user
 
 @router.put("/me", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
-    user = await user_crud.update_user(session, await get_update_data(user, user_data))
+    login = await login_crud.get_login_by_cpf(session, user.cpf)
+    await login_crud.delete_login(session, login)
+    login.cpf = user_data['cpf']
+    await user_crud.update_user(session, await get_update_data(user, user_data))
+    await login_crud.create_login(session, login)
     return {"user updated"}
 
 @router.patch('/user/upgrade/position', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])

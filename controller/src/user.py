@@ -104,9 +104,5 @@ async def get_update_data(user: User, update_data: dict) -> dict:
         login = {"id": login.id, "position": login.position, "password": login.password, "cpf": login.cpf}
         await login_crud.update_login(session, login)
     if update_data.get('cpf'):
-        login = await login_crud.get_login_by_cpf(session, user.cpf)
-        login.cpf = update_data['cpf']
-        login = {"id": login.id, "position": login.position, "password": login.password, "cpf": login.cpf}
         user.cpf = update_data['cpf']
-        await login_crud.update_login(session, login)
     return convert_user_to_dict(user)

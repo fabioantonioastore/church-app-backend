@@ -9,6 +9,7 @@ from controller.src.user import (get_user_client_data, get_update_data,
 from schemas.user import UpdateUserModel, UpgradeUserPosition
 from controller.errors.http.exceptions import unauthorized, bad_request, internal_server_error
 from controller.validators.cpf import CPFValidator
+from controller.auth import jwt
 
 router = APIRouter()
 user_crud = UserCrud()
@@ -20,7 +21,7 @@ async def get_user_data(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
     return user
 
-@router.put("/me", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+@router.put("/me", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
@@ -33,7 +34,7 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
         await login_crud.create_login(session, login)
     else:
         await user_crud.update_user(session, await get_update_data(user, user_data))
-    return {"user updated"}
+    return jwt.create_access_token(user_data['cpf'], user.position)
 
 @router.patch('/user/upgrade/position', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def patch_upgrade_user_position(position_data: UpgradeUserPosition, user: dict = Depends(verify_user_access_token)):

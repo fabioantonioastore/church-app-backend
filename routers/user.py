@@ -19,7 +19,7 @@ community_crud = CommunityCrud()
 @router.get('/me', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_user_data(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
-    return get_user_client_data(user)
+    return await get_user_client_data(user)
 
 @router.put("/me", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):

@@ -19,7 +19,7 @@ community_crud = CommunityCrud()
 @router.get('/me', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_user_data(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
-    return user
+    return get_user_client_data(user)
 
 @router.put("/me", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
@@ -34,7 +34,7 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
         await login_crud.create_login(session, login)
     else:
         await user_crud.update_user(session, await get_update_data(user, user_data))
-    return jwt.create_access_token(user_data['cpf'], user.position)
+    return {"access_token": jwt.create_access_token(user_data['cpf'], user.position)}
 
 @router.patch('/user/upgrade/position', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def patch_upgrade_user_position(position_data: UpgradeUserPosition, user: dict = Depends(verify_user_access_token)):

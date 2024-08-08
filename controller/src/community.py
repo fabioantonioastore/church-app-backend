@@ -1,6 +1,18 @@
 from models.community import Community
 from uuid import uuid4
 
+def get_users_friendly_data(users) -> list[dict]:
+    users_list = []
+    for user in users:
+        new_user = {
+            "name": user.name,
+            "birthday": user.birthday,
+            "email": user.email,
+            "cpf": user.cpf
+        }
+        users_list.append(new_user)
+    return users_list
+
 def get_patrons(communities: [Community]) -> list:
     return [community.patron for community in communities]
 

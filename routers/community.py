@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, Depends
 from controller.crud.community import CommunityCrud
 from database.session import session
 from controller.src.community import (get_patrons, create_community_data, get_community_client_data,
-                                      convert_to_dict, update_community_data)
+                                      convert_to_dict, update_community_data, get_users_friendly_data)
 from routers.middleware.authorization import verify_user_access_token
 from schemas.community import (CreateCommunityModel, UpdateCommunityModel)
 from controller.src.user import is_parish_leader, is_council_member
@@ -56,6 +56,15 @@ async def deactivate_community(community_patron: str, user: dict = Depends(verif
             await community_crud.update_community(session, community)
             return {"community deactivate"}
     raise unauthorized("You can't deactivate this community")
+
+@router.get('/community/{community_patron}/users', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+async def get_community_users(community_patron: str, user: dict = Depends(verify_user_access_token)):
+    if is_council_member(user['position']) or is_parish_leader(user['position']):
+        user = await user_crud.get_user_by_cpf(session, user['cpf'])
+        community = await community_crud.get_community_by_patron(session, community_patron)
+        if user.community_id == community.id:
+            return get_users_friendly_data(community.users)
+    raise unauthorized("You can't access this content")
 
 @router.patch('/community/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def active_community(community_patron: str, user: dict = Depends(verify_user_access_token)):

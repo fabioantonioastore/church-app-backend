@@ -13,3 +13,4 @@ class Community(Base):
     image = mapped_column(LargeBinary)
     active = mapped_column(Boolean, default=True)
     warnings = relationship('Warning', cascade='all, delete-orphan')
+    users = relationship('User')

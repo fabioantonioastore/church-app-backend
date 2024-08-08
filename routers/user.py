@@ -10,6 +10,9 @@ from schemas.user import UpdateUserModel, UpgradeUserPosition
 from controller.errors.http.exceptions import unauthorized, bad_request, internal_server_error
 from controller.validators.cpf import CPFValidator
 from controller.auth import jwt
+from models.login import Login
+from uuid import uuid4
+from controller.auth.password import hash_pasword
 
 router = APIRouter()
 user_crud = UserCrud()
@@ -31,6 +34,12 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
         user = await get_update_data(user, user_data)
         await login_crud.delete_login(session, login)
         login.cpf = user['cpf']
+        login = Login(
+            id = str(uuid4()),
+            cpf = login.cpf,
+            password = login.password,
+            position = login.position
+        )
         await user_crud.update_user(session, user)
         await login_crud.create_login(session, login)
     else:

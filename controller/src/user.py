@@ -105,6 +105,6 @@ async def get_update_data(user: User, update_data: dict) -> dict:
         login = {"id": login.id, "position": login.position, "password": login.password, "cpf": login.cpf}
         await login_crud.update_login(session, login)
     if update_data.get('cpf'):
-        CPFValidator(user['cpf'])
+        CPFValidator(update_data['cpf'])
         user.cpf = update_data['cpf']
     return convert_user_to_dict(user)

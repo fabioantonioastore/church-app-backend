@@ -8,6 +8,7 @@ from controller.src.user import (get_user_client_data, get_update_data,
                                  is_parish_leader, upgrade_user_position, convert_user_to_dict)
 from schemas.user import UpdateUserModel, UpgradeUserPosition
 from controller.errors.http.exceptions import unauthorized, bad_request, internal_server_error
+from controller.validators.cpf import CPFValidator
 
 router = APIRouter()
 user_crud = UserCrud()
@@ -23,11 +24,14 @@ async def get_user_data(user: dict = Depends(verify_user_access_token)):
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
-    login = await login_crud.get_login_by_cpf(session, user.cpf)
-    await login_crud.delete_login(session, login)
-    login.cpf = user_data['cpf']
-    await user_crud.update_user(session, await get_update_data(user, user_data))
-    await login_crud.create_login(session, login)
+    if user_data.get('cpf'):
+        login = await login_crud.get_login_by_cpf(session, user.cpf)
+        await login_crud.delete_login(session, login)
+        login.cpf = user_data['cpf']
+        await user_crud.update_user(session, await get_update_data(user, user_data))
+        await login_crud.create_login(session, login)
+    else:
+        await user_crud.update_user(session, await get_update_data(user, user_data))
     return {"user updated"}
 
 @router.patch('/user/upgrade/position', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])

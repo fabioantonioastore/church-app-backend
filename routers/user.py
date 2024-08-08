@@ -28,7 +28,7 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
     if user_data.get('cpf'):
         CPFValidator(user_data['cpf'])
         login = await login_crud.get_login_by_cpf(session, user.cpf)
-        user = await get_user_data(user, user_data)
+        user = await get_update_data(user, user_data)
         await login_crud.delete_login(session, login)
         login.cpf = user['cpf']
         await user_crud.update_user(session, user)

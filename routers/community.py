@@ -15,7 +15,7 @@ community_crud = CommunityCrud()
 user_crud = UserCrud()
 
 @router.get('/community/list', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
-async def communities_list(user: dict = Depends(verify_user_access_token)):
+async def communities_list():
     communities = await community_crud.get_all_communities(session)
     return get_community_list(communities)
 
@@ -33,7 +33,7 @@ async def create_community(community: CreateCommunityModel, user: dict = Depends
     # raise unauthorized("You can't create the community")
 
 @router.get('/community/{community_patron}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
-async def get_community_info(community_patron: str, user: dict = Depends(verify_user_access_token)):
+async def get_community_info(community_patron: str):
     community = await community_crud.get_community_by_patron(session, community_patron)
     return get_community_client_data(community)
 

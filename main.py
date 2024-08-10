@@ -69,7 +69,7 @@ async def signup(sign_data: SignUp):
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
-    return {"access_token": jwt.create_access_token(user.cpf)}
+    return {"access_token": jwt.create_access_token(user.cpf, position='council member')}
 
 @app.post('/parish')
 async def signup(sign_data: SignUp):
@@ -88,5 +88,5 @@ async def signup(sign_data: SignUp):
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
-    return {"access_token": jwt.create_access_token(user.cpf)}
+    return {"access_token": jwt.create_access_token(user.cpf, position='parish member')}
     

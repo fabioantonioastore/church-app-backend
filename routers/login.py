@@ -7,7 +7,7 @@ from database.session import session
 from controller.crud.user import UserCrud
 from controller.src.user import create_user
 from controller.auth import jwt
-from controller.errors.http.exceptions import internal_server_error, bad_request, unauthorized
+from controller.errors.http.exceptions import internal_server_error, bad_request, not_acceptable
 from controller.src.user import convert_user_to_dict
 
 router = APIRouter()
@@ -20,7 +20,7 @@ async def signin(sign_data: SignIn):
     if await verify_user_login(sign_data):
         user = await user_crud.get_user_by_cpf(session, sign_data['cpf'])
         if user.position != "user":
-            raise unauthorized("You can't login here")
+            raise not_acceptable("You can't login here")
         if not(user.active):
             user.active = True
             user = convert_user_to_dict(user)

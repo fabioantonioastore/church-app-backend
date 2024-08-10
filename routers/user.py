@@ -19,16 +19,16 @@ user_crud = UserCrud()
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
 
-@router.get('/users/all', status_code=status.HTTP_200_OK)
+@router.get('/users/all', status_code=status.HTTP_200_OK, summary="Users", description="Get all users info")
 async def get_all_users():
     return await user_crud.get_all_users(session)
 
-@router.get('/me', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+@router.get('/me', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Get user token info")
 async def get_user_data(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
     return await get_user_client_data(user)
 
-@router.put("/me", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+@router.put("/me", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Update user info")
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
@@ -51,7 +51,7 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
         await user_crud.update_user(session, await get_update_data(user, user_data))
     return {"access_token": jwt.create_access_token(user_data['cpf'], user['position'])}
 
-@router.patch('/user/upgrade/position', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+@router.patch('/user/upgrade/position', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Upgrade user position")
 async def patch_upgrade_user_position(position_data: UpgradeUserPosition, user: dict = Depends(verify_user_access_token)):
     if is_parish_leader(user['position']):
         if position_data.position == "user" or position_data.position == "council member":
@@ -70,7 +70,7 @@ async def patch_upgrade_user_position(position_data: UpgradeUserPosition, user: 
         else: raise bad_request(f"Rule {position_data.position} doesn't exist")
     raise unauthorized(f"You can't upgrade user position")
 
-@router.delete('/me/deactivate', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+@router.delete('/me/deactivate', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Deactivate user account")
 async def deactivate_user_account(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
     user.active = False
@@ -78,14 +78,18 @@ async def deactivate_user_account(user: dict = Depends(verify_user_access_token)
     await user_crud.update_user(session, user)
     return {"user account deactivate, do login again to activate"}
 
-@router.get('/users/{cpf}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+@router.get('/users/{cpf}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Get user info by CPF")
 async def get_user_by_cpf(cpf: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, cpf)
     return await get_user_client_data(user)
 
-@router.delete('/users/{cpf}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+@router.delete('/users/{cpf}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Delete user by CPF")
 async def delete_user_by_cpf(cpf: str, user: dict = Depends(verify_user_access_token)):
     login = await login_crud.get_login_by_cpf(session, cpf)
     await login_crud.delete_login(session, login)
     user = await user_crud.get_user_by_cpf(session, cpf)
     await user_crud.delete_user(session, user)
+
+@router.patch('/users/downgrade/position', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Downgrade user position")
+async def downgrade_user_position(user_data, user: dict = Depends(verify_user_access_token)):
+    pass

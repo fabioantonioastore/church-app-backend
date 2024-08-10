@@ -13,7 +13,7 @@ router = APIRouter()
 warning_crud = WarningCrud()
 user_crud = UserCrud()
 
-@router.get('/community/warnings', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+@router.get('/community/warnings', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Get all community warnings")
 async def get_ten_community_warnings(total: int = Query(10, ge=1, le=20), user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
     warnings = await warning_crud.get_warning_by_community_id(session, user.community_id, total)
@@ -22,7 +22,7 @@ async def get_ten_community_warnings(total: int = Query(10, ge=1, le=20), user: 
         new_warning.append(get_warning_client_data(warning))
     return new_warning
 
-@router.get('/community/warnings/{warning_id}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+@router.get('/community/warnings/{warning_id}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Get warning by id")
 async def get_community_warning(warning_id: str | None = None, user: dict = Depends(verify_user_access_token)):
     if warning_id == None: raise bad_request(f"No warning was send")
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
@@ -30,7 +30,7 @@ async def get_community_warning(warning_id: str | None = None, user: dict = Depe
     if user.community_id != warning.community_id: raise not_found("Warning not found")
     return get_warning_client_data(warning)
 
-@router.post('/community/warnings', status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_user_access_token)])
+@router.post('/community/warnings', status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Create a warning")
 async def create_community_warning(warning: CreateWarningModel, user: dict = Depends(verify_user_access_token)):
     if is_parish_leader(user['position']) or is_council_member(user['position']):
         user = await user_crud.get_user_by_cpf(session, user['cpf'])
@@ -41,7 +41,7 @@ async def create_community_warning(warning: CreateWarningModel, user: dict = Dep
         return get_warning_client_data(warning)
     raise unauthorized(f"You can't create a warning")
 
-@router.put('/community/warnings/{warning_id}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+@router.put('/community/warnings/{warning_id}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Update a warning by id")
 async def update_community_warning(warning: UpdateWarningModel, warning_id: str, user: dict = Depends(verify_user_access_token)):
     if is_parish_leader(user['position']) or is_council_member(user['position']):
         warning = dict(warning)
@@ -53,7 +53,7 @@ async def update_community_warning(warning: UpdateWarningModel, warning_id: str,
             return get_warning_client_data(warning)
     raise unauthorized(f"You can't update this warning")
 
-@router.delete('/community/warnings/{warning_id}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+@router.delete('/community/warnings/{warning_id}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Delete a warning by id")
 async def delete_community_warning(warning_id: str, user: dict = Depends(verify_user_access_token)):
     if is_parish_leader(user['position']) or is_council_member(user['position']):
         user = await user_crud.get_user_by_cpf(session, user['cpf'])

@@ -14,7 +14,7 @@ router = APIRouter()
 login_crud = LoginCrud()
 user_crud = UserCrud()
 
-@router.post("/signin", status_code=status.HTTP_200_OK)
+@router.post("/signin", status_code=status.HTTP_200_OK, summary="Login", description="Do Sign In")
 async def signin(sign_data: SignIn):
     sign_data = dict(sign_data)
     if await verify_user_login(sign_data):
@@ -28,7 +28,7 @@ async def signin(sign_data: SignIn):
         return {"access_token": jwt.create_access_token(sign_data['cpf'])}
     return bad_request("Password or CPF is not correct")
 
-@router.post("/admin/sign", status_code=status.HTTP_200_OK)
+@router.post("/admin/sign", status_code=status.HTTP_200_OK, summary="Login", description="Do Sign In for admin account")
 async def sign_in_admin(sign_data: SignInAdmin):
     sign_data = dict(sign_data)
     if await verify_admin_login(sign_data):
@@ -40,7 +40,7 @@ async def sign_in_admin(sign_data: SignInAdmin):
         return {"access_token": jwt.create_access_token(sign_data['cpf'], sign_data['position'])}
     return bad_request("Password or CPF is not correct")
 
-@router.post("/signup", status_code=status.HTTP_201_CREATED)
+@router.post("/signup", status_code=status.HTTP_201_CREATED, summary="Login", description="Create user account")
 async def signup(sign_data: SignUp):
     sign_data = dict(sign_data)
     SignUpValidator(sign_data)

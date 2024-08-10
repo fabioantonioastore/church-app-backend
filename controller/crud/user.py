@@ -4,6 +4,24 @@ from models.user import User
 from controller.errors.http.exceptions import not_found
 
 class UserCrud:
+    async def get_all_users(self, async_session: async_sessionmaker[AsyncSession]):
+        async with async_session() as session:
+            try:
+                statement = select(User)
+                users = await session.execute(statement)
+                return users.scalars().all()
+            except Exception as error:
+                raise not_found(f"A error occurs during CRUD: {error!r}")
+
+    async def get_users_by_community_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str):
+        async with async_session() as session:
+            try:
+                statement = select(User).filter(User.community_id == community_id)
+                users = await session.execute(statement)
+                return users.scalars().all()
+            except Exception as error:
+                raise not_found(f"A error occurs during CRUD: {error!r}")
+
     async def get_user_by_id(self, async_session: async_sessionmaker[AsyncSession], user_id: str):
         async with async_session() as session:
             try:

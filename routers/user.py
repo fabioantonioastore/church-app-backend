@@ -19,6 +19,10 @@ user_crud = UserCrud()
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
 
+@router.get('/users/all', status_code=status.HTTP_200_OK)
+async def get_all_users():
+    return await user_crud.get_all_users(session)
+
 @router.get('/me', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_user_data(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
@@ -73,3 +77,7 @@ async def deactivate_user_account(user: dict = Depends(verify_user_access_token)
     user = convert_user_to_dict(user)
     await user_crud.update_user(session, user)
     return {"user account deactivate, do login again to activate"}
+
+@router.get('/user/{cpf}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+async def get_user_by_cpf(cpf: str, user: dict = Depends(verify_user_access_token)):
+    return user_crud.get_user_by_cpf(session, cpf)

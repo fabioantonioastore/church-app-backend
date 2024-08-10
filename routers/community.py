@@ -9,6 +9,7 @@ from schemas.community import (CreateCommunityModel, UpdateCommunityModel)
 from controller.src.user import is_parish_leader, is_council_member
 from controller.errors.http.exceptions import unauthorized
 from controller.crud.user import UserCrud
+from controller.src.user import return_user_name_and_cpf
 
 router = APIRouter()
 community_crud = CommunityCrud()
@@ -64,8 +65,9 @@ async def get_community_users(community_patron: str, user: dict = Depends(verify
     #if is_council_member(user['position']) or is_parish_leader(user['position']):
     #user = await user_crud.get_user_by_cpf(session, user['cpf'])
     community = await community_crud.get_community_by_patron(session, community_patron)
+    users = await user_crud.get_users_by_community_id(session, community.id)
         #if user.community_id == community.id:
-    return get_users_friendly_data(community.users)
+    return return_user_name_and_cpf(users)
     #raise unauthorized("You can't access this content")
 
 @router.patch('/community/active/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])

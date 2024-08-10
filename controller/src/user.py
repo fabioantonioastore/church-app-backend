@@ -57,6 +57,7 @@ async def get_user_client_data(user: User) -> dict:
     user_data['community'] = await get_community_patron(user.community_id)
     user_data['email'] = user.email
     user_data['cpf'] = user.cpf
+    user_data['active'] = user.active
 
     return user_data
 

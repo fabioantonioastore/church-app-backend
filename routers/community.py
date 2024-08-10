@@ -47,7 +47,7 @@ async def update_community(community_patron: str, community_data: UpdateCommunit
     await community_crud.update_community(session, update_community_data(community, community_data))
     return {"community updated"}
     #raise unauthorized("You can't update community")
-@router.delete('/community/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+@router.delete('/community/deactive/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def deactivate_community(community_patron: str, user: dict = Depends(verify_user_access_token)):
     #if is_parish_leader(user['position']):
     #user = await user_crud.get_user_by_cpf(session, user['cpf'])
@@ -68,7 +68,7 @@ async def get_community_users(community_patron: str, user: dict = Depends(verify
     return get_users_friendly_data(community.users)
     #raise unauthorized("You can't access this content")
 
-@router.patch('/community/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+@router.patch('/community/active/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def active_community(community_patron: str, user: dict = Depends(verify_user_access_token)):
     #if is_parish_leader(user['position']):
     #user = await user_crud.get_user_by_cpf(session, user['cpf'])

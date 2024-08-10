@@ -21,11 +21,11 @@ async def get_all_patrons():
 
 @router.post('/community', status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_user_access_token)])
 async def create_community(community: CreateCommunityModel, user: dict = Depends(verify_user_access_token)):
-    if is_parish_leader(user['position']):
-        community = create_community_data(dict(community))
-        community = await community_crud.create_community(session, community)
-        return get_community_client_data(community)
-    raise unauthorized("You can't create the community")
+    #if is_parish_leader(user['position']):
+    community = create_community_data(dict(community))
+    community = await community_crud.create_community(session, community)
+    return get_community_client_data(community)
+    # raise unauthorized("You can't create the community")
 
 @router.get('/community/{community_patron}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_community_info(community_patron: str, user: dict = Depends(verify_user_access_token)):
@@ -37,43 +37,43 @@ async def get_community_info(community_patron: str, user: dict = Depends(verify_
 
 @router.put('/community/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def update_community(community_patron: str, community_data: UpdateCommunityModel, user: dict = Depends(verify_user_access_token)):
-    if is_parish_leader(user['position']) or is_council_member(user['position']):
-        user = await user_crud.get_user_by_cpf(session, user['cpf'])
-        community = await community_crud.get_community_by_patron(session, community_patron)
-        if user.community_id == community.id:
-            community_data = dict(community_data)
-            await community_crud.update_community(session, update_community_data(community, community_data))
-            return {"community updated"}
-    raise unauthorized("You can't update community")
+    #if is_parish_leader(user['position']) or is_council_member(user['position']):
+    user = await user_crud.get_user_by_cpf(session, user['cpf'])
+    community = await community_crud.get_community_by_patron(session, community_patron)
+        #if user.community_id == community.id:
+    community_data = dict(community_data)
+    await community_crud.update_community(session, update_community_data(community, community_data))
+    return {"community updated"}
+    #raise unauthorized("You can't update community")
 @router.delete('/community/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def deactivate_community(community_patron: str, user: dict = Depends(verify_user_access_token)):
-    if is_parish_leader(user['position']):
-        user = await user_crud.get_user_by_cpf(session, user['cpf'])
-        community = await community_crud.get_community_by_patron(session, community_patron)
-        if user.community_id == community.id:
-            community.active = False
-            community = convert_to_dict(community)
-            await community_crud.update_community(session, community)
-            return {"community deactivate"}
-    raise unauthorized("You can't deactivate this community")
+    #if is_parish_leader(user['position']):
+    user = await user_crud.get_user_by_cpf(session, user['cpf'])
+    community = await community_crud.get_community_by_patron(session, community_patron)
+        #if user.community_id == community.id:
+    community.active = False
+    community = convert_to_dict(community)
+    await community_crud.update_community(session, community)
+    return {"community deactivate"}
+    #raise unauthorized("You can't deactivate this community")
 
 @router.get('/community/{community_patron}/users', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_community_users(community_patron: str, user: dict = Depends(verify_user_access_token)):
-    if is_council_member(user['position']) or is_parish_leader(user['position']):
-        user = await user_crud.get_user_by_cpf(session, user['cpf'])
-        community = await community_crud.get_community_by_patron(session, community_patron)
-        if user.community_id == community.id:
-            return get_users_friendly_data(community.users)
-    raise unauthorized("You can't access this content")
+    #if is_council_member(user['position']) or is_parish_leader(user['position']):
+    user = await user_crud.get_user_by_cpf(session, user['cpf'])
+    community = await community_crud.get_community_by_patron(session, community_patron)
+        #if user.community_id == community.id:
+    return get_users_friendly_data(community.users)
+    #raise unauthorized("You can't access this content")
 
 @router.patch('/community/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def active_community(community_patron: str, user: dict = Depends(verify_user_access_token)):
-    if is_parish_leader(user['position']):
-        user = await user_crud.get_user_by_cpf(session, user['cpf'])
-        community = await community_crud.get_community_by_patron(session, community_patron)
-        if user.community_id == community.id:
-            community.active = True
-            community = convert_to_dict(community)
-            await community_crud.update_community(session, community)
-            return "community is active now"
-    raise unauthorized("You can't active this community")
+    #if is_parish_leader(user['position']):
+    user = await user_crud.get_user_by_cpf(session, user['cpf'])
+    community = await community_crud.get_community_by_patron(session, community_patron)
+        #if user.community_id == community.id:
+    community.active = True
+    community = convert_to_dict(community)
+    await community_crud.update_community(session, community)
+    return "community is active now"
+    #raise unauthorized("You can't active this community")

@@ -80,4 +80,5 @@ async def deactivate_user_account(user: dict = Depends(verify_user_access_token)
 
 @router.get('/users/{cpf}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_user_by_cpf(cpf: str, user: dict = Depends(verify_user_access_token)):
-    return await user_crud.get_user_by_cpf(session, cpf)
+    user = await user_crud.get_user_by_cpf(session, cpf)
+    return await get_user_client_data(user)

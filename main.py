@@ -16,6 +16,7 @@ from controller.errors.http.exceptions import internal_server_error, bad_request
 from controller.validators.sign_validator import SignUpValidator
 from controller.crud.login import LoginCrud
 from controller.src.login import create_login
+from controller.src.user import create_user
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
@@ -68,7 +69,7 @@ async def signup(sign_data: SignUp):
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
-    return {"access_token": jwt.create_access_token(get_plain_cpf(user.cpf))}
+    return {"access_token": jwt.create_access_token(user.cpf)}
 
 @app.post('/parish')
 async def signup(sign_data: SignUp):
@@ -87,5 +88,5 @@ async def signup(sign_data: SignUp):
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
-    return {"access_token": jwt.create_access_token(get_plain_cpf(user.cpf))}
+    return {"access_token": jwt.create_access_token(user.cpf)}
     

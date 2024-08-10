@@ -82,3 +82,10 @@ async def deactivate_user_account(user: dict = Depends(verify_user_access_token)
 async def get_user_by_cpf(cpf: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, cpf)
     return await get_user_client_data(user)
+
+@router.delete('/users/{cpf}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+async def delete_user_by_cpf(cpf: str, user: dict = Depends(verify_user_access_token)):
+    login = await login_crud.get_login_by_cpf(session, cpf)
+    await login_crud.delete_login(session, login)
+    user = await user_crud.get_user_by_cpf(session, cpf)
+    await user_crud.delete_user(session, user)

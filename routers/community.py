@@ -38,7 +38,7 @@ async def get_community_info(community_patron: str, user: dict = Depends(verify_
 @router.put('/community/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def update_community(community_patron: str, community_data: UpdateCommunityModel, user: dict = Depends(verify_user_access_token)):
     #if is_parish_leader(user['position']) or is_council_member(user['position']):
-    user = await user_crud.get_user_by_cpf(session, user['cpf'])
+    #user = await user_crud.get_user_by_cpf(session, user['cpf'])
     community = await community_crud.get_community_by_patron(session, community_patron)
         #if user.community_id == community.id:
     community_data = dict(community_data)
@@ -48,7 +48,7 @@ async def update_community(community_patron: str, community_data: UpdateCommunit
 @router.delete('/community/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def deactivate_community(community_patron: str, user: dict = Depends(verify_user_access_token)):
     #if is_parish_leader(user['position']):
-    user = await user_crud.get_user_by_cpf(session, user['cpf'])
+    #user = await user_crud.get_user_by_cpf(session, user['cpf'])
     community = await community_crud.get_community_by_patron(session, community_patron)
         #if user.community_id == community.id:
     community.active = False
@@ -60,7 +60,7 @@ async def deactivate_community(community_patron: str, user: dict = Depends(verif
 @router.get('/community/{community_patron}/users', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_community_users(community_patron: str, user: dict = Depends(verify_user_access_token)):
     #if is_council_member(user['position']) or is_parish_leader(user['position']):
-    user = await user_crud.get_user_by_cpf(session, user['cpf'])
+    #user = await user_crud.get_user_by_cpf(session, user['cpf'])
     community = await community_crud.get_community_by_patron(session, community_patron)
         #if user.community_id == community.id:
     return get_users_friendly_data(community.users)
@@ -69,7 +69,7 @@ async def get_community_users(community_patron: str, user: dict = Depends(verify
 @router.patch('/community/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def active_community(community_patron: str, user: dict = Depends(verify_user_access_token)):
     #if is_parish_leader(user['position']):
-    user = await user_crud.get_user_by_cpf(session, user['cpf'])
+    #user = await user_crud.get_user_by_cpf(session, user['cpf'])
     community = await community_crud.get_community_by_patron(session, community_patron)
         #if user.community_id == community.id:
     community.active = True

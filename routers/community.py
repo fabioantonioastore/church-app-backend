@@ -31,9 +31,9 @@ async def create_community(community: CreateCommunityModel, user: dict = Depends
 async def get_community_info(community_patron: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
     community = await community_crud.get_community_by_patron(session, community_patron)
-    if user.community_id == community.id:
-        return get_community_client_data(community)
-    raise unauthorized(f"You can't access this community")
+    #if user.community_id == community.id:
+    return get_community_client_data(community)
+    #raise unauthorized(f"You can't access this community")
 
 @router.put('/community/{community_patron}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def update_community(community_patron: str, community_data: UpdateCommunityModel, user: dict = Depends(verify_user_access_token)):

@@ -76,9 +76,9 @@ async def signup(sign_data: SignUp):
     sign_data = dict(sign_data)
     SignUpValidator(sign_data)
     user = await create_user(sign_data)
-    user.position = "parish member"
+    user.position = "parish leader"
     login = create_login(sign_data)
-    login.position = "parish member"
+    login.position = "parish leader"
     try:
         await user_crud.create_user(session, user)
         try:
@@ -88,5 +88,5 @@ async def signup(sign_data: SignUp):
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
-    return {"access_token": jwt.create_access_token(user.cpf, position='parish member')}
+    return {"access_token": jwt.create_access_token(user.cpf, position='parish leader')}
     

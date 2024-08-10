@@ -16,6 +16,9 @@ def get_users_friendly_data(users) -> list[dict]:
 def get_patrons(communities: [Community]) -> list:
     return [community.patron for community in communities]
 
+def get_community_list(communities: [Community]) -> list:
+    return [{"patron": community.patron, "location": community.location} for community in communities]
+
 def create_community_data(community_data: dict) -> Community:
     community = Community()
     for key in community_data:

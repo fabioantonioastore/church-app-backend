@@ -1,10 +1,11 @@
 from controller.algorithms.node import Node
 from copy import deepcopy
+from typing import Any, NoReturn
 
 class Stack():
     total_stacks: int = 0
     total_instances: int = 0
-    def __init__(self):
+    def __init__(self) -> NoReturn:
         self.first = None
         self.last = None
         self.size = 0
@@ -19,10 +20,10 @@ class Stack():
     def get_total_instances(cls) -> int:
         return cls.total_instances
 
-    def __del__(self):
+    def __del__(self) -> NoReturn:
         Stack.total_stacks -= 1
 
-    def add(self, value = None):
+    def add(self, value: Any = None) -> NoReturn:
         value = deepcopy(value)
         node = Node(value)
         self.size += 1
@@ -53,7 +54,7 @@ class Stack():
             yield deepcopy(node.get_value())
             node = node.get_next()
 
-    def pop(self):
+    def pop(self) -> Any:
         if self.first is None: return
         self.size -= 1
         if self.first is self.last:
@@ -71,5 +72,5 @@ class Stack():
     def get_size(self) -> int:
         return self.size
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "Stack()"

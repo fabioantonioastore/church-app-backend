@@ -1,10 +1,11 @@
 from controller.algorithms.node import Node
 from copy import deepcopy
+from typing import Any, NoReturn
 
 class Queue:
     total_queues: int = 0
     total_instances: int = 0
-    def __init__(self):
+    def __init__(self) -> NoReturn:
         self.first = None
         self.last = None
         self.size = 0
@@ -19,10 +20,10 @@ class Queue:
     def get_total_instances(cls) -> int:
         return cls.total_instances
 
-    def __del__(self):
+    def __del__(self) -> NoReturn:
         Queue.total_queues -= 1
 
-    def add(self, value = None):
+    def add(self, value: Any = None) -> NoReturn:
         value = deepcopy(value)
         node = Node(value)
         self.size += 1
@@ -39,7 +40,7 @@ class Queue:
         node.put_prev(self.last)
         self.last = node
 
-    def pop(self):
+    def pop(self) -> Any:
         if self.first is None: return
         value = self.first.get_value()
         self.size -= 1
@@ -70,5 +71,5 @@ class Queue:
     def get_size(self) -> int:
         return self.size
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "Queue()"

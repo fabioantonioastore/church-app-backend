@@ -24,7 +24,7 @@ async def get_ten_community_warnings(total: int = Query(10, ge=1, le=20), user: 
 
 @router.get('/community/warnings/{warning_id}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Get warning by id")
 async def get_community_warning(warning_id: str | None = None, user: dict = Depends(verify_user_access_token)):
-    if warning_id == None: raise bad_request(f"No warning was send")
+    #if warning_id == None: raise bad_request(f"No warning was send")
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
     warning = await warning_crud.get_warning_by_id(session, warning_id)
     #if user.community_id != warning.community_id: raise not_found("Warning not found")

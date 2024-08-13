@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select
 from models.warning import Warning
-from controller.errors.http.exceptions import not_found
+from controller.errors.http.exceptions import not_found, internal_server_error
 from datetime import datetime
 
 class WarningCrud:
@@ -23,7 +23,7 @@ class WarningCrud:
                 return warnings.scalars().all()
             except Exception as error:
                 await session.rollback()
-                raise not_found(f"A error occurs during CRUD: {error!r}")
+                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
 
     async def create_warning(self, async_session: async_sessionmaker[AsyncSession], warning: Warning):
         async with async_session() as session:

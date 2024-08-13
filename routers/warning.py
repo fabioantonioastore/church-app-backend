@@ -1,6 +1,7 @@
 from fastapi import APIRouter, status, Depends, Query
 from controller.crud.warning import WarningCrud
 from controller.crud.user import UserCrud
+from controller.crud.community import CommunityCrud
 from routers.middleware.authorization import verify_user_access_token
 from database.session import session
 from controller.errors.http.exceptions import bad_request, not_found
@@ -12,11 +13,13 @@ from controller.errors.http.exceptions import unauthorized
 router = APIRouter()
 warning_crud = WarningCrud()
 user_crud = UserCrud()
+community_crud = CommunityCrud()
 
-@router.get('/community/warnings', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Get all community warnings")
-async def get_ten_community_warnings(user: dict = Depends(verify_user_access_token)):
+@router.get('/community/warnings/{community_patron}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Get all community warnings")
+async def get_ten_community_warnings(community_patron: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
-    warnings = await warning_crud.get_warning_by_community_id(session, user.community_id)
+    community = await community_crud.get_community_by_patron(session, community_patron)
+    warnings = await warning_crud.get_warning_by_community_id(session, community.id)
     new_warning = []
     for warning in warnings:
         new_warning.append(get_warning_client_data(warning))

@@ -14,7 +14,7 @@ warning_crud = WarningCrud()
 user_crud = UserCrud()
 
 @router.get('/community/warnings', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Get all community warnings")
-async def get_ten_community_warnings(total: int = Query(10, ge=1, le=20), user: dict = Depends(verify_user_access_token)):
+async def get_ten_community_warnings(total: int = Query(1, ge=1, le=20), user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
     warnings = await warning_crud.get_warning_by_community_id(session, user.community_id, total)
     new_warning = []

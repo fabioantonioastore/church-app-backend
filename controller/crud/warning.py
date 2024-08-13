@@ -15,7 +15,7 @@ class WarningCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_warning_by_community_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str, total_warnings: int = 10):
+    async def get_warning_by_community_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str, total_warnings: int = 1):
         async with async_session() as session:
             try:
                 statement = select(Warning).filter(Warning.community_id == community_id).limit(total_warnings)

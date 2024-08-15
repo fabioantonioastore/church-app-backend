@@ -9,6 +9,7 @@ from schemas.warning import CreateWarningModel, UpdateWarningModel
 from controller.src.warning import create_warning, get_warning_client_data
 from controller.src.user import is_parish_leader, is_council_member
 from controller.errors.http.exceptions import unauthorized
+from controller.validators.warning import WarningValidator
 
 router = APIRouter()
 warning_crud = WarningCrud()
@@ -38,6 +39,7 @@ async def create_community_warning(warning: CreateWarningModel, user: dict = Dep
     #if is_parish_leader(user['position']) or is_council_member(user['position']):
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
     warning = dict(warning)
+    WarningValidator(warning)
     warning['community_id'] = user.community_id
     warning = await create_warning(warning)
     warning = await warning_crud.create_warning(session, warning)
@@ -49,6 +51,7 @@ async def update_community_warning(warning: UpdateWarningModel, warning_id: str,
     #if is_parish_leader(user['position']) or is_council_member(user['position']):
     warning = dict(warning)
     warning['id'] = warning_id
+    WarningValidator(warning)
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
     db_warning = await warning_crud.get_warning_by_id(session, warning['id'])
     #if user.community_id == db_warning.community_id:

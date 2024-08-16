@@ -12,7 +12,6 @@ from controller.validators.cpf import CPFValidator
 from controller.auth import jwt
 from models.login import Login
 from uuid import uuid4
-from controller.auth.password import hash_pasword
 
 router = APIRouter()
 user_crud = UserCrud()
@@ -89,7 +88,3 @@ async def delete_user_by_cpf(cpf: str, user: dict = Depends(verify_user_access_t
     await login_crud.delete_login(session, login)
     user = await user_crud.get_user_by_cpf(session, cpf)
     await user_crud.delete_user(session, user)
-
-@router.patch('/users/downgrade/position', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Downgrade user position")
-async def downgrade_user_position(user_data, user: dict = Depends(verify_user_access_token)):
-    pass

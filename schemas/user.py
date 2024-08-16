@@ -41,13 +41,15 @@ class UpdateUserModel(BaseModel):
 class UpgradeUserPosition(BaseModel):
     cpf: str
     position: str
+    responsibility: str | None = None
 
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={
             "example": {
                 "cpf": "cpf of the user",
-                "position": "new position of the user"
+                "position": "new position of the user",
+                "responsibility": "resposibility of the user or None"
             }
         }
     )

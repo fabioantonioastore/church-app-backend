@@ -83,6 +83,8 @@ def upgrade_user_position(user: User, login: Login, position: str):
 
     user = convert_user_to_dict(user)
     user['position'] = position
+    if user['position'] == 'user':
+        user['responsibility'] = None
     login = upgrade_login_position(login, position)
 
     return Data(user=user, login=login)

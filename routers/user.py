@@ -6,7 +6,7 @@ from controller.crud.community import CommunityCrud
 from database.session import session
 from controller.src.user import (get_user_client_data, get_update_data, is_council_member,
                                  is_parish_leader, upgrade_user_position, convert_user_to_dict)
-from schemas.user import UpdateUserModel, UpgradeUserPosition
+from schemas.user import UpdateUserModel, UpgradeUserPositionResponsability
 from controller.errors.http.exceptions import unauthorized, bad_request, internal_server_error
 from controller.validators.cpf import CPFValidator
 from controller.auth import jwt
@@ -50,23 +50,20 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
         await user_crud.update_user(session, await get_update_data(user, user_data))
     return {"access_token": jwt.create_access_token(user_data['cpf'], user['position'])}
 
-@router.patch('/user/upgrade/position', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Upgrade user position")
-async def patch_upgrade_user_position(position_data: UpgradeUserPosition, user: dict = Depends(verify_user_access_token)):
+@router.patch('/user/upgrade/position_and_responsability', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Upgrade user position")
+async def patch_upgrade_user_position(position_data: UpgradeUserPositionResponsability, user: dict = Depends(verify_user_access_token)):
     #if is_parish_leader(user['position']) or is_council_member(user['position']):
-    if position_data.position == "user" or position_data.position == "council member":
-        user = await user_crud.get_user_by_cpf(session, position_data.cpf)
-        login = await login_crud.get_login_by_cpf(session, position_data.cpf)
-        data = upgrade_user_position(user, login, position_data.position)
-        try:
-            await user_crud.update_user(session, data.user)
-            try:
-                await login_crud.update_login(session, data.login)
-            except Exception as error:
-                raise internal_server_error(f"Database failed to update: {error!r}")
-        except Exception as error:
-            raise internal_server_error(f"Database failed to update: {error!r}")
-        return {"position upgraded"}
-    else: raise bad_request(f"Rule {position_data.position} doesn't exist")
+    if position_data.position == "user":
+        await user_crud.upgrade_user(session, position_data.cpf, position_data.position, "faithful")
+        return
+    if position_data.position == "council member":
+        if position_data.responsibility:
+            await user_crud.upgrade_user(session, position_data.cpf, position_data.position, position_data.responsibility)
+            return
+        else:
+            await user_crud.upgrade_user(session, position_data.cpf, position_data.position, "member")
+            return
+    raise bad_request(f"Rule {position_data.position!r} doesn't exists")
     #raise unauthorized(f"You can't upgrade user position")
 
 @router.delete('/me/deactivate', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Deactivate user account")

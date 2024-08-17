@@ -14,6 +14,19 @@ class UserCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
+    async def upgrade_user(self, async_session: async_sessionmaker[AsyncSession], cpf: str, position: str, responsability: str):
+        async with async_session() as session:
+            try:
+                statement = select(User).filter(User.cpf == cpf)
+                user = await session.execute(statement)
+                user = user.scalars().one()
+                user.position = position
+                user.responsibility = responsability
+                await session.commit()
+                return user
+            except Exception as error:
+                raise not_found(f"A error occurs during CRUD: {error!r}")
+
     async def get_all_community_council_and_parish(self, async_session: async_sessionmaker[AsyncSession], community_id: str):
         async with async_session() as session:
             try:

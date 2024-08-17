@@ -38,7 +38,7 @@ class UpdateUserModel(BaseModel):
         }
     )
 
-class UpgradeUserPosition(BaseModel):
+class UpgradeUserPositionResponsability(BaseModel):
     cpf: str
     position: str
     responsibility: str | None = "member"

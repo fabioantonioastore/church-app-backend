@@ -68,8 +68,8 @@ async def is_council_member(position: str) -> bool:
 async def is_parish_leader(position: str) -> bool:
     return position == "parish leader"
 
-def return_user_name_and_cpf(users: [User]) -> list[dict]:
-    return [{"name": user.name, "cpf": user.cpf} for user in users]
+def return_user_name_and_cpf_and_position(users: [User]) -> list[dict]:
+    return [{"name": user.name, "cpf": user.cpf, "position": user.position} for user in users]
 
 def convert_user_to_dict(user: User) -> dict:
     new_user = {'id': user.id, 'name': user.name, 'image': user.image, 'position': user.position,

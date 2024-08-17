@@ -55,13 +55,16 @@ async def patch_upgrade_user_position(position_data: UpgradeUserPositionResponsa
     #if is_parish_leader(user['position']) or is_council_member(user['position']):
     if position_data.position == "user":
         await user_crud.upgrade_user(session, position_data.cpf, position_data.position, "faithful")
+        await login_crud.update_position(session, position_data.cpf, position_data.position)
         return
     if position_data.position == "council member":
         if position_data.responsibility:
             await user_crud.upgrade_user(session, position_data.cpf, position_data.position, position_data.responsibility)
+            await login_crud.update_position(session, position_data.cpf, position_data.position)
             return
         else:
             await user_crud.upgrade_user(session, position_data.cpf, position_data.position, "member")
+            await login_crud.update_position(session, position_data.cpf, position_data.position)
             return
     raise bad_request(f"Rule {position_data.position!r} doesn't exists")
     #raise unauthorized(f"You can't upgrade user position")
@@ -79,8 +82,8 @@ async def get_user_by_cpf(cpf: str, user: dict = Depends(verify_user_access_toke
     user = await user_crud.get_user_by_cpf(session, cpf)
     return await get_user_client_data(user)
 
-@router.delete('/users/{cpf}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Delete user by CPF")
-async def delete_user_by_cpf(cpf: str, user: dict = Depends(verify_user_access_token)):
+@router.delete('/users/{cpf}', status_code=status.HTTP_204_NO_CONTENT, summary="Users", description="Delete user by CPF")
+async def delete_user_by_cpf(cpf: str):
     login = await login_crud.get_login_by_cpf(session, cpf)
     await login_crud.delete_login(session, login)
     user = await user_crud.get_user_by_cpf(session, cpf)

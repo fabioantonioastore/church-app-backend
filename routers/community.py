@@ -84,7 +84,7 @@ async def active_community(community_patron: str, user: dict = Depends(verify_us
     #raise unauthorized("You can't active this community")
 
 @router.get('/community/{community_patron}/councils', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
-async def get_community_council_members(community_patron: str, user: dict = verify_user_access_token):
+async def get_community_council_members(community_patron: str, user: dict = Depends(verify_user_access_token)):
     community = await community_crud.get_community_by_patron(session, community_patron)
     users = await user_crud.get_all_community_council_and_parish(session, community.id)
     if user['position'] == "user":

@@ -23,7 +23,7 @@ async def signin(sign_data: SignIn):
             user.active = True
             user = convert_user_to_dict(user)
             await user_crud.update_user(session, user)
-        return {"access_token": jwt.create_access_token(sign_data['cpf'])}
+        return {"access_token": jwt.create_access_token(sign_data['cpf'], user.position)}
     return bad_request("Password or CPF is not correct")
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED, summary="Login", description="Create user account")

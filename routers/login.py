@@ -19,25 +19,11 @@ async def signin(sign_data: SignIn):
     sign_data = dict(sign_data)
     if await verify_user_login(sign_data):
         user = await user_crud.get_user_by_cpf(session, sign_data['cpf'])
-        if user.position != "user":
-            raise not_acceptable("You can't login here")
         if not(user.active):
             user.active = True
             user = convert_user_to_dict(user)
             await user_crud.update_user(session, user)
         return {"access_token": jwt.create_access_token(sign_data['cpf'])}
-    return bad_request("Password or CPF is not correct")
-
-@router.post("/admin/sign", status_code=status.HTTP_200_OK, summary="Login", description="Do Sign In for admin account")
-async def sign_in_admin(sign_data: SignInAdmin):
-    sign_data = dict(sign_data)
-    if await verify_admin_login(sign_data):
-        user = await user_crud.get_user_by_cpf(session, sign_data['cpf'])
-        if not(user.active):
-            user.active = True
-            user = convert_user_to_dict(user)
-            await user_crud.update_user(session, user)
-        return {"access_token": jwt.create_access_token(sign_data['cpf'], sign_data['position'])}
     return bad_request("Password or CPF is not correct")
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED, summary="Login", description="Create user account")

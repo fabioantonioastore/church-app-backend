@@ -2,7 +2,6 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy import select, and_, or_
 from models.user import User
 from controller.errors.http.exceptions import not_found
-from controller.auth.cpf import decrypt, encrypt
 
 class UserCrud:
     async def get_all_users(self, async_session: async_sessionmaker[AsyncSession]):

@@ -1,17 +1,16 @@
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes
-from base64 import urlsafe_b64encode, urlsafe_b64decode
+import base64
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
+CRYPTO_KEY = os.getenv("CRYPTO_KEY")
 
-PASSWORD = os.getenv("CRYPTO_KEY")
-
-def generate_key(password, salt):
+def derive_key(password: str, salt: bytes) -> bytes:
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+    from cryptography.hazmat.primitives import hashes
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
@@ -21,32 +20,30 @@ def generate_key(password, salt):
     )
     return kdf.derive(password.encode())
 
-def encrypt(plaintext: str, password: str = PASSWORD):
+def encrypt(message: str, password: str = CRYPTO_KEY) -> str:
     salt = os.urandom(16)
-    key = generate_key(password, salt)
-    iv = os.urandom(16)
-    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+    key = derive_key(password, salt)
+    nonce = os.urandom(12)
+    cipher = Cipher(algorithms.AES(key), modes.GCM(nonce), backend=default_backend())
+    encryptor = cipher.encryptor()
 
     padder = padding.PKCS7(algorithms.AES.block_size).padder()
-    padded_data = padder.update(plaintext.encode()) + padder.finalize()
+    padded_message = padder.update(message.encode()) + padder.finalize()
 
-    encryptor = cipher.encryptor()
-    ciphertext = encryptor.update(padded_data) + encryptor.finalize()
+    encrypted_message = encryptor.update(padded_message) + encryptor.finalize()
+    encrypted_data = salt + nonce + encryptor.tag + encrypted_message
+    return base64.b64encode(encrypted_data).decode('utf-8')
 
-    return urlsafe_b64encode(salt + iv + ciphertext).decode('utf-8')
-
-def decrypt(ciphertext: str, password: str = PASSWORD):
-    data = urlsafe_b64decode(ciphertext)
-    salt = data[:16]
-    iv = data[16:32]
-    ciphertext = data[32:]
-    key = generate_key(password, salt)
-    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
-
+def decrypt(encrypted_message: str, password: str = CRYPTO_KEY) -> str:
+    encrypted_data = base64.b64decode(encrypted_message)
+    salt, nonce, tag, encrypted_message = encrypted_data[:16], encrypted_data[16:28], encrypted_data[
+                                                                                      28:44], encrypted_data[44:]
+    key = derive_key(password, salt)
+    cipher = Cipher(algorithms.AES(key), modes.GCM(nonce, tag), backend=default_backend())
     decryptor = cipher.decryptor()
-    padded_data = decryptor.update(ciphertext) + decryptor.finalize()
 
+    padded_message = decryptor.update(encrypted_message) + decryptor.finalize()
     unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
-    plaintext = unpadder.update(padded_data) + unpadder.finalize()
+    decrypted_message = unpadder.update(padded_message) + unpadder.finalize()
 
-    return plaintext.decode('utf-8')
+    return decrypted_message.decode('utf-8')

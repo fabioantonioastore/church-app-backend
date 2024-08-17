@@ -2,7 +2,6 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select
 from models.login import Login
 from controller.errors.http.exceptions import not_found
-from controller.auth.cpf import encrypt, decrypt
 
 class LoginCrud:
     async def update_position(self, async_session: async_sessionmaker[AsyncSession], cpf: str, position: str):

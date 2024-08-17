@@ -41,7 +41,7 @@ class UpdateUserModel(BaseModel):
 class UpgradeUserPosition(BaseModel):
     cpf: str
     position: str
-    responsibility: str | None = "faithful"
+    responsibility: str | None = "member"
 
     model_config = ConfigDict(
         from_attributes=True,

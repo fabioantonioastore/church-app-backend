@@ -14,5 +14,5 @@ class User(Base):
     image = mapped_column(LargeBinary, nullable=True)
     active = mapped_column(Boolean, default=True)
     community_id = mapped_column(String, ForeignKey('communities.id'))
-    responsibility = mapped_column(String, nullable=True)
+    responsibility = mapped_column(String, default="faithful")
     payments = relationship('Payment')

@@ -6,7 +6,8 @@ from controller.src.community import (get_patrons, create_community_data, get_co
                                       get_community_list)
 from routers.middleware.authorization import verify_user_access_token
 from schemas.community import (CreateCommunityModel, UpdateCommunityModel)
-from controller.src.user import is_parish_leader, is_council_member
+from controller.src.user import (is_parish_leader, is_council_member, get_user_name_and_responsability,
+                                 get_user_name_and_responsability_and_cpf)
 from controller.errors.http.exceptions import unauthorized
 from controller.crud.user import UserCrud
 from controller.src.user import return_user_name_and_cpf
@@ -81,3 +82,13 @@ async def active_community(community_patron: str, user: dict = Depends(verify_us
     await community_crud.update_community(session, community)
     return "community is active now"
     #raise unauthorized("You can't active this community")
+
+@router.get('/community/{community_patron}/councils', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+async def get_community_council_members(community_patron: str, user: dict = verify_user_access_token):
+    community = await community_crud.get_community_by_patron(session, community_patron)
+    users = await user_crud.get_all_community_council_and_parish(session, community.id)
+    if user['position'] == "user":
+        return get_user_name_and_responsability(users)
+    if is_parish_leader(user['position']) or is_council_member(user['position']):
+        return get_user_name_and_responsability_and_cpf(users)
+    raise unauthorized("You can't access this")

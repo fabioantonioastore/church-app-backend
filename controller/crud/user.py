@@ -11,8 +11,18 @@ class UserCrud:
                 users = await session.execute(statement)
                 return users.scalars().all()
             except Exception as error:
+                await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
+    async def get_all_community_council_and_parish(self, async_session: async_sessionmaker[AsyncSession], community_id: str):
+        async with async_session() as session:
+            try:
+                statement = select(User).filter(User.community_id == community_id and (User.position == "parish leader" or User.position == "council member"))
+                users = await session.execute(statement)
+                return users.scalars().all()
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")
     async def get_users_by_community_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str):
         async with async_session() as session:
             try:

@@ -77,6 +77,12 @@ def convert_user_to_dict(user: User) -> dict:
                 'active': user.active}
     return new_user
 
+def get_user_name_and_responsability(users: [User]) -> list[dict]:
+    return [{"name": user.name, "responsability": user.responsibility} for user in users]
+
+def get_user_name_and_responsability_and_cpf(users: [User]) -> list[dict]:
+    return [{"name": user.name, "responsability": user.responsibility, "cpf": user.cpf} for user in users]
+
 def upgrade_user_position(user: User, login: Login, position: str):
     class Data(NamedTuple):
         user: dict

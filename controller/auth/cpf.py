@@ -19,7 +19,7 @@ def generate_key(password, salt):
         iterations=100000,
         backend=default_backend()
     )
-    return str(kdf.derive(password.encode()))
+    return kdf.derive(password.encode())
 
 def encrypt(plaintext: str, password: str = PASSWORD):
     salt = os.urandom(16)
@@ -33,7 +33,7 @@ def encrypt(plaintext: str, password: str = PASSWORD):
     encryptor = cipher.encryptor()
     ciphertext = encryptor.update(padded_data) + encryptor.finalize()
 
-    return str(urlsafe_b64encode(salt + iv + ciphertext).decode('utf-8'))
+    return urlsafe_b64encode(salt + iv + ciphertext).decode('utf-8')
 
 def decrypt(ciphertext: str, password: str = PASSWORD):
     data = urlsafe_b64decode(ciphertext)
@@ -49,4 +49,4 @@ def decrypt(ciphertext: str, password: str = PASSWORD):
     unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
     plaintext = unpadder.update(padded_data) + unpadder.finalize()
 
-    return str(plaintext.decode('utf-8'))
+    return plaintext.decode('utf-8')

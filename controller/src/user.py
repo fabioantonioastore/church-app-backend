@@ -58,6 +58,7 @@ async def get_user_client_data(user: User) -> dict:
     user_data['email'] = user.email
     user_data['cpf'] = user.cpf
     user_data['active'] = user.active
+    user_data['responsibility'] = user.responsibility
 
     return user_data
 

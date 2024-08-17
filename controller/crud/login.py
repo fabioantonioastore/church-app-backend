@@ -8,13 +8,11 @@ class LoginCrud:
     async def update_position(self, async_session: async_sessionmaker[AsyncSession], cpf: str, position: str):
         async with async_session() as session:
             try:
-                cpf = encrypt(cpf)
                 statement = select(Login).filter(Login.cpf == cpf)
                 login = await session.execute(statement)
                 login = login.scalars().one()
                 login.position = position
                 await session.commit()
-                login.cpf = decrypt(cpf)
                 return login
             except Exception as error:
                 await session.rollback()
@@ -25,9 +23,7 @@ class LoginCrud:
             try:
                 statement = select(Login).filter(Login.id == login_id)
                 login = await session.execute(statement)
-                login = login.scalars().one()
-                login.cpf = decrypt(login.cpf)
-                return login
+                return login.scalars().one()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -35,12 +31,9 @@ class LoginCrud:
     async def get_login_by_cpf(self, async_session: async_sessionmaker[AsyncSession], login_cpf: str):
         async with async_session() as session:
             try:
-                login_cpf = encrypt(login_cpf)
                 statement = select(Login).filter(Login.cpf == login_cpf)
                 login = await session.execute(statement)
-                login = login.scalars().one()
-                login.cpf = decrypt(login.cpf)
-                return login
+                return login.scalars().one()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -48,10 +41,8 @@ class LoginCrud:
     async def create_login(self, async_session: async_sessionmaker[AsyncSession], login: Login):
         async with async_session() as session:
             try:
-                login.cpf = encrypt(login.cpf)
                 session.add(login)
                 await session.commit()
-                login.cpf = decrypt(login.cpf)
                 return login
             except Exception as error:
                 await session.rollback()
@@ -60,8 +51,6 @@ class LoginCrud:
     async def update_login(self, async_session: async_sessionmaker[AsyncSession], new_login: dict):
         async with async_session() as session:
             try:
-                if new_login.get('cpf'):
-                    new_login['cpf'] = encrypt(new_login['cpf'])
                 statement = select(Login).filter(Login.id == new_login['id'])
                 login = await session.execute(statement)
                 login = login.scalars().one()
@@ -72,7 +61,6 @@ class LoginCrud:
                         case 'position':
                             login.profile = new_login['position']
                 await session.commit()
-                login.cpf = decrypt(login.cpf)
                 return login
             except Exception as error:
                 await session.rollback()

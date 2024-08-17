@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy import select, and_, or_
 from models.user import User
 from controller.errors.http.exceptions import not_found
+from controller.auth.cpf import decrypt, encrypt
 
 class UserCrud:
     async def get_all_users(self, async_session: async_sessionmaker[AsyncSession]):
@@ -9,7 +10,10 @@ class UserCrud:
             try:
                 statement = select(User)
                 users = await session.execute(statement)
-                return users.scalars().all()
+                users = users.scalars().all()
+                for user in users:
+                    user.cpf = decrypt(user.cpf)
+                return users
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -17,7 +21,7 @@ class UserCrud:
     async def upgrade_user(self, async_session: async_sessionmaker[AsyncSession], cpf: str, position: str, responsability: str):
         async with async_session() as session:
             try:
-                statement = select(User).filter(User.cpf == cpf)
+                statement = select(User).filter(User.cpf == encrypt(cpf))
                 user = await session.execute(statement)
                 user = user.scalars().one()
                 user.position = position
@@ -40,7 +44,9 @@ class UserCrud:
                     )
                 )
                 users = await session.execute(statement)
-                return users.scalars().all()
+                users = users.scalars().all()
+                for user in users:
+                    user.cpf = decrypt(user.cpf)
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -49,7 +55,10 @@ class UserCrud:
             try:
                 statement = select(User).filter(User.community_id == community_id)
                 users = await session.execute(statement)
-                return users.scalars().all()
+                users = users.scalars().all()
+                for user in users:
+                    user.cpf = decrypt(user.cpf)
+                return users
             except Exception as error:
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
@@ -58,7 +67,9 @@ class UserCrud:
             try:
                 statement = select(User).filter(User.id == user_id)
                 user = await session.execute(statement)
-                return user.scalars().one()
+                user = user.scalars().one()
+                user.cpf = decrypt(user.cpf)
+                return user
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -66,6 +77,7 @@ class UserCrud:
     async def get_user_by_cpf(self, async_session: async_sessionmaker[AsyncSession], user_cpf: str):
         async with async_session() as session:
             try:
+                user_cpf = encrypt(user_cpf)
                 statement = select(User).filter(User.cpf == user_cpf)
                 user = await session.execute(statement)
                 return user.scalars().one()
@@ -76,6 +88,7 @@ class UserCrud:
     async def create_user(self, async_session: async_sessionmaker[AsyncSession], user: User):
         async with async_session() as session:
             try:
+                user.cpf = encrypt(user.cpf)
                 session.add(user)
                 await session.commit()
                 return user
@@ -92,7 +105,7 @@ class UserCrud:
                 for key in new_user.keys():
                     match key:
                         case 'cpf':
-                            user.cpf = new_user['cpf']
+                            user.cpf = encrypt(new_user['cpf'])
                         case 'name':
                             user.name = new_user['name']
                         case 'birthday':
@@ -106,6 +119,7 @@ class UserCrud:
                         case 'active':
                             user.active = new_user['active']
                 await session.commit()
+                user.cpf = decrypt(user.cpf)
                 return user
             except Exception as error:
                 await session.rollback()

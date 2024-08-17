@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from sqlalchemy import select
+from sqlalchemy import select, and_, or_
 from models.user import User
 from controller.errors.http.exceptions import not_found
 
@@ -17,7 +17,15 @@ class UserCrud:
     async def get_all_community_council_and_parish(self, async_session: async_sessionmaker[AsyncSession], community_id: str):
         async with async_session() as session:
             try:
-                statement = select(User).filter(User.community_id == community_id and (User.position == "parish leader" or User.position == "council member"))
+                statement = select(User).filter(
+                    and_(
+                        User.community_id == community_id,
+                        or_(
+                            User.position == "parish leader",
+                            User.position == "council member"
+                        )
+                    )
+                )
                 users = await session.execute(statement)
                 return users.scalars().all()
             except Exception as error:

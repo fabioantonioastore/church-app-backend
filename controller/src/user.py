@@ -41,6 +41,8 @@ async def create_user(user_data: dict) -> User:
             case "community":
                 user_data['community'] = await get_community_id(user_data['community'])
                 user.community_id = user_data['community']
+            case "responsibility":
+                user.responsibility = user_data['responsibility']
     user.id = str(uuid4())
     return user
 

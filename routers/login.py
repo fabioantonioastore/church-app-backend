@@ -36,9 +36,9 @@ async def signup(sign_data: SignUp):
         await user_crud.create_user(session, user)
         try:
             await login_crud.create_login(session, login)
-        except:
+        except Exception as error:
             await user_crud.delete_user(session, user)
-            raise internal_server_error("Database failed to create user")
-    except:
-        raise bad_request("User already exist")
+            raise internal_server_error(f"Database failed to create user: {error!r}")
+    except Exception as error:
+        raise bad_request(f"User already exist: {error!r}")
     return {"access_token": jwt.create_access_token(user.cpf)}

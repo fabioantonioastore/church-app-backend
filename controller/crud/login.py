@@ -4,6 +4,19 @@ from models.login import Login
 from controller.errors.http.exceptions import not_found
 
 class LoginCrud:
+    async def update_password(self, async_session: async_sessionmaker[AsyncSession], cpf: str, password: str):
+        async with async_session() as session:
+            try:
+                statement = select(Login).filter(Login.cpf == cpf)
+                login = await session.execute(statement)
+                login = login.scalars().one()
+                login.password = password
+                await session.commit()
+                return login
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")
+
     async def update_position(self, async_session: async_sessionmaker[AsyncSession], cpf: str, position: str):
         async with async_session() as session:
             try:

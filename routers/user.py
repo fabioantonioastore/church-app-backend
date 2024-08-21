@@ -31,6 +31,7 @@ async def get_user_data(user: dict = Depends(verify_user_access_token)):
 @router.put("/me", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Update user info")
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
+    user_cpf = user['cpf']
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
     if user_data.get('cpf'):
         CPFValidator(user_data['cpf'])
@@ -51,6 +52,9 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
         await user_crud.update_user(session, user)
         await login_crud.create_login(session, login)
     else:
+        if user_data.get('password'):
+            password = hash_pasword(user_data['password'])
+            await login_crud.update_password(session, user_cpf, password)
         await user_crud.update_user(session, await get_update_data(user, user_data))
     return {"access_token": jwt.create_access_token(user_data['cpf'], user.position)}
 

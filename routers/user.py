@@ -32,6 +32,9 @@ async def get_user_data(user: dict = Depends(verify_user_access_token)):
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
     user_cpf = user['cpf']
+    the_position = user['position']
+    if user_data.get('position'):
+        the_position = user_data['position']
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
     if user_data.get('cpf'):
         CPFValidator(user_data['cpf'])
@@ -49,6 +52,7 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
             password = password,
             position = login.position
         )
+        the_position = login.position
         await user_crud.update_user(session, user)
         await login_crud.create_login(session, login)
     else:
@@ -56,7 +60,7 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
             password = hash_pasword(user_data['password'])
             await login_crud.update_password(session, user_cpf, password)
         await user_crud.update_user(session, await get_update_data(user, user_data))
-    return {"access_token": jwt.create_access_token(user_data['cpf'], user.position)}
+    return {"access_token": jwt.create_access_token(user_data['cpf'], the_position)}
 
 @router.patch('/user/upgrade/position_and_responsability', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Upgrade user position")
 async def patch_upgrade_user_position(position_data: UpgradeUserPositionResponsability, user: dict = Depends(verify_user_access_token)):

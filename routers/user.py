@@ -31,37 +31,25 @@ async def get_user_data(user: dict = Depends(verify_user_access_token)):
 @router.put("/me", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Update user info")
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
-    user_cpf = user['cpf']
-    the_position = user['position']
-    if user_data.get('position'):
-        the_position = user_data['position']
-    user = await user_crud.get_user_by_cpf(session, user['cpf'])
+    login = await login_crud.get_login_by_cpf(session, user['cpf'])
+    await login_crud.delete_login(session, login)
+    new_login = Login()
+    new_login.id = str(uuid4())
     if user_data.get('cpf'):
-        CPFValidator(user_data['cpf'])
-        cpf = user.cpf
-        user = await get_update_data(user, user_data)
-        login = await login_crud.get_login_by_cpf(session, cpf)
-        await login_crud.delete_login(session, login)
-        login.cpf = user['cpf']
-        password = login.password
-        if user_data.get('password'):
-            password = hash_pasword(password)
-        login = Login(
-            id = str(uuid4()),
-            cpf = login.cpf,
-            password = password,
-            position = login.position
-        )
-        the_position = login.position
-        await user_crud.update_user(session, user)
-        await login_crud.create_login(session, login)
+        new_login.cpf = user_data['cpf']
     else:
-        if user_data.get('password'):
-            password = hash_pasword(user_data['password'])
-            await login_crud.update_password(session, user_cpf, password)
-        await user_crud.update_user(session, await get_update_data(user, user_data))
-    return {"access_token": jwt.create_access_token(user_data['cpf'], the_position)}
-
+        new_login.cpf = login.cpf
+    if user_data.get('position'):
+        new_login.position = user_data['position']
+    else:
+        new_login.position = login.position
+    if user_data.get('password'):
+        new_login.password = hash_pasword(user_data['password'])
+    else:
+        new_login.password = login.password
+    await login_crud.create_login(session, new_login)
+    await user_crud.update_user(session, user_data)
+    return jwt.create_access_token(new_login.cpf, new_login.position)
 @router.patch('/user/upgrade/position_and_responsability', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Upgrade user position")
 async def patch_upgrade_user_position(position_data: UpgradeUserPositionResponsability, user: dict = Depends(verify_user_access_token)):
     #if is_parish_leader(user['position']) or is_council_member(user['position']):

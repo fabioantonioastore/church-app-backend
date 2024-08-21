@@ -68,6 +68,8 @@ class LoginCrud:
                 login = login.scalars().one()
                 for key in new_login.keys():
                     match key:
+                        case 'cpf':
+                            login.cpf = new_login['cpf']
                         case 'password':
                             login.password = new_login['password']
                         case 'position':

@@ -31,25 +31,31 @@ async def get_user_data(user: dict = Depends(verify_user_access_token)):
 @router.put("/me", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Update user info")
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
+    user_obj = await user_crud.get_user_by_cpf(session, user['cpf'])
+    user_data['id'] = user_obj.id
     login = await login_crud.get_login_by_cpf(session, user['cpf'])
-    if user_data.get('cpf'):
-        login.cpf = user_data['cpf']
-    else:
-        login.cpf = login.cpf
+    new_login = Login()
+    new_login.id = str(uuid4())
     if user_data.get('position'):
-        login.position = user_data['position']
+        new_login.position = user_data['position']
     else:
-        login.position = login.position
+        new_login.position = login.position
     if user_data.get('password'):
-        login.password = hash_pasword(user_data['password'])
+        new_login.password = hash_pasword(user_data['password'])
     else:
-        login.password = login.password
-    try:
-        await user_crud.update_user(session, user_data)
-        await login_crud.update_login(session, login)
-        return jwt.create_access_token(login.cpf, login.position)
-    except Exception as error:
-        raise bad_request(f"Data already in use: {error!r}")
+        new_login.password = login.password
+    if user_data.get('cpf'):
+        new_login.cpf = user_data['cpf']
+    else:
+        login_update = user_data.copy()
+        login_update.pop('cpf')
+        login_update['id'] = login.id
+        login_update = await login_crud.update_login(session, login_update)
+        return {"access_token": jwt.create_access_token(login_update.cpf, login_update.position)}
+    await login_crud.delete_login(session, login)
+    await user_crud.update_user(session, user_data)
+    await login_crud.create_login(session, new_login)
+    return {"access_token": jwt.create_access_token(new_login.cpf, new_login.position)}
 @router.patch('/user/upgrade/position_and_responsability', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Upgrade user position")
 async def patch_upgrade_user_position(position_data: UpgradeUserPositionResponsability, user: dict = Depends(verify_user_access_token)):
     #if is_parish_leader(user['position']) or is_council_member(user['position']):

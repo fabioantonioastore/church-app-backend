@@ -32,28 +32,24 @@ async def get_user_data(user: dict = Depends(verify_user_access_token)):
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
     login = await login_crud.get_login_by_cpf(session, user['cpf'])
-    await login_crud.delete_login(session, login)
-    new_login = Login()
-    new_login.id = str(uuid4())
     if user_data.get('cpf'):
-        new_login.cpf = user_data['cpf']
+        login.cpf = user_data['cpf']
     else:
-        new_login.cpf = login.cpf
+        login.cpf = login.cpf
     if user_data.get('position'):
-        new_login.position = user_data['position']
+        login.position = user_data['position']
     else:
-        new_login.position = login.position
+        login.position = login.position
     if user_data.get('password'):
-        new_login.password = hash_pasword(user_data['password'])
+        login.password = hash_pasword(user_data['password'])
     else:
-        new_login.password = login.password
+        login.password = login.password
     try:
         await user_crud.update_user(session, user_data)
-        await login_crud.create_login(session, new_login)
-    except:
-        await login_crud.create_login(session, login)
+        await login_crud.update_login(session, login)
         return jwt.create_access_token(login.cpf, login.position)
-    return jwt.create_access_token(new_login.cpf, new_login.position)
+    except Exception as error:
+        raise bad_request(f"Data already in use: {error!r}")
 @router.patch('/user/upgrade/position_and_responsability', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Upgrade user position")
 async def patch_upgrade_user_position(position_data: UpgradeUserPositionResponsability, user: dict = Depends(verify_user_access_token)):
     #if is_parish_leader(user['position']) or is_council_member(user['position']):

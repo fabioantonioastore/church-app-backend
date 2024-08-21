@@ -47,8 +47,12 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
         new_login.password = hash_pasword(user_data['password'])
     else:
         new_login.password = login.password
-    await login_crud.create_login(session, new_login)
-    await user_crud.update_user(session, user_data)
+    try:
+        await user_crud.update_user(session, user_data)
+        await login_crud.create_login(session, new_login)
+    except:
+        await login_crud.create_login(session, login)
+        return jwt.create_access_token(login.cpf, login.position)
     return jwt.create_access_token(new_login.cpf, new_login.position)
 @router.patch('/user/upgrade/position_and_responsability', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Upgrade user position")
 async def patch_upgrade_user_position(position_data: UpgradeUserPositionResponsability, user: dict = Depends(verify_user_access_token)):

@@ -22,7 +22,11 @@ community_crud = CommunityCrud()
 
 @router.get('/users/all', status_code=status.HTTP_200_OK, summary="Users", description="Get all users info")
 async def get_all_users():
-    return await user_crud.get_all_users(session)
+    users = await user_crud.get_all_users(session)
+    for user in users:
+        community = await community_crud.get_community_by_id(session, user.community_id)
+        user.community_id = community.patron
+    return users
 
 @router.get('/me', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Get user token info")
 async def get_user_data(user: dict = Depends(verify_user_access_token)):

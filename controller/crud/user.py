@@ -2,6 +2,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy import select, and_, or_
 from models.user import User
 from controller.errors.http.exceptions import not_found
+from controller.crud.community import CommunityCrud
+from database.session import session as db_session
+
+community_crud = CommunityCrud()
 
 class UserCrud:
     async def get_all_users(self, async_session: async_sessionmaker[AsyncSession]):
@@ -105,6 +109,9 @@ class UserCrud:
                             user.image = new_user['image']
                         case 'active':
                             user.active = new_user['active']
+                        case 'community_patron':
+                            community = await community_crud.get_community_by_id(db_session, new_user['community_patron'])
+                            user.community_id = community.id
                 await session.commit()
                 return user
             except Exception as error:

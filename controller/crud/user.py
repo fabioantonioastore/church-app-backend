@@ -96,7 +96,8 @@ class UserCrud:
                 for key in new_user.keys():
                     match key:
                         case 'cpf':
-                            user.cpf = new_user['cpf']
+                            if new_user['cpf'] != user.cpf:
+                                user.cpf = new_user['cpf']
                         case 'name':
                             user.name = new_user['name']
                         case 'birthday':
@@ -110,7 +111,7 @@ class UserCrud:
                         case 'active':
                             user.active = new_user['active']
                         case 'community_patron':
-                            community = await community_crud.get_community_by_id(db_session, new_user['community_patron'])
+                            community = await community_crud.get_community_by_patron(db_session, new_user['community_patron'])
                             user.community_id = community.id
                 await session.commit()
                 return user

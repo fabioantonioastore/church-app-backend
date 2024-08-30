@@ -14,6 +14,7 @@ from models.login import Login
 from uuid import uuid4
 from controller.auth.password import hash_pasword
 from datetime import datetime
+from controller.validators.phone import PhoneValidator
 
 router = APIRouter()
 user_crud = UserCrud()
@@ -37,6 +38,8 @@ async def get_user_data(user: dict = Depends(verify_user_access_token)):
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
     CPFValidator(user_data['cpf'])
+    if user_data.get('phone'):
+        PhoneValidator(user_data['phone'])
     user = await user_crud.get_user_by_cpf(session, user['cpf'])
     user_data['id'] = user.id
     user_data['birthday'] = datetime.strptime(user_data['birthday'], "%Y-%m-%d")

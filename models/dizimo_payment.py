@@ -7,7 +7,6 @@ class DizimoPayment(Base):
 
     id = mapped_column(String, primary_key=True)
     correlation_id = mapped_column(String, nullable=True, unique=True)
-    identifier = mapped_column(String, nullable=True, unique=True)
     date = mapped_column(DateTime, nullable=True)
     month = mapped_column(String)
     year = mapped_column(Integer)

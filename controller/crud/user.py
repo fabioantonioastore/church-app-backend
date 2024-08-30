@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy import select, and_, or_
 from models.user import User
+from models.dizimo_payment import DizimoPayment
 from controller.errors.http.exceptions import not_found
 from controller.crud.community import CommunityCrud
 from database.session import session as db_session
@@ -77,6 +78,16 @@ class UserCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
+    async def get_user_by_phone(self, async_session: async_sessionmaker[AsyncSession], phone: str) -> User:
+        async with async_session() as session:
+            try:
+                statement = select(User).filter(User.phone == phone)
+                user = await session.execute(statement)
+                return user.scalars().one()
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")
+
     async def create_user(self, async_session: async_sessionmaker[AsyncSession], user: User):
         async with async_session() as session:
             try:
@@ -102,8 +113,8 @@ class UserCrud:
                             user.name = new_user['name']
                         case 'birthday':
                             user.birthday = new_user['birthday']
-                        case 'email':
-                            user.email = new_user['email']
+                        case 'phone':
+                            user.phone = new_user['phone']
                         case 'community_id':
                             user.community_id = new_user['community_id']
                         case 'image':

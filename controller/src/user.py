@@ -10,7 +10,7 @@ from typing import NamedTuple
 from controller.validators.date import DateValidator
 from controller.validators.cpf import CPFValidator
 from controller.validators.name import NameValidator
-from controller.validators.email import EmailValidator
+from controller.validators.phone import PhoneValidator
 from controller.validators.password import PasswordValidator
 from controller.crud.login import LoginCrud
 from controller.auth.password import hash_pasword
@@ -34,8 +34,8 @@ async def create_user(user_data: dict) -> User:
                 user.position = user_data['position']
             case "birthday":
                 user.birthday = datetime.strptime(user_data['birthday'], "%Y-%m-%d")
-            case "email":
-                user.email = user_data['email']
+            case "phone":
+                user.phone = user_data['phone']
             case "image":
                 user.image = user_data['image']
             case "community":
@@ -57,7 +57,7 @@ async def get_user_client_data(user: User) -> dict:
     user_data['position'] = user.position
     user_data['image'] = user.image
     user_data['community'] = await get_community_patron(user.community_id)
-    user_data['email'] = user.email
+    user_data['phone'] = user.phone
     user_data['cpf'] = user.cpf
     user_data['active'] = user.active
     user_data['responsibility'] = user.responsibility
@@ -75,7 +75,7 @@ def return_user_name_and_cpf_and_position(users: [User]) -> list[dict]:
 
 def convert_user_to_dict(user: User) -> dict:
     new_user = {'id': user.id, 'name': user.name, 'image': user.image, 'position': user.position,
-                'community_id': user.community_id, 'birthday': user.birthday, 'cpf': user.cpf, 'email': user.email,
+                'community_id': user.community_id, 'birthday': user.birthday, 'cpf': user.cpf, 'phone': user.phone,
                 'active': user.active}
     return new_user
 
@@ -99,9 +99,9 @@ def upgrade_user_position(user: User, login: Login, position: str):
     return Data(user=user, login=login)
 
 async def get_update_data(user: User, update_data: dict) -> dict:
-    if update_data.get('email'):
-        EmailValidator(update_data['email'])
-        user.email = update_data['email']
+    if update_data.get('phone'):
+        PhoneValidator(update_data['phone'])
+        user.phone = update_data['phone']
     if update_data.get('name'):
         NameValidator(update_data['name'])
         user.name = update_data['name']

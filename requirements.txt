@@ -27,6 +27,7 @@ MarkupSafe==2.1.5
 mdurl==0.1.2
 orjson==3.10.6
 passlib==1.7.4
+phonenumbers==8.13.44
 pyasn1==0.6.0
 pycparser==2.22
 pydantic==2.8.2
@@ -39,6 +40,7 @@ python-jose==3.3.0
 python-multipart==0.0.9
 pytz==2024.1
 PyYAML==6.0.1
+requests==2.32.3
 rich==13.7.1
 rsa==4.9
 setuptools==70.3.0

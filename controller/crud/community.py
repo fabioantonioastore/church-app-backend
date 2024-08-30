@@ -75,7 +75,7 @@ class CommunityCrud:
                 await session.delete(community)
                 await session.commit()
                 return f"{community} deleted with successfull"
-            except:
+            except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 

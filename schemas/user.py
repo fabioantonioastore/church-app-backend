@@ -5,7 +5,7 @@ class UserModel(BaseModel):
     cpf: str
     name: str
     birthday: str
-    email: str
+    phone: str
     position: str
     image: str
     community_id: str
@@ -16,7 +16,7 @@ class CreateUserModel(UserModel):
 
 class UpdateUserModel(BaseModel):
     cpf: str
-    email: str
+    phone: str
     name: str
     community_patron: str
     password: str
@@ -28,7 +28,7 @@ class UpdateUserModel(BaseModel):
         json_schema_extra={
             "extra": {
                 "cpf": "new cpf of the user",
-                "email": "new email of the user",
+                "phone": "new phone of the user",
                 "name": "new name of the user",
                 "community_patron": "new community of the user",
                 "password": "new password of the user",

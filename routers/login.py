@@ -1,18 +1,21 @@
 from fastapi import APIRouter, status
-from schemas.sign import SignIn, SignUp, SignInAdmin
+from schemas.sign import SignIn, SignUp
 from controller.validators.sign_validator import SignUpValidator
-from controller.src.login import create_login, verify_user_login, verify_admin_login
+from controller.src.login import create_login, verify_user_login
 from controller.crud.login import LoginCrud
 from database.session import session
 from controller.crud.user import UserCrud
 from controller.src.user import create_user
 from controller.auth import jwt
-from controller.errors.http.exceptions import internal_server_error, bad_request, not_acceptable
+from controller.errors.http.exceptions import internal_server_error, bad_request
 from controller.src.user import convert_user_to_dict
+from controller.src.dizimo_payment import create_dizimo_payment
+from controller.crud.dizimo_payment import DizimoPaymentCrud
 
 router = APIRouter()
 login_crud = LoginCrud()
 user_crud = UserCrud()
+dizimo_payment_crud = DizimoPaymentCrud()
 
 @router.post("/signin", status_code=status.HTTP_200_OK, summary="Login", description="Do Sign In")
 async def signin(sign_data: SignIn):
@@ -41,4 +44,6 @@ async def signup(sign_data: SignUp):
             raise internal_server_error(f"Database failed to create user: {error!r}")
     except Exception as error:
         raise bad_request(f"User already exist: {error!r}")
+    dizimo_payment = await create_dizimo_payment(user)
+    await dizimo_payment_crud.create_payment(session, dizimo_payment)
     return {"access_token": jwt.create_access_token(user.cpf)}

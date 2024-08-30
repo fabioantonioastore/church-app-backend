@@ -5,6 +5,7 @@ import routers.user
 import routers.community
 import routers.login
 import routers.warning
+import routers.dizimo_payment
 from controller.auth import jwt
 from models.community import Community
 from controller.crud.community import CommunityCrud
@@ -46,6 +47,7 @@ app.include_router(routers.user.router)
 app.include_router(routers.community.router)
 app.include_router(routers.login.router)
 app.include_router(routers.warning.router)
+app.include_router(routers.dizimo_payment.router)
 
 @app.get('/communities')
 async def get_all():

@@ -3,6 +3,7 @@ from models.dizimo_payment import DizimoPayment
 from sqlalchemy import select, and_
 from controller.errors.http.exceptions import not_found, internal_server_error
 from controller.src.dizimo_payment import is_valid_payment_status
+from controller.src.dizimo_payment import pass_data_to
 
 class DizimoPaymentCrud:
     async def get_payment_by_id(self, async_session: async_sessionmaker[AsyncSession], payment_id: str) -> DizimoPayment:
@@ -133,6 +134,19 @@ class DizimoPaymentCrud:
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
+
+    async def complete_dizimo_payment(self, async_session: async_sessionmaker[AsyncSession], dizimo_payment: DizimoPayment) -> DizimoPayment:
+        async with async_session() as session:
+            try:
+                statement = select(DizimoPayment).filter(DizimoPayment.id == dizimo_payment.id)
+                actual_dizimo_payment = await session.execute(statement)
+                actual_dizimo_payment = actual_dizimo_payment.scalars().one()
+                actual_dizimo_payment = pass_data_to(dizimo_payment, actual_dizimo_payment)
+                await session.commit()
+                return actual_dizimo_payment
+            except Exception as error:
+                await session.rollback()
+                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
 
     async def delete_payment(self, async_session: async_sessionmaker[AsyncSession], payment: DizimoPayment) -> str:
         async with async_session() as session:

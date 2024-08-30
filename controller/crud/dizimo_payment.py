@@ -35,14 +35,6 @@ class DizimoPaymentCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def patch_status(self, async_session: async_sessionmaker[AsyncSession], payment_id: str, status: str) -> DizimoPayment:
-        async with async_session() as session:
-            try:
-                pass
-            except Exception as error:
-                await session.rollback()
-                raise not_found(f"A error occurs during CRUD: {error!r}")
-
     async def get_payments_by_year(self, async_session: async_sessionmaker[AsyncSession], year: int) -> [DizimoPayment]:
         async with async_session() as session:
             try:
@@ -134,6 +126,8 @@ class DizimoPaymentCrud:
                             payment.correlation_id = payment_data['correlation_id']
                         case "value":
                             payment.value = payment_data['value']
+                        case "identifier":
+                            payment.identifier = payment_data['identifier']
                 await session.commit()
                 return payment
             except Exception as error:

@@ -5,7 +5,7 @@ async def create_db():
     async with engine.begin() as conn:
         from models.user import User
         from models.login import Login
-        from models.payment import Payment
+        from models.dizimo_payment import DizimoPayment
         from models.warning import Warning
         from models.community import Community
 

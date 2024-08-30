@@ -1,5 +1,5 @@
 from models.user import User
-from models.payment import Payment
+from models.dizimo_payment import DizimoPayment
 from uuid import uuid4
 from datetime import datetime
 from controller.crud.community import CommunityCrud

@@ -1,5 +1,5 @@
 import uuid
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import routers.user
 import routers.community
@@ -17,12 +17,24 @@ from controller.validators.sign_validator import SignUpValidator
 from controller.crud.login import LoginCrud
 from controller.src.login import create_login
 from controller.src.user import create_user
+from apscheduler.schedulers.background import BackgroundScheduler
+from contextlib import asynccontextmanager
+from apscheduler.triggers.cron import CronTrigger
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
 user_crud = UserCrud()
+scheduler = BackgroundScheduler()
 
-app = FastAPI()
+@asynccontextmanager
+async def event_manager(app: FastAPI):
+    #scheduler.add_job()
+    scheduler.start()
+    yield
+    scheduler.shutdown()
+
+app = FastAPI(lifespan=event_manager)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -34,11 +46,6 @@ app.include_router(routers.user.router)
 app.include_router(routers.community.router)
 app.include_router(routers.login.router)
 app.include_router(routers.warning.router)
-
-@app.get("/")
-async def root():
-    access_token = jwt.create_access_token("hello@gmail.com")
-    return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get('/communities')
 async def get_all():

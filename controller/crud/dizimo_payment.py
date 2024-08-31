@@ -1,11 +1,24 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from models.dizimo_payment import DizimoPayment
 from sqlalchemy import select, and_
+from typing import AsyncIterator
 from controller.errors.http.exceptions import not_found, internal_server_error
 from controller.src.dizimo_payment import is_valid_payment_status
 from controller.src.dizimo_payment import pass_data_to
 
 class DizimoPaymentCrud:
+    async def get_all_user_dizimo_payment(self, async_session: async_sessionmaker[AsyncSession], user_id: str, page: int = 1, page_size: int = 100) -> AsyncIterator:
+        async with async_session() as session:
+            try:
+                offset = (page - 1) * page_size
+                statement = select(DizimoPayment).filter(DizimoPayment.user_id == user_id).offset(offset).limit(page_size)
+                dizimo_payments = await session.execute(statement)
+                dizimo_payments = dizimo_payments.scalars().all()
+                yield dizimo_payments
+            except Exception as error:
+                await session.rollback()
+                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
+
     async def get_payment_by_id(self, async_session: async_sessionmaker[AsyncSession], payment_id: str) -> DizimoPayment:
        async with async_session() as session:
            try:

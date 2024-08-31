@@ -1,4 +1,7 @@
+import json
+
 from fastapi import APIRouter, Depends, status
+from fastapi.responses import StreamingResponse
 from controller.crud.dizimo_payment import DizimoPaymentCrud
 from routers.middleware.authorization import verify_user_access_token
 from controller.crud.user import UserCrud
@@ -59,3 +62,14 @@ async def get_dizimo_payment_by_year_and_month(year: int, month: str, user: dict
     dizimo_payment = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(session, month, year, user.id)
     payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
     return get_pix_no_sensitive_data(payment)
+
+@router.get("/get_all_user_dizimo_payments", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+async def get_all_user_payments(user: dict = Depends(verify_user_access_token)):
+    user = await user_crud.get_user_by_cpf(session, user['cpf'])
+    async for dizimo_payments in dizimo_payment_crud.get_all_user_dizimo_payment(session, user.id):
+        async def dizimo_payment_generator():
+            for dizimo_payment in dizimo_payments:
+                payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
+                yield json.dumps(get_pix_no_sensitive_data(payment)) + "\n"
+
+    return StreamingResponse(dizimo_payment_generator(), media_type="application/json")

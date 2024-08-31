@@ -4,8 +4,8 @@ from routers.middleware.authorization import verify_user_access_token
 from controller.crud.user import UserCrud
 from database.session import session
 from uuid import uuid4
-from controller.src.dizimo_payment import dizimo_payment_is_paid, complete_dizimo_payment
-from controller.errors.http.exceptions import bad_request
+from controller.src.dizimo_payment import dizimo_payment_is_paid, complete_dizimo_payment, dizimo_payment_is_expired
+from controller.errors.http.exceptions import bad_request, not_acceptable
 from controller.src.pix_payment import (PixPayment, create_customer, make_post_pix_request,
                                         get_pix_no_sensitive_data, get_pix_payment_from_correlation_id,
                                         is_pix_active)
@@ -26,10 +26,12 @@ async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel, user:
     pix_data = dict(pix_data)
     month = pix_data['month']
     year = pix_data['year']
-    TIME = datetime.now() + timedelta(minutes=30)
     dizimo_payment = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(session, month, year, user.id)
+    TIME = datetime.now() + timedelta(minutes=30)
     if dizimo_payment_is_paid(dizimo_payment):
         raise bad_request(f"Payment already paid")
+    if dizimo_payment_is_expired(dizimo_payment):
+        raise not_acceptable(f"Payment is expired")
     if dizimo_payment.correlation_id:
         pix_payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
         if is_pix_active(pix_payment):

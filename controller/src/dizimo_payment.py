@@ -3,7 +3,7 @@ from models.user import User
 from uuid import uuid4
 from datetime import datetime
 
-STATUS = ("active", "late", "paid")
+STATUS = ("active", "expired", "paid")
 MONTHS = (
     "january",
     "february",
@@ -50,3 +50,6 @@ async def create_dizimo_payment(user: User) -> DizimoPayment:
     dizimo_payment.year = datetime.now().year
     dizimo_payment.month = convert_to_month(datetime.now().month)
     return dizimo_payment
+
+def dizimo_payment_is_expired(payment: DizimoPayment) -> bool:
+    return payment.status == "expired"

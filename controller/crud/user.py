@@ -2,14 +2,27 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy import select, and_, or_
 from models.user import User
 from models.dizimo_payment import DizimoPayment
-from controller.errors.http.exceptions import not_found
+from controller.errors.http.exceptions import not_found, internal_server_error
 from controller.crud.community import CommunityCrud
 from database.session import session as db_session
+from typing import AsyncIterator
 
 community_crud = CommunityCrud()
 
 class UserCrud:
-    async def get_all_users(self, async_session: async_sessionmaker[AsyncSession]):
+    async def get_users_paginated(self, async_session: async_sessionmaker[AsyncSession], page: int = 1, page_size: int = 100) -> AsyncIterator:
+        async with async_session() as session:
+            offset = (page - 1) * page_size
+            try:
+                statement = select(User).offset(offset).limit(page_size)
+                users = await session.execute(statement)
+                users = users.scalars().all()
+                yield users
+            except Exception as error:
+                await session.rollback()
+                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
+
+    async def get_all_users(self, async_session: async_sessionmaker[AsyncSession]) -> [User]:
         async with async_session() as session:
             try:
                 statement = select(User)

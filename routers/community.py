@@ -1,9 +1,10 @@
 from fastapi import APIRouter, status, Depends
 from controller.crud.community import CommunityCrud
+from fastapi.responses import StreamingResponse
 from database.session import session
 from controller.src.community import (get_patrons, create_community_data, get_community_client_data,
                                       convert_to_dict, update_community_data, get_users_friendly_data,
-                                      get_community_list)
+                                      get_community_list, get_community_patron)
 from routers.middleware.authorization import verify_user_access_token
 from schemas.community import (CreateCommunityModel, UpdateCommunityModel)
 from controller.src.user import (is_parish_leader, is_council_member, get_user_name_and_responsability,
@@ -18,8 +19,12 @@ user_crud = UserCrud()
 
 @router.get('/community/list', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Community", description="Get community list")
 async def communities_list():
-    communities = await community_crud.get_all_communities(session)
-    return get_community_list(communities)
+    async for communities in community_crud.get_communities_paginated(session):
+        async def community_generator():
+            for community in communities:
+                yield get_community_patron(community)
+
+    return StreamingResponse(community_generator(), media_type="application/json")
 
 @router.get('/patrons', status_code=status.HTTP_200_OK, summary="Community", description="Get communities patrons")
 async def get_all_patrons():

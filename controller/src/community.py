@@ -48,3 +48,6 @@ def update_community_data(community: Community, data: dict) -> dict:
             case "image":
                 community.image = data['image']
     return convert_to_dict(community)
+
+def get_community_patron(community: Community) -> str:
+    return community.patron

@@ -13,13 +13,14 @@ header = {"Authorization": getenv("APP_ID"), "type": "application/json"}
 PAID = "COMPLETED"
 ACTIVE = "ACTIVE"
 EXPIRED = "EXPIRED"
+EXPIRE_TIME = (30 * 60)
 
 @dataclass
 class PixPayment:
     value: int
     customer: dict
     correlationID: str
-    expiresIn: int = (30 * 60)
+    expiresIn: int = EXPIRE_TIME
     type: str = "DYNAMIC"
 
     def __dict__(self) -> dict:

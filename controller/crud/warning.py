@@ -1,10 +1,23 @@
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select
+from typing import AsyncIterator
 from models.warning import Warning
 from controller.errors.http.exceptions import not_found, internal_server_error
 from datetime import datetime
 
 class WarningCrud:
+    async def get_warnings_by_community_id_from_pagination(self, async_session: async_sessionmaker[AsyncSession], community_id: str, page: int = 1, page_size: int = 100) -> AsyncIterator:
+        async with async_session() as session:
+            try:
+                offset = (page - 1) * page_size
+                statement = select(Warning).filter(Warning.community_id == community_id).offset(offset).limit(page_size)
+                warnings = await session.execute(statement)
+                warnings = warnings.scalars().all()
+                yield warnings
+            except Exception as error:
+                await session.rollback()
+                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
+
     async def get_warning_by_id(self, async_session: async_sessionmaker[AsyncSession], warning_id: str):
         async with async_session() as session:
             try:

@@ -12,8 +12,8 @@ community_crud = CommunityCrud()
 class UserCrud:
     async def get_users_paginated(self, async_session: async_sessionmaker[AsyncSession], page: int = 1, page_size: int = 100) -> AsyncIterator:
         async with async_session() as session:
-            offset = (page - 1) * page_size
             try:
+                offset = (page - 1) * page_size
                 statement = select(User).offset(offset).limit(page_size)
                 users = await session.execute(statement)
                 users = users.scalars().all()

@@ -30,8 +30,11 @@ async def update_payment_db(correlation_id: str, user: User = None) -> NoReturn:
     delete_pix_by_correlation_id(dizimo_payment.correlation_id)
     await dizimo_payment_crud.update_correlation_id_to_none(session, dizimo_payment.id)
 
-async def create_month_dizimo_payment() -> NoReturn:
+async def create_month_dizimo_payment_and_transfer_payments_values() -> NoReturn:
     async for users in user_crud.get_users_paginated(session):
         for user in users:
             dizimo_payment = await create_dizimo_payment(user)
             await dizimo_payment_crud.create_payment(session, dizimo_payment)
+    async for communities in community_crud.get_communities_paginated(session):
+        for community in communities:
+            await community_crud.transfer_actual_to_last_month_and_reset_actual(session, community.id)

@@ -21,14 +21,14 @@ from controller.src.user import create_user
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
 from apscheduler.triggers.cron import CronTrigger
-from controller.jobs.dizimo_payment import create_month_dizimo_payment
+from controller.jobs.dizimo_payment import create_month_dizimo_payment_and_transfer_payments_values
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
 user_crud = UserCrud()
 scheduler = AsyncIOScheduler()
 
-scheduler.add_job(create_month_dizimo_payment, trigger=CronTrigger(day=1, hour=0, minute=0))
+scheduler.add_job(create_month_dizimo_payment_and_transfer_payments_values, trigger=CronTrigger(day=1, hour=0, minute=0))
 
 @asynccontextmanager
 async def event_manager(app: FastAPI):

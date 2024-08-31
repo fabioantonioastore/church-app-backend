@@ -1,5 +1,5 @@
 from sqlalchemy.orm import mapped_column, relationship
-from sqlalchemy import String, LargeBinary, Boolean
+from sqlalchemy import String, LargeBinary, Boolean, Integer
 from database.db import Base
 from models.warning import Warning
 
@@ -12,5 +12,7 @@ class Community(Base):
     email = mapped_column(String, unique=True)
     image = mapped_column(LargeBinary)
     active = mapped_column(Boolean, default=True)
+    actual_month_total_payment_value = mapped_column(Integer, default=0)
+    last_month_total_payment_value = mapped_column(Integer, default=0)
     warnings = relationship('Warning', cascade='all, delete-orphan')
     users = relationship('User')

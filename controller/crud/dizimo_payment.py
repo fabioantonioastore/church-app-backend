@@ -170,3 +170,45 @@ class DizimoPaymentCrud:
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
+
+    async def update_status(self, async_session: async_sessionmaker[AsyncSession], dizimo_payment_id: str, status: str) -> DizimoPayment:
+        async with async_session() as session:
+            try:
+                statement = select(DizimoPayment).filter(DizimoPayment.id == dizimo_payment_id)
+                payment = await session.execute(statement)
+                payment = payment.scalars().one()
+                if is_valid_payment_status(status):
+                    payment.status = status
+                    await session.commit()
+                    return payment
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")
+
+    async def update_correlation_id(self, async_session: async_sessionmaker[AsyncSession], dizimo_payment_id: str, correlation_id: str = None) -> DizimoPayment:
+        async with async_session() as session:
+            try:
+                statement = select(DizimoPayment).filter(DizimoPayment.id == dizimo_payment_id)
+                payment = await session.execute(statement)
+                payment = payment.scalars().one()
+                payment.correlation_id = correlation_id
+                await session.commit()
+                return payment
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")
+
+    async def update_correlation_id_to_none(self, async_session: async_sessionmaker[AsyncSession], dizimo_payment_id: str) -> DizimoPayment:
+        async with async_session() as session:
+            try:
+                statement = select(DizimoPayment).filter(DizimoPayment.id == dizimo_payment_id)
+                payment = await session.execute(statement)
+                payment = payment.scalars().one()
+                payment.correlation_id = None
+                payment.value = None
+                payment.date = None
+                await session.commit()
+                return payment
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")

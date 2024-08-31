@@ -91,3 +91,30 @@ class CommunityCrud:
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
+
+    async def increase_actual_month_payment_value(self, async_session: async_sessionmaker[AsyncSession], community_id: str, value: int) -> Community:
+        async with async_session() as session:
+            try:
+                statement = select(Community).filter(Community.id == community_id)
+                community = await session.execute(statement)
+                community = community.scalars().one()
+                community.actual_month_total_payment_value += value
+                await session.commit()
+                return community
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")
+
+    async def transfer_actual_to_last_month_and_reset_actual(self, async_session: async_sessionmaker[AsyncSession], community_id: str) -> Community:
+        async with async_session() as session:
+            try:
+                statement = select(Community).filter(Community.id == community_id)
+                community = await session.execute(statement)
+                community = community.scalars().one()
+                community.last_month_total_payment_value = community.actual_month_total_payment_value
+                community.actual_month_total_payment_value = 0
+                await session.commit()
+                return community
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")

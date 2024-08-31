@@ -1,14 +1,18 @@
 from dataclasses import dataclass
-from uuid import uuid4
+from models.dizimo_payment import DizimoPayment
 from models.user import User
 from dotenv import load_dotenv
 from os import getenv
 import requests
+from typing import NoReturn
 
 load_dotenv()
 
 PIX_COB_URL = getenv("PIX_COB_URL")
 header = {"Authorization": getenv("APP_ID"), "type": "application/json"}
+PAID = "COMPLETED"
+ACTIVE = "ACTIVE"
+EXPIRED = "EXPIRED"
 
 @dataclass
 class PixPayment:
@@ -48,3 +52,23 @@ def get_pix_no_sensitive_data(pix: dict) -> dict:
         "brCode": pix['charge']['brCode'],
         "qrCodeImage": pix['charge']['qrCodeImage']
     }
+
+def get_pix_payment_from_correlation_id(correlation_id: str) -> dict:
+    URL = PIX_COB_URL + "/" + correlation_id
+    return requests.get(URL, headers=header).json()
+
+def delete_pix_by_correlation_id(correlation_id: str) -> NoReturn:
+    URL = PIX_COB_URL + "/" + correlation_id
+    return requests.delete(URL, headers=header)
+
+def is_pix_active(pix: dict) -> bool:
+    return pix['charge']['status'] == ACTIVE
+
+def is_pix_expired(pix: dict) -> bool:
+    return pix['charge']['status'] == EXPIRED
+
+def is_pix_paid(pix: dict) -> bool:
+    return pix['charge']['status'] == PAID
+
+def get_pix_value(pix: dict) -> int:
+    return pix['charge']['value']

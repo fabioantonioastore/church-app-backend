@@ -28,8 +28,6 @@ community_crud = CommunityCrud()
 user_crud = UserCrud()
 scheduler = AsyncIOScheduler()
 
-scheduler.add_job(create_month_dizimo_payment_and_transfer_payments_values, trigger=CronTrigger(day=1, hour=0, minute=0))
-
 @asynccontextmanager
 async def event_manager(app: FastAPI):
     scheduler.start()
@@ -37,6 +35,8 @@ async def event_manager(app: FastAPI):
     scheduler.shutdown()
 
 app = FastAPI(lifespan=event_manager)
+
+scheduler.add_job(create_month_dizimo_payment_and_transfer_payments_values, trigger=CronTrigger(day=1, hour=0, minute=0))
 
 app.add_middleware(
     CORSMiddleware,

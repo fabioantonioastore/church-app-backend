@@ -7,6 +7,16 @@ from controller.src.dizimo_payment import is_valid_payment_status
 from controller.src.dizimo_payment import pass_data_to
 
 class DizimoPaymentCrud:
+    async def get_all(self, async_session: async_sessionmaker[AsyncSession]):
+        async with async_session() as session:
+            try:
+                statement = select(DizimoPayment)
+                payments = await session.execute(statement)
+                return payments.scalars().all()
+            except Exception as error:
+                await session.rollback()
+                raise internal_server_error(f"A error occurs during CRUD")
+
     async def get_all_user_dizimo_payment(self, async_session: async_sessionmaker[AsyncSession], user_id: str, page: int = 1, page_size: int = 100) -> AsyncIterator:
         async with async_session() as session:
             try:

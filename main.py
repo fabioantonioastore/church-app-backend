@@ -22,10 +22,12 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
 from apscheduler.triggers.cron import CronTrigger
 from controller.jobs.dizimo_payment import create_month_dizimo_payment_and_transfer_payments_values
+from controller.crud.dizimo_payment import DizimoPaymentCrud
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
 user_crud = UserCrud()
+dizimo_payment_crud = DizimoPaymentCrud()
 scheduler = AsyncIOScheduler()
 
 @asynccontextmanager
@@ -54,6 +56,10 @@ app.include_router(routers.dizimo_payment.router)
 @app.get('/communities')
 async def get_all():
     return await community_crud.get_all_communities(session)
+
+@app.get('/abcd')
+async def get_all_pay():
+    return await dizimo_payment_crud.get_all(session)
 
 @app.post("/community/root")
 async def create_community():

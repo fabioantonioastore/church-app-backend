@@ -32,13 +32,15 @@ scheduler = AsyncIOScheduler()
 
 @asynccontextmanager
 async def event_manager(app: FastAPI):
-    scheduler.start()
-    yield
-    scheduler.shutdown()
+    try:
+        scheduler.start()
+        scheduler.add_job(create_month_dizimo_payment_and_transfer_payments_values,
+                          trigger=CronTrigger(day=1, hour=0, minute=0))
+        yield
+    finally:
+        scheduler.shutdown()
 
 app = FastAPI(lifespan=event_manager)
-
-scheduler.add_job(create_month_dizimo_payment_and_transfer_payments_values, trigger=CronTrigger(day=1, hour=0, minute=0))
 
 app.add_middleware(
     CORSMiddleware,

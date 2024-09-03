@@ -1,5 +1,5 @@
 import uuid
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import routers.user
 import routers.community
@@ -23,6 +23,7 @@ from contextlib import asynccontextmanager
 from apscheduler.triggers.cron import CronTrigger
 from controller.jobs.dizimo_payment import create_month_dizimo_payment_and_transfer_payments_values
 from controller.crud.dizimo_payment import DizimoPaymentCrud
+from routers.middleware.authorization import verify_user_access_token
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
@@ -112,4 +113,11 @@ async def signup(sign_data: SignUp):
     except:
         raise bad_request("User already exist")
     return {"access_token": jwt.create_access_token(user.cpf, position='parish leader')}
-    
+
+
+@app.patch('/make_payment/{year}/{month}', dependencies=[Depends(verify_user_access_token)])
+async def make_payment(year: int, month: str, user: dict = Depends(verify_user_access_token)):
+    user = await user_crud.get_user_by_cpf(session, user['cpf'])
+    dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(session, month, year, user.id)
+    await dizimo_payment_crud.update_status(session, dizimo.id, "paid")
+    return "Ok"

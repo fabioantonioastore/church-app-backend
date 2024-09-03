@@ -5,7 +5,6 @@ from fastapi.responses import StreamingResponse
 from controller.crud.dizimo_payment import DizimoPaymentCrud
 from routers.middleware.authorization import verify_user_access_token
 from controller.crud.user import UserCrud
-from database.session import session
 from uuid import uuid4
 from controller.src.dizimo_payment import dizimo_payment_is_paid, complete_dizimo_payment, dizimo_payment_is_expired
 from controller.errors.http.exceptions import bad_request, not_acceptable
@@ -25,11 +24,11 @@ scheduler = AsyncIOScheduler()
 
 @router.post("/dizimo_payment", status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_user_access_token)])
 async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel, user: dict = Depends(verify_user_access_token)):
-    user = await user_crud.get_user_by_cpf(session, user['cpf'])
+    user = await user_crud.get_user_by_cpf(user['cpf'])
     pix_data = dict(pix_data)
     month = pix_data['month']
     year = pix_data['year']
-    dizimo_payment = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(session, month, year, user.id)
+    dizimo_payment = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, year, user.id)
     TIME = datetime.now() + timedelta(minutes=30)
     if dizimo_payment_is_paid(dizimo_payment):
         raise bad_request(f"Payment already paid")
@@ -46,27 +45,27 @@ async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel, user:
     )
     pix_payment = make_post_pix_request(pix_payment)
     dizimo_payment = complete_dizimo_payment(dizimo_payment, pix_payment)
-    await dizimo_payment_crud.complete_dizimo_payment(session, dizimo_payment)
+    await dizimo_payment_crud.complete_dizimo_payment(dizimo_payment)
     scheduler.add_job(update_payment_db, DateTrigger(run_date=TIME), args=[dizimo_payment.correlation_id])
     return get_pix_no_sensitive_data(pix_payment)
 
 @router.get("/dizimo_payment/{year}", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_dizimo_payment_by_year(year: int, user: dict = Depends(verify_user_access_token)):
-    user = await user_crud.get_user_by_cpf(session, user['cpf'])
-    dizimo_payments = await dizimo_payment_crud.get_payments_by_year_and_user_id(session, year, user.id)
+    user = await user_crud.get_user_by_cpf(user['cpf'])
+    dizimo_payments = await dizimo_payment_crud.get_payments_by_year_and_user_id(year, user.id)
     return [get_pix_no_sensitive_data(get_pix_payment_from_correlation_id(payment.correlation_id)) for payment in dizimo_payments]
 
 @router.get("/dizimo_payment/{year}/{month}", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_dizimo_payment_by_year_and_month(year: int, month: str, user: dict = Depends(verify_user_access_token)):
-    user = await user_crud.get_user_by_cpf(session, user['cpf'])
-    dizimo_payment = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(session, month, year, user.id)
+    user = await user_crud.get_user_by_cpf(user['cpf'])
+    dizimo_payment = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, year, user.id)
     payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
     return get_pix_no_sensitive_data(payment)
 
 @router.get("/get_all_user_dizimo_payments", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_all_user_payments(user: dict = Depends(verify_user_access_token)):
-    user = await user_crud.get_user_by_cpf(session, user['cpf'])
-    async for dizimo_payments in dizimo_payment_crud.get_all_user_dizimo_payment(session, user.id):
+    user = await user_crud.get_user_by_cpf(user['cpf'])
+    async for dizimo_payments in dizimo_payment_crud.get_all_user_dizimo_payment(user.id):
         async def dizimo_payment_generator():
             for dizimo_payment in dizimo_payments:
                 payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)

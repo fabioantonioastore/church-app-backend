@@ -1,10 +1,7 @@
 from models.warning import Warning
-from controller.crud.community import CommunityCrud
-from database.session import session
 from uuid import uuid4
-from datetime import datetime, timezone
+from datetime import datetime
 
-community_crud = CommunityCrud()
 
 async def create_warning(warning: dict) -> Warning:
     new_warning = Warning()
@@ -24,13 +21,9 @@ async def create_warning(warning: dict) -> Warning:
     new_warning.posted_at = datetime.now()
     return new_warning
 
+
 def get_warning_client_data(warning: Warning) -> dict:
-    new_warning = {}
-    new_warning['id'] = warning.id
-    new_warning['title'] = warning.title
-    new_warning['description'] = warning.description
-    new_warning['posted_at'] = warning.posted_at
-    new_warning['image'] = warning.image
-    new_warning['scope'] = warning.scope
-    new_warning['edited_at'] = warning.edited_at
+    new_warning = {'id': warning.id, 'title': warning.title, 'description': warning.description,
+                   'posted_at': warning.posted_at, 'image': warning.image, 'scope': warning.scope,
+                   'edited_at': warning.edited_at}
     return new_warning

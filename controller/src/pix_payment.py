@@ -15,6 +15,7 @@ ACTIVE = "ACTIVE"
 EXPIRED = "EXPIRED"
 EXPIRE_TIME = (30 * 60)
 
+
 @dataclass
 class PixPayment:
     value: int
@@ -32,6 +33,7 @@ class PixPayment:
             "correlationID": self.correlationID
         }
 
+
 def create_customer(user: User) -> dict:
     return {
         "name": user.name,
@@ -39,9 +41,11 @@ def create_customer(user: User) -> dict:
         "phone": user.phone
     }
 
+
 def make_post_pix_request(pix: PixPayment) -> dict:
     result = requests.post(url=PIX_COB_URL, headers=header, json=pix.__dict__())
     return result.json()
+
 
 def get_pix_no_sensitive_data(pix: dict) -> dict:
     return {
@@ -54,22 +58,28 @@ def get_pix_no_sensitive_data(pix: dict) -> dict:
         "qrCodeImage": pix['charge']['qrCodeImage']
     }
 
+
 def get_pix_payment_from_correlation_id(correlation_id: str) -> dict:
     URL = PIX_COB_URL + "/" + correlation_id
     return requests.get(URL, headers=header).json()
+
 
 def delete_pix_by_correlation_id(correlation_id: str) -> NoReturn:
     URL = PIX_COB_URL + "/" + correlation_id
     return requests.delete(URL, headers=header)
 
+
 def is_pix_active(pix: dict) -> bool:
     return pix['charge']['status'] == ACTIVE
+
 
 def is_pix_expired(pix: dict) -> bool:
     return pix['charge']['status'] == EXPIRED
 
+
 def is_pix_paid(pix: dict) -> bool:
     return pix['charge']['status'] == PAID
+
 
 def get_pix_value(pix: dict) -> int:
     return pix['charge']['value']

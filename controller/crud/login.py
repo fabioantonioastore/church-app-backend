@@ -1,11 +1,17 @@
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select
 from models.login import Login
 from controller.errors.http.exceptions import not_found
+from database.session import session as db_session
+
+SESSION = db_session
+
 
 class LoginCrud:
-    async def update_password(self, async_session: async_sessionmaker[AsyncSession], cpf: str, password: str):
-        async with async_session() as session:
+    def __init__(self) -> None:
+        self.session = SESSION
+
+    async def update_password(self, cpf: str, password: str):
+        async with self.session() as session:
             try:
                 statement = select(Login).filter(Login.cpf == cpf)
                 login = await session.execute(statement)
@@ -17,8 +23,8 @@ class LoginCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def update_position(self, async_session: async_sessionmaker[AsyncSession], cpf: str, position: str):
-        async with async_session() as session:
+    async def update_position(self, cpf: str, position: str):
+        async with self.session() as session:
             try:
                 statement = select(Login).filter(Login.cpf == cpf)
                 login = await session.execute(statement)
@@ -30,8 +36,8 @@ class LoginCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_login_by_id(self, async_session: async_sessionmaker[AsyncSession], login_id: str):
-        async with async_session() as session:
+    async def get_login_by_id(self, login_id: str):
+        async with self.session() as session:
             try:
                 statement = select(Login).filter(Login.id == login_id)
                 login = await session.execute(statement)
@@ -40,8 +46,8 @@ class LoginCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_login_by_cpf(self, async_session: async_sessionmaker[AsyncSession], login_cpf: str):
-        async with async_session() as session:
+    async def get_login_by_cpf(self, login_cpf: str):
+        async with self.session() as session:
             try:
                 statement = select(Login).filter(Login.cpf == login_cpf)
                 login = await session.execute(statement)
@@ -50,8 +56,8 @@ class LoginCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def create_login(self, async_session: async_sessionmaker[AsyncSession], login: Login):
-        async with async_session() as session:
+    async def create_login(self, login: Login):
+        async with self.session() as session:
             try:
                 session.add(login)
                 await session.commit()
@@ -60,8 +66,8 @@ class LoginCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def update_login(self, async_session: async_sessionmaker[AsyncSession], new_login: dict):
-        async with async_session() as session:
+    async def update_login(self, new_login: dict):
+        async with self.session() as session:
             try:
                 statement = select(Login).filter(Login.id == new_login['id'])
                 login = await session.execute(statement)
@@ -80,8 +86,8 @@ class LoginCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def delete_login(self, async_session: async_sessionmaker[AsyncSession], login: Login):
-        async with async_session() as session:
+    async def delete_login(self, login: Login):
+        async with self.session() as session:
             try:
                 await session.delete(login)
                 await session.commit()
@@ -90,8 +96,8 @@ class LoginCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def delete_login_by_id(self, async_session: async_sessionmaker[AsyncSession], login_id: str):
-        async with async_session() as session:
+    async def delete_login_by_id(self, login_id: str):
+        async with self.session() as session:
             try:
                 statement = select(Login).filter(Login.id == login_id)
                 login = await session.execute(statement)

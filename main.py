@@ -9,7 +9,6 @@ import routers.dizimo_payment
 from controller.auth import jwt
 from models.community import Community
 from controller.crud.community import CommunityCrud
-from database.session import session
 from controller.crud.user import UserCrud
 from models.user import User
 from schemas.sign import SignUp
@@ -58,11 +57,11 @@ app.include_router(routers.dizimo_payment.router)
 
 @app.get('/communities')
 async def get_all():
-    return await community_crud.get_all_communities(session)
+    return await community_crud.get_all_communities()
 
 @app.get('/abcd')
 async def get_all_pay():
-    return await dizimo_payment_crud.get_all(session)
+    return await dizimo_payment_crud.get_all()
 
 @app.post("/community/root")
 async def create_community():
@@ -74,7 +73,7 @@ async def create_community():
     a.patron = "hello"
     a.location = "something"
 
-    return await community_crud.create_community(session, a)
+    return await community_crud.create_community(a)
 
 @app.post('/council')
 async def signup(sign_data: SignUp):
@@ -85,11 +84,11 @@ async def signup(sign_data: SignUp):
     login = create_login(sign_data)
     login.position = "council member"
     try:
-        await user_crud.create_user(session, user)
+        await user_crud.create_user(user)
         try:
-            await login_crud.create_login(session, login)
+            await login_crud.create_login(login)
         except:
-            await user_crud.delete_user(session, user)
+            await user_crud.delete_user(user)
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
@@ -104,11 +103,11 @@ async def signup(sign_data: SignUp):
     login = create_login(sign_data)
     login.position = "parish leader"
     try:
-        await user_crud.create_user(session, user)
+        await user_crud.create_user(user)
         try:
-            await login_crud.create_login(session, login)
+            await login_crud.create_login(login)
         except:
-            await user_crud.delete_user(session, user)
+            await user_crud.delete_user(user)
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
@@ -117,7 +116,7 @@ async def signup(sign_data: SignUp):
 
 @app.patch('/make_payment/{year}/{month}', dependencies=[Depends(verify_user_access_token)])
 async def make_payment(year: int, month: str, user: dict = Depends(verify_user_access_token)):
-    user = await user_crud.get_user_by_cpf(session, user['cpf'])
-    dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(session, month, year, user.id)
-    await dizimo_payment_crud.update_status(session, dizimo.id, "paid")
+    user = await user_crud.get_user_by_cpf(user['cpf'])
+    dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, year, user.id)
+    await dizimo_payment_crud.update_status(dizimo.id, "paid")
     return "Ok"

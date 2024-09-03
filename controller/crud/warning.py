@@ -4,10 +4,18 @@ from typing import AsyncIterator
 from models.warning import Warning
 from controller.errors.http.exceptions import not_found, internal_server_error
 from datetime import datetime
+from database.session import session as db_session
+
+SESSION = db_session
+
 
 class WarningCrud:
-    async def get_warnings_by_community_id_from_pagination(self, async_session: async_sessionmaker[AsyncSession], community_id: str, page: int = 1, page_size: int = 100) -> AsyncIterator:
-        async with async_session() as session:
+    def __init__(self) -> None:
+        self.session = SESSION
+
+    async def get_warnings_by_community_id_from_pagination(self, community_id: str, page: int = 1,
+                                                           page_size: int = 100) -> AsyncIterator:
+        async with self.session() as session:
             try:
                 offset = (page - 1) * page_size
                 statement = select(Warning).filter(Warning.community_id == community_id).offset(offset).limit(page_size)
@@ -18,8 +26,8 @@ class WarningCrud:
                 await session.rollback()
                 raise internal_server_error(f"A error occurs during CRUD: {error!r}")
 
-    async def get_warning_by_id(self, async_session: async_sessionmaker[AsyncSession], warning_id: str):
-        async with async_session() as session:
+    async def get_warning_by_id(self, warning_id: str):
+        async with self.session() as session:
             try:
                 statement = select(Warning).filter(Warning.id == warning_id)
                 warning = await session.execute(statement)
@@ -28,8 +36,8 @@ class WarningCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_warning_by_community_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str, total: int = 10):
-        async with async_session() as session:
+    async def get_warning_by_community_id(self, community_id: str, total: int = 10):
+        async with self.session() as session:
             try:
                 statement = select(Warning).filter(Warning.community_id == community_id).limit(total)
                 warnings = await session.execute(statement)
@@ -38,8 +46,8 @@ class WarningCrud:
                 await session.rollback()
                 raise internal_server_error(f"A error occurs during CRUD: {error!r}")
 
-    async def create_warning(self, async_session: async_sessionmaker[AsyncSession], warning: Warning):
-        async with async_session() as session:
+    async def create_warning(self, warning: Warning):
+        async with self.session() as session:
             try:
                 session.add(warning)
                 await session.commit()
@@ -48,8 +56,8 @@ class WarningCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def update_warning(self, async_session: async_sessionmaker[AsyncSession], new_warning: dict):
-        async with async_session() as session:
+    async def update_warning(self, new_warning: dict):
+        async with self.session() as session:
             try:
                 statement = select(Warning).filter(Warning.id == new_warning['id'])
                 warning = await session.execute(statement)
@@ -69,8 +77,8 @@ class WarningCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def delete_warning(self, async_session: async_sessionmaker[AsyncSession], warning: Warning):
-        async with async_session() as session:
+    async def delete_warning(self, warning: Warning):
+        async with self.session() as session:
             try:
                 await session.delete(warning)
                 await session.commit()
@@ -79,8 +87,8 @@ class WarningCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def delete_warning_by_id(self, async_session: async_sessionmaker[AsyncSession], warning_id: str):
-        async with async_session() as session:
+    async def delete_warning_by_id(self, warning_id: str):
+        async with self.session() as session:
             try:
                 statement = select(Warning).filter(Warning.id == warning_id)
                 warning = await session.execute(statement)

@@ -3,7 +3,6 @@ from schemas.sign import SignIn, SignUp
 from controller.validators.sign_validator import SignUpValidator
 from controller.src.login import create_login, verify_user_login
 from controller.crud.login import LoginCrud
-from database.session import session
 from controller.crud.user import UserCrud
 from controller.src.user import create_user
 from controller.auth import jwt
@@ -21,11 +20,11 @@ dizimo_payment_crud = DizimoPaymentCrud()
 async def signin(sign_data: SignIn):
     sign_data = dict(sign_data)
     if await verify_user_login(sign_data):
-        user = await user_crud.get_user_by_cpf(session, sign_data['cpf'])
+        user = await user_crud.get_user_by_cpf(sign_data['cpf'])
         if not(user.active):
             user.active = True
             user = convert_user_to_dict(user)
-            await user_crud.update_user(session, user)
+            await user_crud.update_user(user)
         return {"access_token": jwt.create_access_token(sign_data['cpf'], user.position)}
     return bad_request("Password or CPF is not correct")
 
@@ -36,14 +35,14 @@ async def signup(sign_data: SignUp):
     user = await create_user(sign_data)
     login = create_login(sign_data)
     try:
-        await user_crud.create_user(session, user)
+        await user_crud.create_user(user)
         try:
-            await login_crud.create_login(session, login)
+            await login_crud.create_login(login)
         except Exception as error:
-            await user_crud.delete_user(session, user)
+            await user_crud.delete_user(user)
             raise internal_server_error(f"Database failed to create user: {error!r}")
     except Exception as error:
         raise bad_request(f"User already exist: {error!r}")
     dizimo_payment = await create_dizimo_payment(user)
-    await dizimo_payment_crud.create_payment(session, dizimo_payment)
+    await dizimo_payment_crud.create_payment(dizimo_payment)
     return {"access_token": jwt.create_access_token(user.cpf)}

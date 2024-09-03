@@ -1,12 +1,18 @@
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select
 from typing import AsyncIterator
 from models.community import Community
 from controller.errors.http.exceptions import not_found, internal_server_error
+from database.session import session as db_session
+
+SESSION = db_session
+
 
 class CommunityCrud:
-    async def get_communities_paginated(self, async_session: async_sessionmaker[AsyncSession], page: int = 1, page_size: int = 100) -> AsyncIterator:
-        async with async_session() as session:
+    def __init__(self) -> None:
+        self.session = SESSION
+
+    async def get_communities_paginated(self, page: int = 1, page_size: int = 100) -> AsyncIterator:
+        async with self.session() as session:
             try:
                 offset = (page - 1) * page_size
                 statement = select(Community).offset(offset).limit(page_size)
@@ -17,8 +23,8 @@ class CommunityCrud:
                 await session.rollback()
                 raise internal_server_error(f"A error occurs during CRUD: {error!r}")
 
-    async def get_all_communities(self, async_session: async_sessionmaker[AsyncSession]):
-        async with async_session() as session:
+    async def get_all_communities(self):
+        async with self.session() as session:
             try:
                 statement = select(Community)
                 communities = await session.execute(statement)
@@ -26,8 +32,9 @@ class CommunityCrud:
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
-    async def get_community_by_patron(self, async_session: async_sessionmaker[AsyncSession], community_patron: str):
-        async with async_session() as session:
+
+    async def get_community_by_patron(self, community_patron: str):
+        async with self.session() as session:
             try:
                 statement = select(Community).filter(Community.patron == community_patron)
                 community = await session.execute(statement)
@@ -36,8 +43,8 @@ class CommunityCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_community_by_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str):
-        async with async_session() as session:
+    async def get_community_by_id(self, community_id: str):
+        async with self.session() as session:
             try:
                 statement = select(Community).filter(Community.id == community_id)
                 community = await session.execute(statement)
@@ -46,8 +53,8 @@ class CommunityCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def create_community(self, async_session: async_sessionmaker[AsyncSession], community: Community):
-        async with async_session() as session:
+    async def create_community(self, community: Community):
+        async with self.session() as session:
             try:
                 session.add(community)
                 await session.commit()
@@ -56,8 +63,8 @@ class CommunityCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def update_community(self, async_session: async_sessionmaker[AsyncSession], new_community: dict):
-        async with async_session() as session:
+    async def update_community(self, new_community: dict):
+        async with self.session() as session:
             try:
                 statement = select(Community).filter(Community.id == new_community['id'])
                 community = await session.execute(statement)
@@ -82,8 +89,8 @@ class CommunityCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def delete_community(self, async_session: async_sessionmaker[AsyncSession], community: Community):
-        async with async_session() as session:
+    async def delete_community(self, community: Community):
+        async with self.session() as session:
             try:
                 await session.delete(community)
                 await session.commit()
@@ -92,8 +99,8 @@ class CommunityCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def delete_community_by_id(self, async_session: async_sessionmaker[AsyncSession], community_id: str):
-        async with async_session() as session:
+    async def delete_community_by_id(self, community_id: str):
+        async with self.session() as session:
             try:
                 statement = select(Community).filter(Community.id == community_id)
                 community = await session.execute(statement)
@@ -105,8 +112,9 @@ class CommunityCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def increase_actual_month_payment_value(self, async_session: async_sessionmaker[AsyncSession], community_id: str, value: int) -> Community:
-        async with async_session() as session:
+    async def increase_actual_month_payment_value(self,
+                                                  community_id: str, value: int) -> Community:
+        async with self.session() as session:
             try:
                 statement = select(Community).filter(Community.id == community_id)
                 community = await session.execute(statement)
@@ -118,8 +126,9 @@ class CommunityCrud:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def transfer_actual_to_last_month_and_reset_actual(self, async_session: async_sessionmaker[AsyncSession], community_id: str) -> Community:
-        async with async_session() as session:
+    async def transfer_actual_to_last_month_and_reset_actual(self,
+                                                             community_id: str) -> Community:
+        async with self.session() as session:
             try:
                 statement = select(Community).filter(Community.id == community_id)
                 community = await session.execute(statement)

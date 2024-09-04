@@ -127,7 +127,7 @@ class DizimoPaymentCrud:
                          ))
                 )
                 payment = await session.execute(statement)
-                return payment.scalars().one()
+                return payment.scalars().first()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")

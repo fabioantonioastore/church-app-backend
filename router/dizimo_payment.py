@@ -16,6 +16,7 @@ from apscheduler.triggers.date import DateTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from controller.jobs.dizimo_payment import update_payment_db
 from datetime import datetime, timedelta
+from controller.src.dizimo_payment import get_dizimo_payment_no_sensitive_data
 
 router = APIRouter()
 dizimo_payment_crud = DizimoPaymentCrud()
@@ -53,14 +54,13 @@ async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel, user:
 async def get_dizimo_payment_by_year(year: int, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user['cpf'])
     dizimo_payments = await dizimo_payment_crud.get_payments_by_year_and_user_id(year, user.id)
-    return [get_pix_no_sensitive_data(get_pix_payment_from_correlation_id(payment.correlation_id)) for payment in dizimo_payments if payment.correlation_id]
+    return [get_dizimo_payment_no_sensitive_data(payment) for payment in dizimo_payments]
 
 @router.get("/dizimo_payment/{year}/{month}", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_dizimo_payment_by_year_and_month(year: int, month: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user['cpf'])
     dizimo_payment = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, year, user.id)
-    payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
-    return get_pix_no_sensitive_data(payment)
+    return get_dizimo_payment_no_sensitive_data(dizimo_payment)
 
 @router.get("/get_all_user_dizimo_payments", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_all_user_payments(user: dict = Depends(verify_user_access_token)):

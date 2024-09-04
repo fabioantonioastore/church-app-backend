@@ -7,6 +7,7 @@ import router.login
 import router.warning
 import router.dizimo_payment
 from controller.auth import jwt
+from controller.src.pix_payment import make_post_pix_request, create_customer, PixPayment
 from models.community import Community
 from controller.crud.community import CommunityCrud
 from controller.crud.user import UserCrud
@@ -23,7 +24,7 @@ from apscheduler.triggers.cron import CronTrigger
 from controller.jobs.dizimo_payment import create_month_dizimo_payment_and_transfer_payments_values
 from controller.crud.dizimo_payment import DizimoPaymentCrud
 from router.middleware.authorization import verify_user_access_token
-from controller.src.dizimo_payment import is_valid_payment_status, test_create_dizimo_payment
+from controller.src.dizimo_payment import is_valid_payment_status, test_create_dizimo_payment, complete_dizimo_payment
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
@@ -136,4 +137,11 @@ async def make_payment(year: int, month: str, status: str, user: dict = Depends(
 async def create_payment_router(year: int, month: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user["cpf"])
     dizimo = await test_create_dizimo_payment(user, int(year), month)
+    pix_payment = PixPayment(
+        value = 10,
+        customer = create_customer(user),
+        correlationID = str(uuid.uuid4())
+    )
+    pix_payment = make_post_pix_request(pix_payment)
+    dizimo = complete_dizimo_payment(dizimo, pix_payment)
     return await dizimo_payment_crud.create_payment(dizimo)

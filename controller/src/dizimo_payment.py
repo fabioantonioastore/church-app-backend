@@ -2,6 +2,7 @@ from models.dizimo_payment import DizimoPayment
 from models.user import User
 from uuid import uuid4
 from datetime import datetime
+from controller.src.pix_payment import get_pix_no_sensitive_data, get_pix_payment_from_correlation_id
 
 STATUS = ("active", "expired", "paid")
 MONTHS = (
@@ -60,6 +61,16 @@ async def create_dizimo_payment(user: User) -> DizimoPayment:
 
 def dizimo_payment_is_expired(payment: DizimoPayment) -> bool:
     return payment.status == "expired"
+
+
+def get_dizimo_payment_no_sensitive_data(payment: DizimoPayment) -> dict:
+    payment_no_sensitive_data = {'status': payment.status, 'year': payment.year, 'month': payment.month,
+                                 'payment': None}
+    if payment.correlation_id:
+        payment_no_sensitive_data['payment'] = get_pix_no_sensitive_data(get_pix_payment_from_correlation_id(payment.correlation_id))
+    return payment_no_sensitive_data
+
+
 
 
 async def test_create_dizimo_payment(user: User, year: int, month: str) -> DizimoPayment:

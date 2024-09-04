@@ -38,7 +38,7 @@ class CommunityCrud:
             try:
                 statement = select(Community).filter(Community.patron == community_patron)
                 community = await session.execute(statement)
-                return community.scalars().one()
+                return community.scalars().first()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -48,7 +48,7 @@ class CommunityCrud:
             try:
                 statement = select(Community).filter(Community.id == community_id)
                 community = await session.execute(statement)
-                return community.scalars().one()
+                return community.scalars().first()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -104,7 +104,7 @@ class CommunityCrud:
             try:
                 statement = select(Community).filter(Community.id == community_id)
                 community = await session.execute(statement)
-                community = community.scalars().one()
+                community = community.scalars().first()
                 await session.delete(community)
                 await session.commit()
                 return f"{community} deleted with succesfull"
@@ -118,7 +118,7 @@ class CommunityCrud:
             try:
                 statement = select(Community).filter(Community.id == community_id)
                 community = await session.execute(statement)
-                community = community.scalars().one()
+                community = community.scalars().first()
                 community.actual_month_total_payment_value += value
                 await session.commit()
                 return community
@@ -132,7 +132,7 @@ class CommunityCrud:
             try:
                 statement = select(Community).filter(Community.id == community_id)
                 community = await session.execute(statement)
-                community = community.scalars().one()
+                community = community.scalars().first()
                 community.last_month_total_payment_value = community.actual_month_total_payment_value
                 community.actual_month_total_payment_value = 0
                 await session.commit()

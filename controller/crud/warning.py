@@ -31,7 +31,7 @@ class WarningCrud:
             try:
                 statement = select(Warning).filter(Warning.id == warning_id)
                 warning = await session.execute(statement)
-                return warning.scalars().one()
+                return warning.scalars().first()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -61,7 +61,7 @@ class WarningCrud:
             try:
                 statement = select(Warning).filter(Warning.id == new_warning['id'])
                 warning = await session.execute(statement)
-                warning = warning.scalars().one()
+                warning = warning.scalars().first()
                 for key in new_warning.keys():
                     match key:
                         case 'scope':
@@ -92,7 +92,7 @@ class WarningCrud:
             try:
                 statement = select(Warning).filter(Warning.id == warning_id)
                 warning = await session.execute(statement)
-                warning = warning.scalars().one()
+                warning = warning.scalars().first()
                 await session.delete(warning)
                 await session.commit()
                 return f"{warning} deleted with succesfull"

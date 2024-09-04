@@ -41,7 +41,7 @@ class DizimoPaymentCrud:
             try:
                 statement = select(DizimoPayment).filter(DizimoPayment.id == payment_id)
                 payment = await session.execute(statement)
-                return payment.scalars().one()
+                return payment.scalars().first()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -51,7 +51,7 @@ class DizimoPaymentCrud:
             try:
                 statement = select(DizimoPayment).filter(DizimoPayment.correlation_id == correlation_id)
                 payment = await session.execute(statement)
-                return payment.scalars().one()
+                return payment.scalars().first()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -61,7 +61,7 @@ class DizimoPaymentCrud:
             try:
                 statement = select(DizimoPayment).filter(DizimoPayment.identifier == identifier)
                 payment = await session.execute(statement)
-                return payment.scalars().one()
+                return payment.scalars().first()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -147,7 +147,7 @@ class DizimoPaymentCrud:
             try:
                 statement = select(DizimoPayment).filter(DizimoPayment.id == payment_data['id'])
                 payment = await session.execute(statement)
-                payment = payment.scalars().one()
+                payment = payment.scalars().first()
                 for key in payment_data.keys():
                     match key:
                         case "status":
@@ -206,7 +206,7 @@ class DizimoPaymentCrud:
             try:
                 statement = select(DizimoPayment).filter(DizimoPayment.id == dizimo_payment_id)
                 payment = await session.execute(statement)
-                payment = payment.scalars().one()
+                payment = payment.scalars().first()
                 if is_valid_payment_status(status):
                     payment.status = status
                     await session.commit()
@@ -220,7 +220,7 @@ class DizimoPaymentCrud:
             try:
                 statement = select(DizimoPayment).filter(DizimoPayment.id == dizimo_payment_id)
                 payment = await session.execute(statement)
-                payment = payment.scalars().one()
+                payment = payment.scalars().first()
                 payment.correlation_id = correlation_id
                 await session.commit()
                 return payment
@@ -233,7 +233,7 @@ class DizimoPaymentCrud:
             try:
                 statement = select(DizimoPayment).filter(DizimoPayment.id == dizimo_payment_id)
                 payment = await session.execute(statement)
-                payment = payment.scalars().one()
+                payment = payment.scalars().first()
                 payment.correlation_id = None
                 payment.value = None
                 payment.date = None

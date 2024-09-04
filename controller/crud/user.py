@@ -40,7 +40,7 @@ class UserCrud:
             try:
                 statement = select(User).filter(User.cpf == cpf)
                 user = await session.execute(statement)
-                user = user.scalars().one()
+                user = user.scalars().first()
                 user.position = position
                 user.responsibility = responsability
                 await session.commit()
@@ -80,7 +80,7 @@ class UserCrud:
             try:
                 statement = select(User).filter(User.id == user_id)
                 user = await session.execute(statement)
-                return user.scalars().one()
+                return user.scalars().first()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -90,7 +90,7 @@ class UserCrud:
             try:
                 statement = select(User).filter(User.cpf == user_cpf)
                 user = await session.execute(statement)
-                return user.scalars().one()
+                return user.scalars().first()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -100,7 +100,7 @@ class UserCrud:
             try:
                 statement = select(User).filter(User.phone == phone)
                 user = await session.execute(statement)
-                return user.scalars().one()
+                return user.scalars().first()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -120,7 +120,7 @@ class UserCrud:
             try:
                 statement = select(User).filter(User.id == new_user['id'])
                 user = await session.execute(statement)
-                user = user.scalars().one()
+                user = user.scalars().first()
                 for key in new_user.keys():
                     match key:
                         case 'cpf':
@@ -163,7 +163,7 @@ class UserCrud:
             try:
                 statement = select(User).filter(User.id == user_id)
                 user = await session.execute(statement)
-                user = user.scalars().one()
+                user = user.scalars().first()
                 await session.delete(user)
                 await session.commit()
                 return f"{user} deleted with succesfull"

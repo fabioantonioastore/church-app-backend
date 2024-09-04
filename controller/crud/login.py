@@ -15,7 +15,7 @@ class LoginCrud:
             try:
                 statement = select(Login).filter(Login.cpf == cpf)
                 login = await session.execute(statement)
-                login = login.scalars().one()
+                login = login.scalars().first()
                 login.password = password
                 await session.commit()
                 return login
@@ -28,7 +28,7 @@ class LoginCrud:
             try:
                 statement = select(Login).filter(Login.cpf == cpf)
                 login = await session.execute(statement)
-                login = login.scalars().one()
+                login = login.scalars().first()
                 login.position = position
                 await session.commit()
                 return login
@@ -41,7 +41,7 @@ class LoginCrud:
             try:
                 statement = select(Login).filter(Login.id == login_id)
                 login = await session.execute(statement)
-                return login.scalars().one()
+                return login.scalars().first()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -51,7 +51,7 @@ class LoginCrud:
             try:
                 statement = select(Login).filter(Login.cpf == login_cpf)
                 login = await session.execute(statement)
-                return login.scalars().one()
+                return login.scalars().first()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
@@ -71,7 +71,7 @@ class LoginCrud:
             try:
                 statement = select(Login).filter(Login.id == new_login['id'])
                 login = await session.execute(statement)
-                login = login.scalars().one()
+                login = login.scalars().first()
                 for key in new_login.keys():
                     match key:
                         case 'cpf':
@@ -101,7 +101,7 @@ class LoginCrud:
             try:
                 statement = select(Login).filter(Login.id == login_id)
                 login = await session.execute(statement)
-                login = login.scalars().one()
+                login = login.scalars().first()
                 await session.delete(login)
                 await session.commit()
                 return f"{login} deleted with succesfull"

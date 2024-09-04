@@ -47,6 +47,10 @@ def make_post_pix_request(pix: PixPayment) -> dict:
     return result.json()
 
 
+def verify_if_is_payment_paid(pix: dict) -> bool:
+    return pix['charge']['status'] == PAID
+
+
 def get_pix_no_sensitive_data(pix: dict) -> dict:
     return {
         "value": pix['charge']['value'],

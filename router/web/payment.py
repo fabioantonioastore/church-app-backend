@@ -3,6 +3,7 @@ from router.middleware.authorization import verify_user_access_token
 
 router = APIRouter()
 
+
 @router.websocket("/verify_pix_payment", dependencies=[Depends(verify_user_access_token)])
-async def verify_pix_payment_web_socket(websocket: WebSocket, user = Depends(verify_user_access_token)):
-    await websocket.accept()
+async def verify_pix_payment_web_socket(websocket: WebSocket, user=Depends(verify_user_access_token)):
+    pass

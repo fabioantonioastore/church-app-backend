@@ -145,3 +145,11 @@ async def create_payment_router(year: int, month: str, user: dict = Depends(veri
     pix_payment = make_post_pix_request(pix_payment)
     dizimo = complete_dizimo_payment(dizimo, pix_payment)
     return await dizimo_payment_crud.create_payment(dizimo)
+
+
+@app.delete("/delete/dizimo_payment/{year}/{month}", dependencies=[Depends(verify_user_access_token)])
+async def delete_payment_router(year: int, month: str, user: dict = Depends(verify_user_access_token)):
+    user = await user_crud.get_user_by_cpf(user["cpf"])
+    dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, int(year), user.id)
+    await dizimo_payment_crud.delete_payment(dizimo)
+    return "Deleted"

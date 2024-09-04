@@ -151,5 +151,5 @@ async def create_payment_router(year: int, month: str, user: dict = Depends(veri
 async def delete_payment_router(year: int, month: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user["cpf"])
     dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, int(year), user.id)
-    await dizimo_payment_crud.delete_payment(dizimo)
+    await dizimo_payment_crud.delete_payment_by_id(dizimo.id)
     return "Deleted"

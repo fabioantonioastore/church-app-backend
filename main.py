@@ -127,7 +127,7 @@ async def make_payment(year: int, month: str, status: str, user: dict = Depends(
     if not (is_valid_payment_status(status)):
         raise "Invalid status: active, paid, expired"
     user = await user_crud.get_user_by_cpf(user['cpf'])
-    dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, year, user.id)
+    dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, int(year), user.id)
     await dizimo_payment_crud.update_status(dizimo.id, status)
     return "Ok"
 
@@ -135,5 +135,5 @@ async def make_payment(year: int, month: str, status: str, user: dict = Depends(
 @app.post("/create/dizimo_payment/{year}/{month}", dependencies=[Depends(verify_user_access_token)])
 async def create_payment_router(year: int, month: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user["cpf"])
-    dizimo = await test_create_dizimo_payment(user, year, month)
+    dizimo = await test_create_dizimo_payment(user, int(year), month)
     return await dizimo_payment_crud.create_payment(dizimo)

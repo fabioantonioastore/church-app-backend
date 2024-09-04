@@ -53,7 +53,7 @@ async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel, user:
 async def get_dizimo_payment_by_year(year: int, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user['cpf'])
     dizimo_payments = await dizimo_payment_crud.get_payments_by_year_and_user_id(year, user.id)
-    return [get_pix_no_sensitive_data(get_pix_payment_from_correlation_id(payment.correlation_id)) for payment in dizimo_payments]
+    return [get_pix_no_sensitive_data(get_pix_payment_from_correlation_id(payment.correlation_id)) for payment in dizimo_payments if payment.correlation_id]
 
 @router.get("/dizimo_payment/{year}/{month}", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_dizimo_payment_by_year_and_month(year: int, month: str, user: dict = Depends(verify_user_access_token)):

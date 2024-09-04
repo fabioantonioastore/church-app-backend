@@ -31,6 +31,7 @@ user_crud = UserCrud()
 dizimo_payment_crud = DizimoPaymentCrud()
 scheduler = AsyncIOScheduler()
 
+
 @asynccontextmanager
 async def event_manager(app: FastAPI):
     try:
@@ -40,6 +41,7 @@ async def event_manager(app: FastAPI):
         yield
     finally:
         scheduler.shutdown()
+
 
 app = FastAPI(lifespan=event_manager)
 
@@ -56,13 +58,16 @@ app.include_router(routers.login.router)
 app.include_router(routers.warning.router)
 app.include_router(routers.dizimo_payment.router)
 
+
 @app.get('/communities')
 async def get_all():
     return await community_crud.get_all_communities()
 
+
 @app.get('/abcd')
 async def get_all_pay():
     return await dizimo_payment_crud.get_all()
+
 
 @app.post("/community/root")
 async def create_community():
@@ -75,6 +80,7 @@ async def create_community():
     a.location = "something"
 
     return await community_crud.create_community(a)
+
 
 @app.post('/council')
 async def signup(sign_data: SignUp):
@@ -94,6 +100,7 @@ async def signup(sign_data: SignUp):
     except:
         raise bad_request("User already exist")
     return {"access_token": jwt.create_access_token(user.cpf, position='council member')}
+
 
 @app.post('/parish')
 async def signup(sign_data: SignUp):
@@ -117,12 +124,13 @@ async def signup(sign_data: SignUp):
 
 @app.patch('/make_payment/{year}/{month}/{status}', dependencies=[Depends(verify_user_access_token)])
 async def make_payment(year: int, month: str, status: str, user: dict = Depends(verify_user_access_token)):
-    if not(is_valid_payment_status(status)):
+    if not (is_valid_payment_status(status)):
         raise "Invalid status: active, paid, expired"
     user = await user_crud.get_user_by_cpf(user['cpf'])
     dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, year, user.id)
     await dizimo_payment_crud.update_status(dizimo.id, status)
     return "Ok"
+
 
 @app.post("/create/dizimo_payment/{year}/{month}", dependencies=[Depends(verify_user_access_token)])
 async def create_payment_router(year: int, month: str, user: dict = Depends(verify_user_access_token)):

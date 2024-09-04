@@ -135,5 +135,5 @@ async def make_payment(year: int, month: str, status: str, user: dict = Depends(
 @app.post("/create/dizimo_payment/{year}/{month}", dependencies=[Depends(verify_user_access_token)])
 async def create_payment_router(year: int, month: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user["cpf"])
-    dizimo = test_create_dizimo_payment(user, year, month)
+    dizimo = await test_create_dizimo_payment(user, year, month)
     return await dizimo_payment_crud.create_payment(dizimo)

@@ -117,7 +117,7 @@ class DizimoPaymentCrud:
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def get_payment_by_month_year_and_user_id(self, month: str, year: int, user_id: str) -> [DizimoPayment]:
-        async with self.session as session:
+        async with self.session() as session:
             try:
                 statement = select(DizimoPayment).filter(
                     and_(DizimoPayment.user_id == user_id,

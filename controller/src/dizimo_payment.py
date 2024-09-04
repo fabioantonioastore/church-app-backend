@@ -60,3 +60,13 @@ async def create_dizimo_payment(user: User) -> DizimoPayment:
 
 def dizimo_payment_is_expired(payment: DizimoPayment) -> bool:
     return payment.status == "expired"
+
+
+async def test_create_dizimo_payment(user: User, year: int, month: str) -> DizimoPayment:
+    dizimo_payment = DizimoPayment()
+    dizimo_payment.id = str(uuid4())
+    dizimo_payment.user_id = user.id
+    dizimo_payment.status = "active"
+    dizimo_payment.year = year
+    dizimo_payment.month = month
+    return dizimo_payment

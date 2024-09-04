@@ -23,6 +23,7 @@ from apscheduler.triggers.cron import CronTrigger
 from controller.jobs.dizimo_payment import create_month_dizimo_payment_and_transfer_payments_values
 from controller.crud.dizimo_payment import DizimoPaymentCrud
 from routers.middleware.authorization import verify_user_access_token
+from controller.src.dizimo_payment import is_valid_payment_status, test_create_dizimo_payment
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
@@ -114,9 +115,17 @@ async def signup(sign_data: SignUp):
     return {"access_token": jwt.create_access_token(user.cpf, position='parish leader')}
 
 
-@app.patch('/make_payment/{year}/{month}', dependencies=[Depends(verify_user_access_token)])
-async def make_payment(year: int, month: str, user: dict = Depends(verify_user_access_token)):
+@app.patch('/make_payment/{year}/{month}/{status}', dependencies=[Depends(verify_user_access_token)])
+async def make_payment(year: int, month: str, status: str, user: dict = Depends(verify_user_access_token)):
+    if not(is_valid_payment_status(status)):
+        raise "Invalid status: active, paid, expired"
     user = await user_crud.get_user_by_cpf(user['cpf'])
     dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, year, user.id)
-    await dizimo_payment_crud.update_status(dizimo.id, "paid")
+    await dizimo_payment_crud.update_status(dizimo.id, status)
     return "Ok"
+
+@app.post("/create/dizimo_payment/{year}/{month}", dependencies=[Depends(verify_user_access_token)])
+async def create_payment_router(year: int, month: str, user: dict = verify_user_access_token):
+    user = await user_crud.get_user_by_cpf(user["cpf"])
+    dizimo = test_create_dizimo_payment(user, year, month)
+    return await dizimo_payment_crud.create_payment(dizimo)

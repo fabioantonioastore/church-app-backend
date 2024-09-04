@@ -3,7 +3,7 @@ from fastapi.responses import StreamingResponse
 from controller.crud.warning import WarningCrud
 from controller.crud.user import UserCrud
 from controller.crud.community import CommunityCrud
-from routers.middleware.authorization import verify_user_access_token
+from router.middleware.authorization import verify_user_access_token
 from schemas.warning import CreateWarningModel, UpdateWarningModel
 from controller.src.warning import create_warning, get_warning_client_data
 from controller.validators.warning import WarningValidator

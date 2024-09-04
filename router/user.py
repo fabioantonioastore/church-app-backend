@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status, Depends
-from routers.middleware.authorization import verify_user_access_token
+from router.middleware.authorization import verify_user_access_token
 from controller.crud.user import UserCrud
 from controller.crud.login import LoginCrud
 from controller.crud.community import CommunityCrud

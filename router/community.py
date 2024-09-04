@@ -4,7 +4,7 @@ from fastapi.responses import StreamingResponse
 from controller.src.community import (get_patrons, create_community_data, get_community_client_data,
                                       convert_to_dict, update_community_data, get_users_friendly_data,
                                       get_community_list, get_community_patron)
-from routers.middleware.authorization import verify_user_access_token
+from router.middleware.authorization import verify_user_access_token
 from schemas.community import (CreateCommunityModel, UpdateCommunityModel)
 from controller.src.user import (is_parish_leader, is_council_member, get_user_name_and_responsability,
                                  get_user_name_and_responsability_and_cpf)

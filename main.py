@@ -1,11 +1,11 @@
 import uuid
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-import routers.user
-import routers.community
-import routers.login
-import routers.warning
-import routers.dizimo_payment
+import router.user
+import router.community
+import router.login
+import router.warning
+import router.dizimo_payment
 from controller.auth import jwt
 from models.community import Community
 from controller.crud.community import CommunityCrud
@@ -22,7 +22,7 @@ from contextlib import asynccontextmanager
 from apscheduler.triggers.cron import CronTrigger
 from controller.jobs.dizimo_payment import create_month_dizimo_payment_and_transfer_payments_values
 from controller.crud.dizimo_payment import DizimoPaymentCrud
-from routers.middleware.authorization import verify_user_access_token
+from router.middleware.authorization import verify_user_access_token
 from controller.src.dizimo_payment import is_valid_payment_status, test_create_dizimo_payment
 
 login_crud = LoginCrud()
@@ -52,11 +52,11 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-app.include_router(routers.user.router)
-app.include_router(routers.community.router)
-app.include_router(routers.login.router)
-app.include_router(routers.warning.router)
-app.include_router(routers.dizimo_payment.router)
+app.include_router(router.user.router)
+app.include_router(router.community.router)
+app.include_router(router.login.router)
+app.include_router(router.warning.router)
+app.include_router(router.dizimo_payment.router)
 
 
 @app.get('/communities')

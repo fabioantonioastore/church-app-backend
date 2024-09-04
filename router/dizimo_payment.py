@@ -3,7 +3,7 @@ import json
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import StreamingResponse
 from controller.crud.dizimo_payment import DizimoPaymentCrud
-from routers.middleware.authorization import verify_user_access_token
+from router.middleware.authorization import verify_user_access_token
 from controller.crud.user import UserCrud
 from uuid import uuid4
 from controller.src.dizimo_payment import dizimo_payment_is_paid, complete_dizimo_payment, dizimo_payment_is_expired

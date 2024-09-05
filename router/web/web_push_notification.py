@@ -1,8 +1,6 @@
 from pywebpush import webpush, WebPushException
 from schemas.web_push_notification import PushSubscription
 from controller.src.web_push_notification import create_web_push_model
-from models.user import User
-from models.web_push import WebPush
 from controller.crud.web_push import WebPushCrud
 from fastapi import APIRouter, Depends, status
 from controller.crud.user import UserCrud

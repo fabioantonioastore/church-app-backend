@@ -7,7 +7,7 @@ from controller.crud.web_push import WebPushCrud
 from fastapi import APIRouter, Depends, status
 from controller.crud.user import UserCrud
 from router.middleware.authorization import verify_user_access_token
-from controller.auth.vapid import VAPID_PRIVATE_KEY, VAPID_CLAIMS
+from controller.auth.vapid import VAPID_PRIVATE_KEY, VAPID_CLAIMS, VAPID_PUBLIC_KEY
 from controller.errors.http.exceptions import internal_server_error
 
 router = APIRouter()
@@ -43,3 +43,8 @@ async def send_notification(subscription: PushSubscription, message: str):
         return "Notification sent"
     except WebPushException as error:
         raise internal_server_error(str(error))
+
+
+@router.get("/web/public_key", status_code=status.HTTP_200_OK)
+async def get_public_key_router():
+    return {"public_key": VAPID_PUBLIC_KEY}

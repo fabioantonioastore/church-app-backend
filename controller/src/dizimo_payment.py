@@ -67,10 +67,13 @@ def get_dizimo_payment_no_sensitive_data(payment: DizimoPayment) -> dict:
     payment_no_sensitive_data = {'status': payment.status, 'year': payment.year, 'month': payment.month,
                                  'payment': None}
     if payment.correlation_id:
-        payment_no_sensitive_data['payment'] = get_pix_no_sensitive_data(get_pix_payment_from_correlation_id(payment.correlation_id))
+        payment_no_sensitive_data['payment'] = get_pix_no_sensitive_data(
+            get_pix_payment_from_correlation_id(payment.correlation_id))
     return payment_no_sensitive_data
 
 
+def get_dizimo_status(dizimo: DizimoPayment) -> str:
+    return dizimo.status
 
 
 async def test_create_dizimo_payment(user: User, year: int, month: str) -> DizimoPayment:

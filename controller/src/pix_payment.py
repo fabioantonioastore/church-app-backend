@@ -63,6 +63,10 @@ def get_pix_no_sensitive_data(pix: dict) -> dict:
     }
 
 
+def get_pix_status(pix: dict) -> str:
+    return pix['charge']['status']
+
+
 def get_pix_payment_from_correlation_id(correlation_id: str) -> dict:
     URL = PIX_COB_URL + "/" + correlation_id
     return requests.get(URL, headers=header).json()

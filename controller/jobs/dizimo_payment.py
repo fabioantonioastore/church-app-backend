@@ -18,14 +18,6 @@ scheduler = AsyncIOScheduler()
 PAID = "paid"
 EXPIRED = "expired"
 ACTIVE = "active"
-STATUS = None
-
-
-async def get_pix_payment_status() -> dict:
-    return {
-        "status": STATUS,
-        "date": datetime.now()
-    }
 
 
 async def update_payment_and_push_notification(correlation_id: str, user: User = None) -> NoReturn:
@@ -37,19 +29,15 @@ async def update_payment_and_push_notification(correlation_id: str, user: User =
             if not user:
                 user = await user_crud.get_user_by_id(dizimo_payment.user_id)
             await community_crud.increase_actual_month_payment_value(user.community_id, get_pix_value(pix_payment))
-            STATUS = PAID
             remove_jobs_by_function(update_payment_and_push_notification)
             return
         if is_pix_expired(pix_payment):
-            STATUS = EXPIRED
             delete_pix_by_correlation_id(dizimo_payment.correlation_id)
             await dizimo_payment_crud.update_correlation_id_to_none(dizimo_payment.id)
             return
         if is_pix_active(pix_payment):
-            STATUS = ACTIVE
             return
     if get_dizimo_status(dizimo_payment) == PAID:
-        STATUS = None
         remove_jobs_by_function(update_payment_and_push_notification)
 
 

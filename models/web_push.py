@@ -2,7 +2,6 @@ from database.db import Base
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import mapped_column, relationship
 from controller.src.generate_uuid import generate_uuid4
-from models.user import User
 
 
 class WebPush(Base):

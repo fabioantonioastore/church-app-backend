@@ -13,4 +13,4 @@ class WebPush(Base):
     auth = mapped_column(String)
     user_id = mapped_column(String, ForeignKey("users.id"))
 
-    relationship("User", back_populates="web_push")
+    user = relationship("User", back_populates="web_push")

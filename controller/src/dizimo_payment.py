@@ -20,6 +20,10 @@ MONTHS = (
     "december"
 )
 
+PAID = "paid"
+ACTIVE = "active"
+EXPIRED = "expired"
+
 
 def is_valid_payment_status(status: str) -> bool:
     return status in STATUS
@@ -30,12 +34,12 @@ def convert_to_month(number: int) -> str:
 
 
 def dizimo_payment_is_paid(payment: DizimoPayment) -> bool:
-    return payment.status == "paid"
+    return payment.status == PAID
 
 
 def complete_dizimo_payment(dizimo_payment: DizimoPayment, pix_payment: dict) -> DizimoPayment:
     dizimo_payment.correlation_id = pix_payment['charge']['correlationID']
-    dizimo_payment.status = "active"
+    dizimo_payment.status = ACTIVE
     dizimo_payment.value = pix_payment['charge']['value']
     dizimo_payment.date = datetime.now()
     return dizimo_payment
@@ -53,14 +57,14 @@ async def create_dizimo_payment(user: User) -> DizimoPayment:
     dizimo_payment = DizimoPayment()
     dizimo_payment.id = str(uuid4())
     dizimo_payment.user_id = user.id
-    dizimo_payment.status = "active"
+    dizimo_payment.status = ACTIVE
     dizimo_payment.year = datetime.now().year
     dizimo_payment.month = convert_to_month(datetime.now().month)
     return dizimo_payment
 
 
 def dizimo_payment_is_expired(payment: DizimoPayment) -> bool:
-    return payment.status == "expired"
+    return payment.status == EXPIRED
 
 
 def get_dizimo_payment_no_sensitive_data(payment: DizimoPayment) -> dict:
@@ -80,7 +84,11 @@ async def test_create_dizimo_payment(user: User, year: int, month: str) -> Dizim
     dizimo_payment = DizimoPayment()
     dizimo_payment.id = str(uuid4())
     dizimo_payment.user_id = user.id
-    dizimo_payment.status = "active"
+    dizimo_payment.status = ACTIVE
     dizimo_payment.year = year
     dizimo_payment.month = month
     return dizimo_payment
+
+
+def dizimo_payment_is_active(dizimo: DizimoPayment) -> bool:
+    return dizimo.status == ACTIVE

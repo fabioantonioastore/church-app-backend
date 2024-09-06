@@ -28,6 +28,7 @@ from controller.jobs.dizimo_payment import create_month_dizimo_payment_and_trans
 from controller.crud.dizimo_payment import DizimoPaymentCrud
 from router.middleware.authorization import verify_user_access_token
 from controller.src.dizimo_payment import is_valid_payment_status, test_create_dizimo_payment, complete_dizimo_payment
+from controller.src.web_push_notification import initiciate_push_notification_jobs
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
@@ -41,8 +42,9 @@ async def event_manager(app: FastAPI):
     try:
         initialize_firebase()
         scheduler.start()
+        initiciate_push_notification_jobs(scheduler)
         scheduler.add_job(create_month_dizimo_payment_and_transfer_payments_values,
-                          trigger=CronTrigger(day=1, hour=0, minute=0))
+                          trigger=CronTrigger(day=1, hour=0, minute=0, second=0))
         yield
     finally:
         scheduler.shutdown()

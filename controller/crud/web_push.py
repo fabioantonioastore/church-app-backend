@@ -4,6 +4,7 @@ from models.web_push import WebPush
 from controller.errors.http.exceptions import internal_server_error
 from sqlalchemy.orm import selectinload
 from typing import AsyncIterator
+from models.user import User
 
 SESSION = db_session
 

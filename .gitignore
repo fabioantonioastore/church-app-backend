@@ -4,4 +4,3 @@ __pycache__
 .idea
 .vscode
 venv
-firebase_credentials.json

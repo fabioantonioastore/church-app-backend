@@ -1,12 +1,10 @@
-from pywebpush import webpush, WebPushException
-from schemas.web_push_notification import PushSubscription
+from schemas.web_push_notification import PushSubscription, PushNotification
 from controller.src.web_push_notification import create_web_push_model
 from controller.crud.web_push import WebPushCrud
 from fastapi import APIRouter, Depends, status
 from controller.crud.user import UserCrud
 from router.middleware.authorization import verify_user_access_token
-from controller.auth.vapid import VAPID_PRIVATE_KEY, VAPID_CLAIMS, VAPID_PUBLIC_KEY
-from controller.errors.http.exceptions import internal_server_error
+from firebase_admin import messaging
 
 router = APIRouter()
 web_push_crud = WebPushCrud()
@@ -24,25 +22,13 @@ async def subscribe(subscription: PushSubscription, user: dict = Depends(verify_
 
 
 @router.post("/web_push/send_notification", status_code=status.HTTP_200_OK)
-async def send_notification(subscription: PushSubscription, message: str):
-    try:
-        KEYS = {"p256dh": subscription.p256dh,
-                "auth": subscription.auth
-                }
-        webpush(
-            subscription_info={
-                "endpoint": subscription.endpoint,
-                "keys": KEYS
-            },
-            data=message,
-            vapid_private_key=VAPID_PRIVATE_KEY,
-            vapid_claims=VAPID_CLAIMS
-        )
-        return "Notification sent"
-    except WebPushException as error:
-        raise internal_server_error(str(error))
-
-
-@router.get("/web/public_key", status_code=status.HTTP_200_OK)
-async def get_public_key_router():
-    return {"public_key": VAPID_PUBLIC_KEY}
+async def send_notification(notification: PushNotification):
+    message = messaging.Message(
+        notification=messaging.Notification(
+            title=notification.title,
+            body=notification.body
+        ),
+        token=notification.token
+    )
+    response = messaging.send(message)
+    return {"message_id": response}

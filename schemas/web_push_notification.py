@@ -2,17 +2,13 @@ from pydantic import BaseModel, ConfigDict
 
 
 class PushSubscription(BaseModel):
-    endpoint: str
-    p256dh: str
-    auth: str
+    token: str
 
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={
             "example": {
-                "endpoint": "endpoint of device",
-                "p256dh": "public key",
-                "auth": "auth key"
+                "token": "Token of device"
             }
         }
     )
@@ -21,4 +17,15 @@ class PushSubscription(BaseModel):
 class PushNotification(BaseModel):
     title: str
     body: str
-    subscription: PushSubscription
+    token: str
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "title": "Title of the notification",
+                "body": "Body of the notification",
+                "token": "Token of the device"
+            }
+        }
+    )

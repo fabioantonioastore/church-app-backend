@@ -1,4 +1,5 @@
 import uuid
+from controller.auth.firebase import initialize_firebase
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import router.user
@@ -38,6 +39,7 @@ scheduler = AsyncIOScheduler()
 @asynccontextmanager
 async def event_manager(app: FastAPI):
     try:
+        initialize_firebase()
         scheduler.start()
         scheduler.add_job(create_month_dizimo_payment_and_transfer_payments_values,
                           trigger=CronTrigger(day=1, hour=0, minute=0))

@@ -19,5 +19,5 @@ class User(Base):
     community_id = mapped_column(String, ForeignKey('communities.id'))
     responsibility = mapped_column(String, default="faithful")
 
-    dizimo_payments = relationship('DizimoPayment')
+    dizimo_payments = relationship('DizimoPayment', back_populates="user")
     web_push = relationship("WebPush", back_populates="user", cascade="all, delete-orphan")

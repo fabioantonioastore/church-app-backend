@@ -1,4 +1,4 @@
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy import String, DateTime, Float, ForeignKey, Integer
 from database.db import Base
 from controller.src.generate_uuid import generate_uuid4
@@ -15,3 +15,5 @@ class DizimoPayment(Base):
     value = mapped_column(Float, nullable=True)
     status = mapped_column(String)
     user_id = mapped_column(String, ForeignKey('users.id'))
+
+    user = relationship("User", back_populates="dizimo_payments")

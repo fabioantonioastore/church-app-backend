@@ -9,6 +9,6 @@ class WebPush(Base):
 
     id = mapped_column(String, primary_key=True, default=generate_uuid4)
     token = mapped_column(String, unique=True)
-    user_id = mapped_column(String, ForeignKey("users.id"), unique=True)
+    user_id = mapped_column(String, ForeignKey("users.id"))
 
     user = relationship("User", back_populates="web_push")

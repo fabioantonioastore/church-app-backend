@@ -31,7 +31,7 @@ class WebPushCrud:
                     selectinload(WebPush.user)
                 ).offset(offset).limit(page_size)
                 web_pushes = await session.execute(statement)
-                web_pushes = web_pushes.scalars().unique().all()
+                web_pushes = web_pushes.scalars().all()
                 yield web_pushes
             except Exception as error:
                 await session.rollback()

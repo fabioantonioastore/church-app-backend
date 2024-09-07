@@ -13,12 +13,15 @@ user_crud = UserCrud()
 
 @router.post("/web_push/subscription", status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_user_access_token)])
 async def subscribe(subscription: PushSubscription, user: dict = Depends(verify_user_access_token)) -> str:
-    subscription = dict(subscription)
-    user = await user_crud.get_user_by_cpf(user["cpf"])
-    subscription["user_id"] = user.id
-    web_push = create_web_push_model(subscription)
-    await web_push_crud.create_web_push(web_push)
-    return "Subscription realized"
+    try:
+        subscription = dict(subscription)
+        user = await user_crud.get_user_by_cpf(user["cpf"])
+        subscription["user_id"] = user.id
+        web_push = create_web_push_model(subscription)
+        await web_push_crud.create_web_push(web_push)
+        return "Subscription realized"
+    except:
+        return "Ok"
 
 
 @router.post("/web_push/send_notification", status_code=status.HTTP_200_OK)

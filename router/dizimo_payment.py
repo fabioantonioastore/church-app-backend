@@ -51,7 +51,7 @@ async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel,
     for i in range(1, 31):
         TIME = datetime.now() + timedelta(minutes=i)
         scheduler.add_job(update_payment_and_push_notification, DateTrigger(run_date=TIME),
-                      args=[dizimo_payment.correlation_id])
+                      args=[dizimo_payment.correlation_id, i])
     return get_pix_no_sensitive_data(pix_payment)
 
 

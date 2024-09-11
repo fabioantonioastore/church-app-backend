@@ -8,11 +8,13 @@ from controller.crud.user import UserCrud
 from controller.crud.community import CommunityCrud
 from controller.src.dizimo_payment import create_dizimo_payment, get_dizimo_status
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from datetime import datetime
+from firebase_admin import messaging
+from controller.crud.web_push import WebPushCrud
 
 dizimo_payment_crud = DizimoPaymentCrud()
 user_crud = UserCrud()
 community_crud = CommunityCrud()
+web_push_crud = WebPushCrud()
 scheduler = AsyncIOScheduler()
 
 PAID = "paid"
@@ -20,7 +22,7 @@ EXPIRED = "expired"
 ACTIVE = "active"
 
 
-async def update_payment_and_push_notification(correlation_id: str, user: User = None) -> NoReturn:
+async def update_payment_and_push_notification(correlation_id: str, count: int = 0, user: User = None) -> NoReturn:
     dizimo_payment = await dizimo_payment_crud.get_payment_by_correlation_id(correlation_id)
     pix_payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
     if get_dizimo_status(dizimo_payment) == ACTIVE:
@@ -29,16 +31,32 @@ async def update_payment_and_push_notification(correlation_id: str, user: User =
             if not user:
                 user = await user_crud.get_user_by_id(dizimo_payment.user_id)
             await community_crud.increase_actual_month_payment_value(user.community_id, get_pix_value(pix_payment))
+            await pix_notification_message("Pagamento realizado com sucesso", "Obrigado pela a sua doacao", user.id)
             remove_jobs_by_function(update_payment_and_push_notification)
             return
         if is_pix_expired(pix_payment):
             delete_pix_by_correlation_id(dizimo_payment.correlation_id)
             await dizimo_payment_crud.update_correlation_id_to_none(dizimo_payment.id)
+            await pix_notification_message("Pix expirado", "Por favor gerar outro pix", user.id)
             return
         if is_pix_active(pix_payment):
+            if count == 5 or count == 10 or count == 15 or count == 20 or count == 25:
+                await pix_notification_message("Realize o pagamento", f"Ainda falta {30 - count} minutos para realizar o pagamento", user.id)
             return
     if get_dizimo_status(dizimo_payment) == PAID:
         remove_jobs_by_function(update_payment_and_push_notification)
+
+
+async def pix_notification_message(title: str, body: str, user_id: str) -> NoReturn:
+    web_push = await web_push_crud.get_web_push_by_user_id(user_id)
+    message = messaging.Message(
+        notification=messaging.Notification(
+            title=title,
+            body=body
+        ),
+        token=web_push.token
+    )
+    messaging.send(message)
 
 
 def remove_jobs_by_function(func):

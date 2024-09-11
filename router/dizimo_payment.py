@@ -17,6 +17,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from controller.jobs.dizimo_payment import update_payment_and_push_notification
 from datetime import datetime, timedelta
 from controller.src.dizimo_payment import get_dizimo_payment_no_sensitive_data
+from controller.jobs.dizimo_payment import pix_notification_message
 
 router = APIRouter()
 dizimo_payment_crud = DizimoPaymentCrud()
@@ -52,6 +53,7 @@ async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel,
         TIME = datetime.now() + timedelta(minutes=i)
         scheduler.add_job(update_payment_and_push_notification, DateTrigger(run_date=TIME),
                       args=[dizimo_payment.correlation_id, i])
+    await pix_notification_message("Pix gerado", "Realize o pagamento em ate 30 minutos", user.id)
     return get_pix_no_sensitive_data(pix_payment)
 
 

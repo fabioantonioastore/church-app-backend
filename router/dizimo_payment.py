@@ -29,7 +29,10 @@ scheduler = AsyncIOScheduler()
 @router.post("/dizimo_payment", status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_user_access_token)])
 async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel,
                                        user: dict = Depends(verify_user_access_token)):
-        scheduler.start()
+        try:
+          scheduler.start()
+        except Exception as error:
+          pass
         user = await user_crud.get_user_by_cpf(user['cpf'])
         pix_data = dict(pix_data)
         month = pix_data['month']

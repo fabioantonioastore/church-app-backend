@@ -45,11 +45,6 @@ async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel,
         if dizimo_payment.correlation_id:
             pix_payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
             if is_pix_active(pix_payment):
-                for i in range(1, 31):
-                    TIME = datetime.now() + timedelta(minutes=i)
-                    scheduler.add_job(update_payment_and_push_notification,
-                                      trigger=DateTrigger(run_date=TIME),
-                                      args=[dizimo_payment.correlation_id, i])
                 await pix_notification_message("Pix ja foi gerado", "Realize o pagamento", user.id)
                 return get_pix_no_sensitive_data(pix_payment)
         pix_payment = PixPayment(

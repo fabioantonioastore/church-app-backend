@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from controller.auth.firebase import initialize_firebase
 from fastapi import FastAPI, Depends
@@ -29,6 +30,8 @@ from router.middleware.authorization import verify_user_access_token
 from controller.src.dizimo_payment import is_valid_payment_status, test_create_dizimo_payment, complete_dizimo_payment
 from controller.src.web_push_notification import initiciate_push_notification_jobs
 from controller.crud.web_push import WebPushCrud
+from apscheduler.triggers.date import DateTrigger
+from controller.jobs.web_push_notification import execute_notification
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
@@ -165,3 +168,12 @@ async def delete_payment_router(year: int, month: str, user: dict = Depends(veri
 @app.get("/abcde")
 async def a():
     return await web_push_crud.get_all_tokens()
+
+
+@app.get("/test/message/{token}")
+async def test_async_message(token: str):
+    scheduler.add_job(execute_notification, trigger=DateTrigger(datetime.datetime.now()), args=[token, "hello", "hello"])
+    for i in range(1, 5):
+        TIME = datetime.datetime.now() + datetime.timedelta(minutes=i)
+        scheduler.add_job(execute_notification, trigger=DateTrigger(TIME), args=[token, "hello", "hello"])
+    return "Ok"

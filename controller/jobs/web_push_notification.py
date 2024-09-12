@@ -17,8 +17,8 @@ def execute_notification(token: str, title: str, body: str) -> NoReturn:
             token=token
         )
         messaging.send(message)
-    except:
-        pass
+    except Exception as error:
+        print(error)
 
 
 async def send_notification() -> NoReturn:

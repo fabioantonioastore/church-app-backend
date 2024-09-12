@@ -25,11 +25,10 @@ ACTIVE = "active"
 async def update_payment_and_push_notification(correlation_id: str, count: int = 0, user: User = None) -> NoReturn:
     dizimo_payment = await dizimo_payment_crud.get_payment_by_correlation_id(correlation_id)
     pix_payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
+    user = await user_crud.get_user_by_id(dizimo_payment.user_id)
     if get_dizimo_status(dizimo_payment) == ACTIVE:
         if is_pix_paid(pix_payment):
             await dizimo_payment_crud.update_status(dizimo_payment.id, PAID)
-            if not user:
-                user = await user_crud.get_user_by_id(dizimo_payment.user_id)
             await community_crud.increase_actual_month_payment_value(user.community_id, get_pix_value(pix_payment))
             await pix_notification_message("Pagamento realizado com sucesso", "Obrigado pela a sua doacao", user.id)
             remove_jobs_by_function(update_payment_and_push_notification, correlation_id)
@@ -38,6 +37,7 @@ async def update_payment_and_push_notification(correlation_id: str, count: int =
             delete_pix_by_correlation_id(dizimo_payment.correlation_id)
             await dizimo_payment_crud.update_correlation_id_to_none(dizimo_payment.id)
             await pix_notification_message("Pix expirado", "Por favor gerar outro pix", user.id)
+            remove_jobs_by_function(update_payment_and_push_notification, correlation_id)
             return
         if is_pix_active(pix_payment):
             if count == 5 or count == 10 or count == 15 or count == 20 or count == 25:
@@ -48,15 +48,18 @@ async def update_payment_and_push_notification(correlation_id: str, count: int =
 
 
 async def pix_notification_message(title: str, body: str, user_id: str) -> NoReturn:
-    web_push = await web_push_crud.get_web_push_by_user_id(user_id)
-    message = messaging.Message(
-        notification=messaging.Notification(
-            title=title,
-            body=body
-        ),
-        token=web_push.token
-    )
-    messaging.send(message)
+    try:
+        web_push = await web_push_crud.get_web_push_by_user_id(user_id)
+        message = messaging.Message(
+            notification=messaging.Notification(
+                title=title,
+                body=body
+            ),
+            token=web_push.token
+        )
+        messaging.send(message)
+    except Exception as error:
+        print(title, body)
 
 
 def remove_jobs_by_function(func, correlation_id: str) -> NoReturn:

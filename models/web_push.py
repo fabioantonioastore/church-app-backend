@@ -8,7 +8,7 @@ class WebPush(Base):
     __tablename__ = "web_push"
 
     id = mapped_column(String, primary_key=True, default=generate_uuid4)
-    token = mapped_column(String, unique=True)
+    token = mapped_column(String)
     user_id = mapped_column(String, ForeignKey("users.id"))
 
     user = relationship("User", back_populates="web_push")

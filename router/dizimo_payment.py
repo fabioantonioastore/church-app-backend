@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 from fastapi import APIRouter, Depends, status
@@ -52,8 +53,8 @@ async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel,
         await dizimo_payment_crud.complete_dizimo_payment(dizimo_payment)
         for i in range(1, 31):
             TIME = datetime.now() + timedelta(minutes=i)
-            scheduler.add_job(update_payment_and_push_notification, DateTrigger(run_date=TIME),
-                          args=[dizimo_payment.correlation_id, i])
+            scheduler.add_job(lambda: asyncio.create_task(update_payment_and_push_notification, DateTrigger(run_date=TIME),
+                          args=[dizimo_payment.correlation_id, i]))
         await pix_notification_message("Pix gerado", "Realize o pagamento em ate 30 minutos", user.id)
         return get_pix_no_sensitive_data(pix_payment)
     except:

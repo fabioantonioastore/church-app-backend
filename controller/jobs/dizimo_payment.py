@@ -32,7 +32,7 @@ async def update_payment_and_push_notification(correlation_id: str, count: int =
                 user = await user_crud.get_user_by_id(dizimo_payment.user_id)
             await community_crud.increase_actual_month_payment_value(user.community_id, get_pix_value(pix_payment))
             await pix_notification_message("Pagamento realizado com sucesso", "Obrigado pela a sua doacao", user.id)
-            remove_jobs_by_function(update_payment_and_push_notification)
+            remove_jobs_by_function(update_payment_and_push_notification, correlation_id)
             return
         if is_pix_expired(pix_payment):
             delete_pix_by_correlation_id(dizimo_payment.correlation_id)
@@ -44,7 +44,7 @@ async def update_payment_and_push_notification(correlation_id: str, count: int =
                 await pix_notification_message("Realize o pagamento", f"Ainda falta {30 - count} minutos para realizar o pagamento", user.id)
             return
     if get_dizimo_status(dizimo_payment) == PAID:
-        remove_jobs_by_function(update_payment_and_push_notification)
+        remove_jobs_by_function(update_payment_and_push_notification, correlation_id)
 
 
 async def pix_notification_message(title: str, body: str, user_id: str) -> NoReturn:
@@ -59,10 +59,10 @@ async def pix_notification_message(title: str, body: str, user_id: str) -> NoRet
     messaging.send(message)
 
 
-def remove_jobs_by_function(func):
+def remove_jobs_by_function(func, correlation_id: str) -> NoReturn:
     jobs = scheduler.get_jobs()
     for job in jobs:
-        if job.func == func:
+        if job.func == func and job.kwargs.get("correlation_id") == correlation_id:
             scheduler.remove_job(job.id)
 
 

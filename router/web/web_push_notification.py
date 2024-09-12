@@ -17,6 +17,12 @@ async def subscribe(subscription: PushSubscription, user: dict = Depends(verify_
         subscription = dict(subscription)
         user = await user_crud.get_user_by_cpf(user["cpf"])
         subscription["user_id"] = user.id
+        web = None
+        try:
+            web = await web_push_crud.get_web_push_by_user_id(user.id)
+            await web_push_crud.delete_web_push(web)
+        except:
+            pass
         web_push = create_web_push_model(subscription)
         await web_push_crud.create_web_push(web_push)
         return "Subscription realized"
@@ -36,5 +42,5 @@ async def send_notification(notification: PushNotification):
         )
         response = messaging.send(message)
         return {"message_id": response}
-    except:
-        return "Failed"
+    except Exception as error:
+        raise error

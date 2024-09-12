@@ -47,3 +47,12 @@ class WebPushCrud:
                 await session.rollback()
                 raise error
 
+    async def delete_web_push(self, web_push: WebPush) -> str:
+        async with self.session() as session:
+            try:
+                await session.delete(web_push)
+                await session.commit()
+                return "deleted"
+            except Exception as error:
+                await session.rollback()
+                raise error

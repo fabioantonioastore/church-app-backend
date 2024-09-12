@@ -28,34 +28,36 @@ scheduler = AsyncIOScheduler()
 @router.post("/dizimo_payment", status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_user_access_token)])
 async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel,
                                        user: dict = Depends(verify_user_access_token)):
-    user = await user_crud.get_user_by_cpf(user['cpf'])
-    pix_data = dict(pix_data)
-    month = pix_data['month']
-    year = pix_data['year']
-    dizimo_payment = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, year, user.id)
-    if dizimo_payment_is_paid(dizimo_payment):
-        raise bad_request(f"Payment already paid")
-    if dizimo_payment_is_expired(dizimo_payment):
-        raise not_acceptable(f"Payment is expired")
-    if dizimo_payment.correlation_id:
-        pix_payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
-        if is_pix_active(pix_payment):
-            return get_pix_no_sensitive_data(pix_payment)
-    pix_payment = PixPayment(
-        value=pix_data['value'],
-        customer=create_customer(user),
-        correlationID=str(uuid4())
-    )
-    pix_payment = make_post_pix_request(pix_payment)
-    dizimo_payment = complete_dizimo_payment(dizimo_payment, pix_payment)
-    await dizimo_payment_crud.complete_dizimo_payment(dizimo_payment)
-    for i in range(1, 31):
-        TIME = datetime.now() + timedelta(minutes=i)
-        scheduler.add_job(update_payment_and_push_notification, DateTrigger(run_date=TIME),
-                      args=[dizimo_payment.correlation_id, i])
-    await pix_notification_message("Pix gerado", "Realize o pagamento em ate 30 minutos", user.id)
-    return get_pix_no_sensitive_data(pix_payment)
-
+    try:
+        user = await user_crud.get_user_by_cpf(user['cpf'])
+        pix_data = dict(pix_data)
+        month = pix_data['month']
+        year = pix_data['year']
+        dizimo_payment = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, year, user.id)
+        if dizimo_payment_is_paid(dizimo_payment):
+            raise bad_request(f"Payment already paid")
+        if dizimo_payment_is_expired(dizimo_payment):
+            raise not_acceptable(f"Payment is expired")
+        if dizimo_payment.correlation_id:
+            pix_payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
+            if is_pix_active(pix_payment):
+                return get_pix_no_sensitive_data(pix_payment)
+        pix_payment = PixPayment(
+            value=pix_data['value'],
+            customer=create_customer(user),
+            correlationID=str(uuid4())
+        )
+        pix_payment = make_post_pix_request(pix_payment)
+        dizimo_payment = complete_dizimo_payment(dizimo_payment, pix_payment)
+        await dizimo_payment_crud.complete_dizimo_payment(dizimo_payment)
+        for i in range(1, 31):
+            TIME = datetime.now() + timedelta(minutes=i)
+            scheduler.add_job(update_payment_and_push_notification, DateTrigger(run_date=TIME),
+                          args=[dizimo_payment.correlation_id, i])
+        await pix_notification_message("Pix gerado", "Realize o pagamento em ate 30 minutos", user.id)
+        return get_pix_no_sensitive_data(pix_payment)
+    except:
+        "Failed"
 
 @router.get("/dizimo_payment/{year}", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_dizimo_payment_by_year(year: int, user: dict = Depends(verify_user_access_token)):

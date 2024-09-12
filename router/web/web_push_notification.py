@@ -21,7 +21,7 @@ async def subscribe(subscription: PushSubscription, user: dict = Depends(verify_
         await web_push_crud.create_web_push(web_push)
         return "Subscription realized"
     except:
-        return "Ok"
+        return "Failed"
 
 
 @router.post("/web_push/send_notification", status_code=status.HTTP_200_OK)

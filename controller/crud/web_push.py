@@ -68,8 +68,7 @@ class WebPushCrud:
                 return "deleted"
             except Exception as error:
                 await session.rollback()
-                raise error
-                
+                raise error                
 
     async def get_all_tokens(self) -> [WebPush]:
         async with self.session() as session:

@@ -28,12 +28,14 @@ from controller.crud.dizimo_payment import DizimoPaymentCrud
 from router.middleware.authorization import verify_user_access_token
 from controller.src.dizimo_payment import is_valid_payment_status, test_create_dizimo_payment, complete_dizimo_payment
 from controller.src.web_push_notification import initiciate_push_notification_jobs
+from controller.crud.web_push import WebPushCrud
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
 user_crud = UserCrud()
 dizimo_payment_crud = DizimoPaymentCrud()
 scheduler = AsyncIOScheduler()
+web_push_crud = WebPushCrud()
 
 
 @asynccontextmanager
@@ -159,3 +161,7 @@ async def delete_payment_router(year: int, month: str, user: dict = Depends(veri
     dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, int(year), user.id)
     await dizimo_payment_crud.delete_payment_by_id(dizimo.id)
     return "Deleted"
+
+@app.get("/abcde")
+async def a():
+    return await web_push_crud.get_all_tokens()

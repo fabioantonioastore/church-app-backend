@@ -56,3 +56,13 @@ class WebPushCrud:
             except Exception as error:
                 await session.rollback()
                 raise error
+
+    async def get_all_tokens(self) -> [WebPush]:
+        async with self.session() as session:
+            try:
+                statement = select(WebPush)
+                tokens = await session.execute(statement)
+                return tokens.scalars().all()
+            except Exception as error:
+                await session.rollback()
+                raise error

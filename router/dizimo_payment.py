@@ -29,7 +29,6 @@ scheduler = AsyncIOScheduler()
 @router.post("/dizimo_payment", status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_user_access_token)])
 async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel,
                                        user: dict = Depends(verify_user_access_token)):
-    try:
         user = await user_crud.get_user_by_cpf(user['cpf'])
         pix_data = dict(pix_data)
         month = pix_data['month']
@@ -57,8 +56,6 @@ async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel,
                           args=[dizimo_payment.correlation_id, i])
         await pix_notification_message("Pix gerado", "Realize o pagamento em ate 30 minutos", user.id)
         return get_pix_no_sensitive_data(pix_payment)
-    except:
-        "Failed"
 
 @router.get("/dizimo_payment/{year}", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_dizimo_payment_by_year(year: int, user: dict = Depends(verify_user_access_token)):

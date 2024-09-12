@@ -26,12 +26,15 @@ async def subscribe(subscription: PushSubscription, user: dict = Depends(verify_
 
 @router.post("/web_push/send_notification", status_code=status.HTTP_200_OK)
 async def send_notification(notification: PushNotification):
-    message = messaging.Message(
-        notification=messaging.Notification(
-            title=notification.title,
-            body=notification.body
-        ),
-        token=notification.token
-    )
-    response = messaging.send(message)
-    return {"message_id": response}
+    try:
+        message = messaging.Message(
+            notification=messaging.Notification(
+                title=notification.title,
+                body=notification.body
+            ),
+            token=notification.token
+        )
+        response = messaging.send(message)
+        return {"message_id": response}
+    except:
+        return "Failed"

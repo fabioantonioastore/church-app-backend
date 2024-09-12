@@ -22,7 +22,7 @@ EXPIRED = "expired"
 ACTIVE = "active"
 
 
-async def update_payment_and_push_notification(correlation_id: str, count: int = 0, user: User = None) -> NoReturn:
+async def update_payment_and_push_notification(correlation_id: str, count: int = 0) -> NoReturn:
     dizimo_payment = await dizimo_payment_crud.get_payment_by_correlation_id(correlation_id)
     pix_payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
     user = await user_crud.get_user_by_id(dizimo_payment.user_id)
@@ -59,7 +59,7 @@ async def pix_notification_message(title: str, body: str, user_id: str) -> NoRet
         )
         messaging.send(message)
     except Exception as error:
-        print(title, body)
+        print(error)
 
 
 def remove_jobs_by_function(func, correlation_id: str) -> NoReturn:

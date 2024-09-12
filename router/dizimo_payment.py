@@ -29,6 +29,7 @@ scheduler = AsyncIOScheduler()
 @router.post("/dizimo_payment", status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_user_access_token)])
 async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel,
                                        user: dict = Depends(verify_user_access_token)):
+        scheduler.start()
         user = await user_crud.get_user_by_cpf(user['cpf'])
         pix_data = dict(pix_data)
         month = pix_data['month']
@@ -41,6 +42,12 @@ async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel,
         if dizimo_payment.correlation_id:
             pix_payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
             if is_pix_active(pix_payment):
+                for i in range(1, 31):
+                    TIME = datetime.now() + timedelta(minutes=i)
+                    scheduler.add_job(update_payment_and_push_notification,
+                                      trigger=DateTrigger(run_date=TIME),
+                                      args=[dizimo_payment.correlation_id, i])
+                await pix_notification_message("Pix ja foi gerado", "Realize o pagamento", user.id)
                 return get_pix_no_sensitive_data(pix_payment)
         pix_payment = PixPayment(
             value=pix_data['value'],
@@ -53,7 +60,7 @@ async def create_dizimo_payment_router(pix_data: CreateDizimoPaymentModel,
         for i in range(1, 31):
             TIME = datetime.now() + timedelta(minutes=i)
             scheduler.add_job(update_payment_and_push_notification, DateTrigger(run_date=TIME),
-                          args=[dizimo_payment.correlation_id, i])
+            args=[dizimo_payment.correlation_id, i])
         await pix_notification_message("Pix gerado", "Realize o pagamento em ate 30 minutos", user.id)
         return get_pix_no_sensitive_data(pix_payment)
 

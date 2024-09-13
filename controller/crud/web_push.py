@@ -57,6 +57,19 @@ class WebPushCrud:
                 await session.rollback()
                 raise error
 
+    async def delete_web_push_by_user_id(self, user_id: str) -> str:
+        async with self.session() as session:
+            try:
+                statement = select(WebPush).filter(WebPush.user_id == user_id)
+                web_push = await session.execute(statement)
+                web_push = web_push.scalars().first()
+                await session.delete(web_push)
+                await session.commit()
+                return "deleted"
+            except Exception as error:
+                await session.rollback()
+                raise error                
+
     async def get_all_tokens(self) -> [WebPush]:
         async with self.session() as session:
             try:

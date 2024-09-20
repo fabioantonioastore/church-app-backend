@@ -1,17 +1,14 @@
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+from controller.crud.crud import CRUD
 from sqlalchemy import select
 from typing import AsyncIterator
-from models.warning import Warning
+from models import Warning
 from controller.errors.http.exceptions import not_found, internal_server_error
 from datetime import datetime
-from database.session import session as db_session
-
-SESSION = db_session
 
 
-class WarningCrud:
+class WarningCrud(CRUD):
     def __init__(self) -> None:
-        self.session = SESSION
+        super().__init__()
 
     async def get_warnings_by_community_id_from_pagination(self, community_id: str, page: int = 1,
                                                            page_size: int = 100) -> AsyncIterator:

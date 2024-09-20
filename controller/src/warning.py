@@ -1,4 +1,4 @@
-from models.warning import Warning
+from models import Warning
 from uuid import uuid4
 from datetime import datetime
 

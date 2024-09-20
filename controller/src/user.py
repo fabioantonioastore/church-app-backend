@@ -1,9 +1,9 @@
-from models.user import User
-from models.dizimo_payment import DizimoPayment
+from models import User
+from models import DizimoPayment
 from uuid import uuid4
 from datetime import datetime
-from controller.crud.community import CommunityCrud
-from models.login import Login
+from controller.crud import CommunityCrud
+from models import Login
 from controller.src.login import upgrade_login_position
 from typing import NamedTuple
 from controller.validators.date import DateValidator
@@ -11,7 +11,7 @@ from controller.validators.cpf import CPFValidator
 from controller.validators.name import NameValidator
 from controller.validators.phone import PhoneValidator
 from controller.validators.password import PasswordValidator
-from controller.crud.login import LoginCrud
+from controller.crud import LoginCrud
 from controller.auth.password import hash_pasword
 
 community_crud = CommunityCrud()

@@ -1,17 +1,15 @@
-from database.session import session as db_session
+from controller.crud.crud import CRUD
 from sqlalchemy import select
-from models.web_push import WebPush
+from models import WebPush
 from controller.errors.http.exceptions import internal_server_error
 from sqlalchemy.orm import selectinload
 from typing import AsyncIterator
-from models.user import User
-
-SESSION = db_session
+from models import User
 
 
-class WebPushCrud:
+class WebPushCrud(CRUD):
     def __init__(self) -> None:
-        self.session = SESSION
+        super().__init__()
 
     async def create_web_push(self, web_push: WebPush) -> WebPush:
         async with self.session() as session:

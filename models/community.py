@@ -1,6 +1,6 @@
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy import String, LargeBinary, Boolean, Integer
-from database.db import Base
+from database import Base
 from models.warning import Warning
 from controller.src.generate_uuid import generate_uuid4
 

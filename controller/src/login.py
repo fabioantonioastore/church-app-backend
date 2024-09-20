@@ -1,7 +1,7 @@
-from models.login import Login
+from models import Login
 from uuid import uuid4
 from controller.auth.password import hash_pasword, verify_hashed_password
-from controller.crud.login import LoginCrud
+from controller.crud import LoginCrud
 
 login_crud = LoginCrud()
 

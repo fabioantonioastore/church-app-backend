@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status, Depends
-from controller.crud.community import CommunityCrud
+from controller.crud import CommunityCrud
 from fastapi.responses import StreamingResponse
 from controller.src.community import (get_patrons, create_community_data, get_community_client_data,
                                       convert_to_dict, update_community_data, get_users_friendly_data,
@@ -9,7 +9,7 @@ from schemas.community import (CreateCommunityModel, UpdateCommunityModel)
 from controller.src.user import (is_parish_leader, is_council_member, get_user_name_and_responsability,
                                  get_user_name_and_responsability_and_cpf)
 from controller.errors.http.exceptions import unauthorized
-from controller.crud.user import UserCrud
+from controller.crud import UserCrud
 from controller.src.user import return_user_name_and_cpf_and_position
 
 router = APIRouter()

@@ -1,14 +1,12 @@
 from sqlalchemy import select
-from models.login import Login
+from models import Login
 from controller.errors.http.exceptions import not_found
-from database.session import session as db_session
-
-SESSION = db_session
+from controller.crud.crud import CRUD
 
 
-class LoginCrud:
+class LoginCrud(CRUD):
     def __init__(self) -> None:
-        self.session = SESSION
+        super().__init__()
 
     async def update_password(self, cpf: str, password: str):
         async with self.session() as session:

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import String, ForeignKey
-from database.db import Base
+from database import Base
 from controller.src.generate_uuid import generate_uuid4
 
 

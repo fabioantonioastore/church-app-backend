@@ -2,14 +2,14 @@ from fastapi import APIRouter, status
 from schemas.sign import SignIn, SignUp
 from controller.validators.sign_validator import SignUpValidator
 from controller.src.login import create_login, verify_user_login
-from controller.crud.login import LoginCrud
-from controller.crud.user import UserCrud
+from controller.crud import LoginCrud
+from controller.crud import UserCrud
 from controller.src.user import create_user
 from controller.auth import jwt
 from controller.errors.http.exceptions import internal_server_error, bad_request
 from controller.src.user import convert_user_to_dict
 from controller.src.dizimo_payment import create_dizimo_payment
-from controller.crud.dizimo_payment import DizimoPaymentCrud
+from controller.crud import DizimoPaymentCrud
 
 router = APIRouter()
 login_crud = LoginCrud()

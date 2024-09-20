@@ -1,17 +1,16 @@
 from sqlalchemy import select, and_, or_
-from models.user import User
+from models import User
 from controller.errors.http.exceptions import not_found, internal_server_error
 from controller.crud.community import CommunityCrud
-from database.session import session as db_session
+from controller.crud.crud import CRUD
 from typing import AsyncIterator
 
 community_crud = CommunityCrud()
-SESSION = db_session
 
 
-class UserCrud:
+class UserCrud(CRUD):
     def __init__(self) -> None:
-        self.session = SESSION
+        super().__init__()
 
     async def get_users_paginated(self, page: int = 1, page_size: int = 100) -> AsyncIterator:
         async with self.session() as session:

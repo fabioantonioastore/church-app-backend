@@ -1,15 +1,15 @@
 from fastapi import APIRouter, status, Depends
 from router.middleware.authorization import verify_user_access_token
-from controller.crud.user import UserCrud
-from controller.crud.login import LoginCrud
-from controller.crud.community import CommunityCrud
+from controller.crud import UserCrud
+from controller.crud import LoginCrud
+from controller.crud import CommunityCrud
 from controller.src.user import (get_user_client_data, get_update_data, is_council_member,
                                  is_parish_leader, upgrade_user_position, convert_user_to_dict)
 from schemas.user import UpdateUserModel, UpgradeUserPositionResponsability
 from controller.errors.http.exceptions import unauthorized, bad_request, internal_server_error
 from controller.validators.cpf import CPFValidator
 from controller.auth import jwt
-from models.login import Login
+from models import Login
 from uuid import uuid4
 from controller.auth.password import hash_pasword
 from datetime import datetime

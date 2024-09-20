@@ -1,6 +1,6 @@
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy import String, Date, LargeBinary, ForeignKey, Boolean
-from database.db import Base
+from database import Base
 from controller.src.generate_uuid import generate_uuid4
 from models.web_push import WebPush
 

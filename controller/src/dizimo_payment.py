@@ -1,5 +1,5 @@
-from models.dizimo_payment import DizimoPayment
-from models.user import User
+from models import DizimoPayment
+from models import User
 from uuid import uuid4
 from datetime import datetime
 from controller.src.pix_payment import get_pix_no_sensitive_data, get_pix_payment_from_correlation_id

@@ -1,5 +1,5 @@
-from models.web_push import WebPush
-from controller.crud.web_push import WebPushCrud
+from models import WebPush
+from controller.crud import WebPushCrud
 from typing import NoReturn
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger

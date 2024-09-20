@@ -1,11 +1,11 @@
 from schemas.web_push_notification import PushSubscription, PushNotification
 from controller.src.web_push_notification import create_web_push_model
-from controller.crud.web_push import WebPushCrud
+from controller.crud import WebPushCrud
 from fastapi import APIRouter, Depends, status
-from controller.crud.user import UserCrud
+from controller.crud import UserCrud
 from router.middleware.authorization import verify_user_access_token
 from firebase_admin import messaging
-from controller.crud.dizimo_payment import DizimoPaymentCrud
+from controller.crud import DizimoPaymentCrud
 
 router = APIRouter()
 web_push_crud = WebPushCrud()

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, status, Depends, Query
 from fastapi.responses import StreamingResponse
-from controller.crud.warning import WarningCrud
-from controller.crud.user import UserCrud
-from controller.crud.community import CommunityCrud
+from controller.crud import WarningCrud
+from controller.crud import UserCrud
+from controller.crud import CommunityCrud
 from router.middleware.authorization import verify_user_access_token
 from schemas.warning import CreateWarningModel, UpdateWarningModel
 from controller.src.warning import create_warning, get_warning_client_data

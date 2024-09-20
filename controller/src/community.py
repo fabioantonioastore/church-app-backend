@@ -1,6 +1,6 @@
-from models.community import Community
+from models import Community
 from uuid import uuid4
-from models.user import User
+from models import User
 
 
 def get_users_friendly_data(users: [User]) -> list[dict]:

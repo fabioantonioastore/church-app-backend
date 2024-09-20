@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from models.dizimo_payment import DizimoPayment
-from models.user import User
+from models import DizimoPayment
+from models import User
 from dotenv import load_dotenv
 from os import getenv
 import requests

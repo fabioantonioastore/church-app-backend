@@ -1,15 +1,13 @@
 from sqlalchemy import select
 from typing import AsyncIterator
-from models.community import Community
+from models import Community
+from controller.crud.crud import CRUD
 from controller.errors.http.exceptions import not_found, internal_server_error
-from database.session import session as db_session
-
-SESSION = db_session
 
 
-class CommunityCrud:
+class CommunityCrud(CRUD):
     def __init__(self) -> None:
-        self.session = SESSION
+        super().__init__()
 
     async def get_communities_paginated(self, page: int = 1, page_size: int = 100) -> AsyncIterator:
         async with self.session() as session:

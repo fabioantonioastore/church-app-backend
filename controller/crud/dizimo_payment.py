@@ -1,17 +1,15 @@
-from models.dizimo_payment import DizimoPayment
+from models import DizimoPayment
 from sqlalchemy import select, and_
 from typing import AsyncIterator
 from controller.errors.http.exceptions import not_found, internal_server_error
 from controller.src.dizimo_payment import is_valid_payment_status
 from controller.src.dizimo_payment import pass_data_to
-from database.session import session as db_session
-
-SESSION = db_session
+from controller.crud.crud import CRUD
 
 
-class DizimoPaymentCrud:
+class DizimoPaymentCrud(CRUD):
     def __init__(self) -> None:
-        self.session = SESSION
+        super().__init__()
 
     async def get_all(self):
         async with self.session() as session:

@@ -22,12 +22,12 @@ async def get_ten_community_warnings(community_patron: str, total: int = Query(d
         new_warning.append(get_warning_client_data(warning))
     return new_warning
 
-@router.get('/community/warnings/{community_patron}/paginated', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Get all community warnings by pagination")
-async def get_all_community_warnings_by_pagination(community_patron: str, user: dict = Depends(verify_user_access_token)):
+@router.get('/community/warnings/{community_patron}/paginated/{page}/{total}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Get all community warnings by pagination")
+async def get_all_community_warnings_by_pagination(community_patron: str, page: int = 1, total: int = 100, user: dict = Depends(verify_user_access_token)):
     community = await community_crud.get_community_by_patron(community_patron)
 
     async def warning_generator():
-        async for warnings in warning_crud.get_warnings_by_community_id_from_pagination(community.id):
+        async for warnings in warning_crud.get_warnings_by_community_id_from_pagination(community.id, page, total):
             for warning in warnings:
                 yield get_warning_client_data(warning)
 

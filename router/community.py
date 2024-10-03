@@ -17,15 +17,12 @@ community_crud = CommunityCrud()
 user_crud = UserCrud()
 
 
-@router.get('/community/list', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)],
+@router.get('/community/list/{page}/{page_size}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)],
             summary="Community", description="Get community list")
-async def communities_list():
-    async for communities in community_crud.get_communities_paginated():
-        async def community_generator():
-            for community in communities:
-                yield get_community_patron(community)
-
-    return StreamingResponse(community_generator(), media_type="application/json")
+async def communities_list(page: int, page_size: int):
+    communities = await community_crud.get_communities_paginated(page, page_size)
+    communities = [get_community_client_data(community) for community in communities]
+    return communities
 
 
 @router.get('/patrons', status_code=status.HTTP_200_OK, summary="Community", description="Get communities patrons")

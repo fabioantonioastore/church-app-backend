@@ -1,6 +1,5 @@
 from controller.crud.crud import CRUD
 from sqlalchemy import select
-from typing import Iterator
 from models import Warning
 from controller.errors.http.exceptions import not_found, internal_server_error
 from datetime import datetime

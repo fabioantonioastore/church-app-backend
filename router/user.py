@@ -20,6 +20,7 @@ user_crud = UserCrud()
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
 
+
 @router.get('/users/all', status_code=status.HTTP_200_OK, summary="Users", description="Get all users info")
 async def get_all_users():
     users = await user_crud.get_all_users()
@@ -28,12 +29,16 @@ async def get_all_users():
         user.community_id = community.patron
     return users
 
-@router.get('/me', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Get user token info")
+
+@router.get('/me', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Users",
+            description="Get user token info")
 async def get_user_data(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user['cpf'])
     return await get_user_client_data(user)
 
-@router.put("/me", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Update user info")
+
+@router.put("/me", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Users",
+            description="Update user info")
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
     CPFValidator(user_data['cpf'])
@@ -55,12 +60,12 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
         await login_crud.create_login(login_obj)
         raise bad_request(f"This data is already in use: {error!r}")
     new_login = Login(
-        id = str(uuid4()),
-        position = user.position,
-        cpf = user.cpf
+        id=str(uuid4()),
+        position=user.position,
+        cpf=user.cpf
     )
     if user_data.get('password'):
-        if not(user_data['password'] is None):
+        if not (user_data['password'] is None):
             new_login.password = hash_pasword(user_data['password'])
         else:
             new_login.password = login.password
@@ -68,8 +73,12 @@ async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_us
         new_login.password = login.password
     await login_crud.create_login(new_login)
     return {"access_token": jwt.create_access_token(user.cpf, user.position)}
-@router.patch('/user/upgrade/position_and_responsability', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Upgrade user position")
-async def patch_upgrade_user_position(position_data: UpgradeUserPositionResponsability, user: dict = Depends(verify_user_access_token)):
+
+
+@router.patch('/user/upgrade/position_and_responsability', status_code=status.HTTP_204_NO_CONTENT,
+              dependencies=[Depends(verify_user_access_token)], summary="Users", description="Upgrade user position")
+async def patch_upgrade_user_position(position_data: UpgradeUserPositionResponsability,
+                                      user: dict = Depends(verify_user_access_token)):
     #if is_parish_leader(user['position']) or is_council_member(user['position']):
     if position_data.position == "user":
         await user_crud.upgrade_user(position_data.cpf, position_data.position, "faithful")
@@ -87,7 +96,9 @@ async def patch_upgrade_user_position(position_data: UpgradeUserPositionResponsa
     raise bad_request(f"Rule {position_data.position!r} doesn't exists")
     #raise unauthorized(f"You can't upgrade user position")
 
-@router.delete('/me/deactivate', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Deactivate user account")
+
+@router.delete('/me/deactivate', status_code=status.HTTP_204_NO_CONTENT,
+               dependencies=[Depends(verify_user_access_token)], summary="Users", description="Deactivate user account")
 async def deactivate_user_account(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user['cpf'])
     user.active = False
@@ -95,12 +106,16 @@ async def deactivate_user_account(user: dict = Depends(verify_user_access_token)
     await user_crud.update_user(user)
     return {"user account deactivate, do login again to activate"}
 
-@router.get('/users/{cpf}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Users", description="Get user info by CPF")
+
+@router.get('/users/{cpf}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)],
+            summary="Users", description="Get user info by CPF")
 async def get_user_by_cpf(cpf: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(cpf)
     return await get_user_client_data(user)
 
-@router.delete('/users/{cpf}', status_code=status.HTTP_204_NO_CONTENT, summary="Users", description="Delete user by CPF")
+
+@router.delete('/users/{cpf}', status_code=status.HTTP_204_NO_CONTENT, summary="Users",
+               description="Delete user by CPF")
 async def delete_user_by_cpf(cpf: str):
     login = await login_crud.get_login_by_cpf(cpf)
     await login_crud.delete_login(login)

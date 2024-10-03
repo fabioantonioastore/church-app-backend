@@ -1,6 +1,6 @@
 from controller.crud.crud import CRUD
 from sqlalchemy import select
-from typing import AsyncIterator
+from typing import Iterator
 from models import Warning
 from controller.errors.http.exceptions import not_found, internal_server_error
 from datetime import datetime
@@ -11,7 +11,7 @@ class WarningCrud(CRUD):
         super().__init__()
 
     async def get_warnings_by_community_id_from_pagination(self, community_id: str, page: int = 1,
-                                                           page_size: int = 100):
+                                                           page_size: int = 100) -> Iterator[Warning]:
         async with self.session() as session:
             try:
                 offset = (page - 1) * page_size

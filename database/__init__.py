@@ -1,2 +1,2 @@
-from db import Base, engine
-from session import session
+from database.db import Base, engine
+from database.session import session

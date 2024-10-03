@@ -18,7 +18,7 @@ class WarningCrud(CRUD):
                 statement = select(Warning).filter(Warning.community_id == community_id).offset(offset).limit(page_size)
                 warnings = await session.execute(statement)
                 warnings = warnings.scalars().all()
-                yield warnings
+                return warnings
             except Exception as error:
                 await session.rollback()
                 raise internal_server_error(f"A error occurs during CRUD: {error!r}")

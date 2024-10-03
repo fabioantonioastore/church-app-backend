@@ -26,12 +26,9 @@ async def get_ten_community_warnings(community_patron: str, total: int = Query(d
 async def get_all_community_warnings_by_pagination(community_patron: str, page: int = 1, page_size: int = 100, user: dict = Depends(verify_user_access_token)):
     community = await community_crud.get_community_by_patron(community_patron)
 
-    async def warning_generator():
-        async for warnings in warning_crud.get_warnings_by_community_id_from_pagination(community.id, page, page_size):
-            for warning in warnings:
-                yield get_warning_client_data(warning)
-
-    return StreamingResponse(warning_generator(), media_type="application/json")
+    warnings = await warning_crud.get_warnings_by_community_id_from_pagination(community.id, page, page_size)
+    warnings = [get_warning_client_data(warning) for warning in warnings]
+    return {"warnings": warnings}
 
 @router.get('/community/warning/{warning_id}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Get warning by id")
 async def get_community_warning(warning_id: str | None = None, user: dict = Depends(verify_user_access_token)):

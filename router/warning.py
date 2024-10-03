@@ -27,7 +27,7 @@ async def get_all_community_warnings_by_pagination(community_patron: str, page: 
 
     warnings = await warning_crud.get_warnings_by_community_id_from_pagination(community.id, page, page_size)
     warnings = [get_warning_client_data(warning) for warning in warnings]
-    return {"warnings": warnings}
+    return warnings
 
 @router.get('/community/warning/{warning_id}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)], summary="Warnings", description="Get warning by id")
 async def get_community_warning(warning_id: str | None = None, user: dict = Depends(verify_user_access_token)):

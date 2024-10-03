@@ -11,7 +11,7 @@ class WarningCrud(CRUD):
         super().__init__()
 
     async def get_warnings_by_community_id_from_pagination(self, community_id: str, page: int = 1,
-                                                           page_size: int = 100) -> AsyncIterator:
+                                                           page_size: int = 100):
         async with self.session() as session:
             try:
                 offset = (page - 1) * page_size

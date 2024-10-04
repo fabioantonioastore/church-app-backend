@@ -14,7 +14,7 @@ class WarningCrud(CRUD):
         async with self.session() as session:
             try:
                 offset = (page - 1) * page_size
-                statement = select(Warning).filter(Warning.community_id == community_id).order_by(desc(Warning.posted_at).offset(offset).limit(page_size))
+                statement = select(Warning).filter(Warning.community_id == community_id).order_by(desc(Warning.posted_at)).offset(offset).limit(page_size)
                 result = await session.execute(statement)
                 warnings = result.scalars().all()
                 return warnings

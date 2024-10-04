@@ -138,8 +138,7 @@ class UserCrud(CRUD):
                         case 'active':
                             user.active = new_user['active']
                         case 'community_patron':
-                            community = await community_crud.get_community_by_patron(db_session,
-                                                                                     new_user['community_patron'])
+                            community = await community_crud.get_community_by_patron(new_user['community_patron'])
                             user.community_id = community.id
                 await session.commit()
                 return user

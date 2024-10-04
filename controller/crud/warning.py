@@ -1,5 +1,5 @@
 from controller.crud.crud import CRUD
-from sqlalchemy import select
+from sqlalchemy import select, desc
 from models import Warning
 from controller.errors.http.exceptions import not_found, internal_server_error
 from datetime import datetime
@@ -14,9 +14,9 @@ class WarningCrud(CRUD):
         async with self.session() as session:
             try:
                 offset = (page - 1) * page_size
-                statement = select(Warning).filter(Warning.community_id == community_id).offset(offset).limit(page_size)
-                warnings = await session.execute(statement)
-                warnings = warnings.scalars().all()
+                statement = select(Warning).filter(Warning.community_id == community_id).order_by(desc(Warning.posted_at).offset(offset).limit(page_size))
+                result = await session.execute(statement)
+                warnings = result.scalars().all()
                 return warnings
             except Exception as error:
                 await session.rollback()

@@ -33,17 +33,17 @@ async def send_notification() -> NoReturn:
             day = datetime.day
             dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, year, user.id)
             if is_first_month_day(day):
-                title = f"Pagamento de {month} ja esta disponivel"
-                body = f"Realize o pagamento agora acessando o app E-Igreja"
+                title = f"E-Igreja"
+                body = f"Pagamento de {month} ja disponivel"
                 execute_notification(token, title, body)
                 return
             if dizimo_payment_is_active(dizimo):
-                title = f"O pagamento de {month} ainda esta pendente"
-                body = f"Realize o pagamento agora acessando o app E-Igreja"
+                title = f"E-Igreja"
+                body = f"Pagamento de {month} ainda pendente"
                 execute_notification(token, title, body)
                 return
-            title = f"Convide mais amigos para fazerem parte do app!"
-            body = f"Agradecemos pela sua contribuicao!"
+            title = f"E-Igreja"
+            body = f"Convide amigos para fazer parte! Agradecemos pela sua contribuicao!"
             execute_notification(token, title, body)
     except:
         pass

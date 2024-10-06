@@ -6,6 +6,7 @@ from router.middleware.authorization import verify_user_access_token
 from schemas.warning import CreateWarningModel, UpdateWarningModel
 from controller.src.warning import create_warning, get_warning_client_data
 from controller.validators.warning import WarningValidator
+from controller.src.web_push_notification import send_notification_to_user, MessageNotification
 
 router = APIRouter()
 warning_crud = WarningCrud()
@@ -58,6 +59,14 @@ async def create_community_warning(warning: CreateWarningModel, user: dict = Dep
     warning['community_id'] = user.community_id
     warning = await create_warning(warning)
     warning = await warning_crud.create_warning(warning)
+    users = True
+    page = 1
+    message = MessageNotification(title="E-Igreja", body="Novo aviso postado na comunidade! Venha conferir.")
+    while users:
+        users = community_crud.get_all_community_users_paginated(warning.community_id, page)
+        for user in users:
+            await send_notification_to_user(user.id, message)
+        page += 1
     return get_warning_client_data(warning)
     #raise unauthorized(f"You can't create a warning")
 

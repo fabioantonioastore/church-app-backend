@@ -30,18 +30,18 @@ async def update_payment_and_push_notification(correlation_id: str, count: int =
         if is_pix_paid(pix_payment):
             await dizimo_payment_crud.update_status(dizimo_payment.id, PAID)
             await community_crud.increase_actual_month_payment_value(user.community_id, get_pix_value(pix_payment))
-            await pix_notification_message("Pagamento realizado com sucesso", "Obrigado pela a sua doacao", user.id)
+            await pix_notification_message("E-Igreja", "Pagamento confirmado, obrigado pela a sua doacao", user.id)
             remove_jobs_by_function(update_payment_and_push_notification, correlation_id)
             return
         if is_pix_expired(pix_payment):
             delete_pix_by_correlation_id(dizimo_payment.correlation_id)
             await dizimo_payment_crud.update_correlation_id_to_none(dizimo_payment.id)
-            await pix_notification_message("Pix expirado", "Por favor gerar outro pix", user.id)
+            await pix_notification_message("E-Igreja", "Pix expirado, por favor gerar outro pix", user.id)
             remove_jobs_by_function(update_payment_and_push_notification, correlation_id)
             return
         if is_pix_active(pix_payment):
             if count == 5 or count == 10 or count == 15 or count == 20 or count == 25:
-                await pix_notification_message("Realize o pagamento", f"Ainda falta {30 - count} minutos para realizar o pagamento", user.id)
+                await pix_notification_message("E-Igreja", f"Realize o pagamento, ainda falta {30 - count} minutos para realizar o pagamento", user.id)
             return
     if get_dizimo_status(dizimo_payment) == PAID:
         remove_jobs_by_function(update_payment_and_push_notification, correlation_id)

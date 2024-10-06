@@ -63,7 +63,7 @@ async def create_community_warning(warning: CreateWarningModel, user: dict = Dep
     page = 1
     message = MessageNotification(title="E-Igreja", body="Novo aviso postado na comunidade! Venha conferir.")
     while users:
-        users = community_crud.get_all_community_users_paginated(warning.community_id, page)
+        users = await community_crud.get_all_community_users_paginated(warning.community_id, page)
         for user in users:
             await send_notification_to_user(user.id, message)
         page += 1

@@ -42,8 +42,8 @@ async def send_notification_to_user(user_id: str, message: MessageNotification) 
         web_push = await web_push_crud.get_web_push_by_user_id(user_id)
         token = web_push.token
         execute_notification(token, message.title, message.body)
-    except:
-        pass
+    except Exception as error:
+        print(error)
 
 
 def create_message_notification(title: str, body: str) -> MessageNotification:

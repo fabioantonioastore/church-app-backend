@@ -38,13 +38,12 @@ def initiciate_push_notification_jobs(scheduler: AsyncIOScheduler) -> NoReturn:
 
 
 async def send_notification_to_user(user_id: str, message: MessageNotification) -> None:
-    print(user_id)
     try:
         web_push = await web_push_crud.get_web_push_by_user_id(user_id)
         token = web_push.token
         execute_notification(token, message.title, message.body)
     except Exception as error:
-        print(error)
+        pass
 
 
 def create_message_notification(title: str, body: str) -> MessageNotification:

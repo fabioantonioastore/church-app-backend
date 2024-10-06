@@ -11,7 +11,7 @@ load_dotenv()
 
 SECRET_KEY = getenv('SECRET_KEY')
 ALGORITHM = getenv('ALGORITHM')
-EXPIRE_MINUTES = 60 * 24
+EXPIRE_MINUTES = 60 * 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/signin")
 
 def create_access_token(cpf: str, position: str = "user"):

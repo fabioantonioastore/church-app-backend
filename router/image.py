@@ -1,14 +1,17 @@
 from fastapi import File, UploadFile, APIRouter, Depends, status
 from router.middleware.authorization import verify_user_access_token
-from fastapi.responses import StreamingResponse
-from io import BytesIO
 from controller.src.image import is_png_or_jpeg_image
 from controller.errors.http.exceptions import not_acceptable
 from controller.crud.user import UserCrud
 from controller.crud.community import CommunityCrud
+from io import BytesIO
+from fastapi.responses import StreamingResponse
+from controller.crud.image import ImageCrud
+from controller.src.image import get_image_bytes
 
 user_crud = UserCrud()
 community_crud = CommunityCrud()
+image_crud = ImageCrud()
 
 router = APIRouter()
 
@@ -25,8 +28,9 @@ async def upload_community_image(user: dict = Depends(verify_user_access_token),
 @router.get("/image/community", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_community_image(user: dict = Depends(verify_user_access_token), file: UploadFile = File(...)):
     user = await user_crud.get_user_by_cpf(user['cpf'])
-    image = await community_crud.get_community_image(user.community_id)
-    image = BytesIO(image)
+    community = await community_crud.get_community_by_id(user.community_id)
+    image = await image_crud.get_image_by_id(community.image)
+    image = BytesIO(get_image_bytes(image))
     return StreamingResponse(image, media_type="image/jpeg")
 
 
@@ -42,6 +46,7 @@ async def upload_user_image(user: dict = Depends(verify_user_access_token), file
 
 @router.get('/image/user', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_user_image(user: dict = Depends(verify_user_access_token)):
-    image = await user_crud.get_user_image(user['cpf'])
-    image = BytesIO(image)
+    user = await user_crud.get_user_by_cpf(user['cpf'])
+    image = await image_crud.get_image_by_id(user.image)
+    image = BytesIO(get_image_bytes(image))
     return StreamingResponse(image, media_type="image/jpeg")

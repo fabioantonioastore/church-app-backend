@@ -14,6 +14,7 @@ from uuid import uuid4
 from controller.auth.password import hash_pasword
 from datetime import datetime
 from controller.validators.phone import PhoneValidator
+from io import BytesIO
 
 router = APIRouter()
 user_crud = UserCrud()

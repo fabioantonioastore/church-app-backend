@@ -14,7 +14,7 @@ class User(Base):
     birthday = mapped_column(Date)
     phone = mapped_column(String, unique=True)
     position = mapped_column(String, default="user")
-    image = mapped_column(LargeBinary, nullable=True)
+    image = mapped_column(String, nullable=True)
     active = mapped_column(Boolean, default=True)
     community_id = mapped_column(String, ForeignKey('communities.id'))
     responsibility = mapped_column(String, default="faithful")

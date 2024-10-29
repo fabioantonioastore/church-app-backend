@@ -24,7 +24,6 @@ async def upload_community_image(user: dict = Depends(verify_user_access_token),
         community = await community_crud.get_community_by_id(user.id)
         if community.image:
             await image_crud.delete_image_by_id(community.image)
-            community.image = None
         image_data = file.read()
         image = await create_image(image_data)
         await community_crud.update_community_image(community.id, image.id)
@@ -47,7 +46,6 @@ async def upload_user_image(user: dict = Depends(verify_user_access_token), file
         user = await user_crud.get_user_by_cpf(user['cpf'])
         if user.image:
             await image_crud.delete_image_by_id(user.image)
-            user.image = None
         image_data = await file.read()
         image = await create_image(image_data)
         await user_crud.update_user_image(user.cpf, image.id)

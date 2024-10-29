@@ -20,10 +20,15 @@ router = APIRouter()
               dependencies=[Depends(verify_user_access_token)])
 async def upload_community_image(user: dict = Depends(verify_user_access_token), file: UploadFile = File(...)):
     if is_png_or_jpeg_image(file):
-        image_data = await file.read()
         user = await user_crud.get_user_by_cpf(user['cpf'])
+        community = await community_crud.get_community_by_id(user.id)
+        if community.image:
+            await image_crud.delete_image_by_id(community.image)
+            community.image = None
+        image_data = file.read()
         image = await create_image(image_data)
-        await community_crud.update_community_image(user.community_id, image)
+        await community_crud.update_community_image(community.id, image.id)
+    raise not_acceptable("Invalid content type")
 
 
 @router.get("/image/community", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
@@ -39,9 +44,13 @@ async def get_community_image(user: dict = Depends(verify_user_access_token), fi
               dependencies=[Depends(verify_user_access_token)])
 async def upload_user_image(user: dict = Depends(verify_user_access_token), file: UploadFile = File(...)):
     if is_png_or_jpeg_image(file):
+        user = await user_crud.get_user_by_cpf(user['cpf'])
+        if user.image:
+            await image_crud.delete_image_by_id(user.image)
+            user.image = None
         image_data = await file.read()
         image = await create_image(image_data)
-        user = await user_crud.update_user_image(user['cpf'], image.id)
+        await user_crud.update_user_image(user.cpf, image.id)
         return
     raise not_acceptable("Invalid content type")
 

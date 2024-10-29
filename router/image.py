@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.put("/upload/image/user", status_code=status.HTTP_204_NO_CONTENT,
             dependencies=[Depends(verify_user_access_token)])
-async def upload_image(user: Depends(verify_user_access_token), file: UploadFile = File(...)):
+async def upload_image(user: dict = Depends(verify_user_access_token), file: UploadFile = File(...)):
     if is_png_or_jpeg_image(file):
         image_data = await file.read()
         user = await user_crud.update_user_image(user['cpf'], image_data)

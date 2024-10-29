@@ -1,7 +1,7 @@
 from models.image import Image
 from controller.crud.crud import CRUD
 from sqlalchemy import select
-from controller.errors.http.exceptions import not_found
+from controller.errors.http.exceptions import not_found, internal_server_error
 
 
 class ImageCrud(CRUD):
@@ -18,3 +18,13 @@ class ImageCrud(CRUD):
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
+
+    async def create_image(self, image: Image) -> Image:
+        async with self.session() as session:
+            try:
+                session.add(image)
+                await session.commit()
+                return image
+            except Exception as error:
+                await session.rollback()
+                raise internal_server_error(f"A error occurs during CRUD: {error!r}")

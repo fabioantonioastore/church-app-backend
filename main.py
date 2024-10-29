@@ -89,7 +89,7 @@ async def create_community():
     a.id = str(uuid.uuid4())
     a.name = 'community'
     a.email = "a@gmail.com"
-    a.image = bytes("asb", 'utf-8')
+    a.image = None
     a.patron = "hello"
     a.location = "something"
 

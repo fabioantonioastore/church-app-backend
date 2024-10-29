@@ -7,7 +7,7 @@ from controller.crud.community import CommunityCrud
 from io import BytesIO
 from fastapi.responses import StreamingResponse
 from controller.crud.image import ImageCrud
-from controller.src.image import get_image_bytes
+from controller.src.image import get_image_bytes, create_image
 
 user_crud = UserCrud()
 community_crud = CommunityCrud()
@@ -22,7 +22,8 @@ async def upload_community_image(user: dict = Depends(verify_user_access_token),
     if is_png_or_jpeg_image(file):
         image_data = await file.read()
         user = await user_crud.get_user_by_cpf(user['cpf'])
-        await community_crud.update_community_image(user.community_id, image_data)
+        image = await create_image(image_data)
+        await community_crud.update_community_image(user.community_id, image)
 
 
 @router.get("/image/community", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
@@ -39,7 +40,8 @@ async def get_community_image(user: dict = Depends(verify_user_access_token), fi
 async def upload_user_image(user: dict = Depends(verify_user_access_token), file: UploadFile = File(...)):
     if is_png_or_jpeg_image(file):
         image_data = await file.read()
-        user = await user_crud.update_user_image(user['cpf'], image_data)
+        image = await create_image(image_data)
+        user = await user_crud.update_user_image(user['cpf'], image.id)
         return
     raise not_acceptable("Invalid content type")
 

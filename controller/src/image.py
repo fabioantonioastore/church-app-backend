@@ -1,5 +1,8 @@
 from fastapi import File, UploadFile
 from models.image import Image
+from controller.crud.image import ImageCrud
+
+image_crud = ImageCrud()
 
 
 def is_png_or_jpeg_image(file: UploadFile) -> bool:
@@ -16,3 +19,9 @@ def is_jpeg_image(file: UploadFile) -> bool:
 
 def get_image_bytes(image: Image):
     return image.byte
+
+
+async def create_image(image_data) -> Image:
+    image = Image()
+    image.byte = image_data
+    return await image_crud.create_image(image)

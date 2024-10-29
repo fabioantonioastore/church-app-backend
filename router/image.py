@@ -13,8 +13,8 @@ community_crud = CommunityCrud()
 router = APIRouter()
 
 
-@router.put("/image/community", status_code=status.HTTP_204_NO_CONTENT,
-            dependencies=[Depends(verify_user_access_token)])
+@router.patch("/image/community", status_code=status.HTTP_204_NO_CONTENT,
+              dependencies=[Depends(verify_user_access_token)])
 async def upload_community_image(user: dict = Depends(verify_user_access_token), file: UploadFile = File(...)):
     if is_png_or_jpeg_image(file):
         image_data = await file.read()
@@ -30,8 +30,8 @@ async def get_community_image(user: dict = Depends(verify_user_access_token), fi
     return StreamingResponse(image, media_type="image/jpeg")
 
 
-@router.put("/image/user", status_code=status.HTTP_204_NO_CONTENT,
-            dependencies=[Depends(verify_user_access_token)])
+@router.patch("/image/user", status_code=status.HTTP_204_NO_CONTENT,
+              dependencies=[Depends(verify_user_access_token)])
 async def upload_user_image(user: dict = Depends(verify_user_access_token), file: UploadFile = File(...)):
     if is_png_or_jpeg_image(file):
         image_data = await file.read()

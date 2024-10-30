@@ -1,5 +1,4 @@
 import base64
-
 from fastapi import File, UploadFile
 from models.image import Image
 from controller.crud.image import ImageCrud

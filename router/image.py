@@ -37,8 +37,8 @@ async def get_community_image(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user['cpf'])
     community = await community_crud.get_community_by_id(user.community_id)
     image = await image_crud.get_image_by_id(community.image)
-    image_base4 = convert_image_to_base64(image.byte)
-    return {"image": image_base4}
+    image_base64 = convert_image_to_base64(image.byte)
+    return {"image": image_base64}
 
 
 @router.patch("/image/user", status_code=status.HTTP_204_NO_CONTENT,

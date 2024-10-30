@@ -125,7 +125,7 @@ class UserCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def update_user_image(self, user_cpf: str, image):
+    async def update_user_image(self, user_cpf: str, image: str):
         async with self.session() as session:
             try:
                 statement = select(User).filter(User.cpf == user_cpf)

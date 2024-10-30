@@ -7,7 +7,7 @@ from controller.crud.community import CommunityCrud
 from io import BytesIO
 from fastapi.responses import StreamingResponse
 from controller.crud.image import ImageCrud
-from controller.src.image import get_image_bytes, create_image
+from controller.src.image import get_image_bytes, create_image, convert_image_to_base64
 from models.image import Image
 
 user_crud = UserCrud()
@@ -37,8 +37,8 @@ async def get_community_image(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user['cpf'])
     community = await community_crud.get_community_by_id(user.community_id)
     image = await image_crud.get_image_by_id(community.image)
-    image = BytesIO(image.byte)
-    return StreamingResponse(image, media_type="image/jpeg")
+    image_base4 = convert_image_to_base64(image.byte)
+    return {"image": image_base4}
 
 
 @router.patch("/image/user", status_code=status.HTTP_204_NO_CONTENT,

@@ -1,3 +1,5 @@
+import base64
+
 from fastapi import File, UploadFile
 from models.image import Image
 from controller.crud.image import ImageCrud
@@ -25,3 +27,7 @@ async def create_image(image_data) -> Image:
     image = Image()
     image.byte = image_data
     return await image_crud.create_image(image)
+
+
+def convert_image_to_base64(image_data):
+    return base64.b64encode(image_data).decode('utf-8')

@@ -54,7 +54,7 @@ async def get_community_patron(community_id: str) -> str:
 
 
 async def get_user_client_data(user: User) -> dict:
-    user_data = {'name': user.name, 'birthday': user.birthday, 'position': user.position, 'image': user.image,
+    user_data = {'name': user.name, 'birthday': user.birthday, 'position': user.position,
                  'community': await get_community_patron(user.community_id), 'phone': user.phone, 'cpf': user.cpf,
                  'active': user.active, 'responsibility': user.responsibility}
 

@@ -60,5 +60,5 @@ async def upload_user_image(user: dict = Depends(verify_user_access_token), file
 async def get_user_image(user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user['cpf'])
     image = await image_crud.get_image_by_id(user.image)
-    image = BytesIO(image.byte)
-    return StreamingResponse(image, media_type="image/jpeg")
+    image_base64 = convert_image_to_base64(image.bytes)
+    return {"image": image_base64}

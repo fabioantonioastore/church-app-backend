@@ -43,7 +43,7 @@ async def get_community_image(user: dict = Depends(verify_user_access_token)):
 async def upload_user_image(user: dict = Depends(verify_user_access_token), file: UploadFile = File(...)):
     if is_png_or_jpeg_image(file):
         image = Image()
-        user = await user_crud.get_user_by_id(user['cpf'])
+        user = await user_crud.get_user_by_cpf(user['cpf'])
         image_data = await file.read()
         image.byte = image_data
         await image_crud.create_image(image)

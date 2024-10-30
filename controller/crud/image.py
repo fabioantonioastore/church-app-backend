@@ -34,7 +34,7 @@ class ImageCrud(CRUD):
             try:
                 statement = select(Image).filter(Image.id == image_id)
                 image = await session.execute(statement)
-                image = image.scalars().one()
+                image = image.scalars().first()
                 await session.delete(image)
                 await session.commit()
                 return "deleted"

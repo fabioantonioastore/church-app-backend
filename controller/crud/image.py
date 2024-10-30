@@ -27,7 +27,7 @@ class ImageCrud(CRUD):
                 return image
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
+                raise error
 
     async def delete_image_by_id(self, image_id: str) -> str:
         async with self.session() as session:

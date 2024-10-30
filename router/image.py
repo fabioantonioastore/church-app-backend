@@ -24,7 +24,7 @@ async def upload_community_image(user: dict = Depends(verify_user_access_token),
         community = await community_crud.get_community_by_id(user.id)
         if community.image:
             await image_crud.delete_image_by_id(community.image)
-        image_data = file.read()
+        image_data = await file.read()
         image = await create_image(image_data)
         await community_crud.update_community_image(community.id, image.id)
     raise not_acceptable("Invalid content type")

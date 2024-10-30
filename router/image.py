@@ -55,14 +55,16 @@ async def upload_user_image(user: dict = Depends(verify_user_access_token), file
     raise not_acceptable("Invalid content type")
 
 
-@router.get('/image/user', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
-async def get_user_image(user: dict = Depends(verify_user_access_token)):
+@router.get('/image/user/{cpf}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+async def get_user_image(cpf: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user['cpf'])
-    if user.image:
-        image = await image_crud.get_image_by_id(user.image)
+    user_cpf = await user_crud.get_user_by_cpf(cpf)
+    if user_cpf.image:
+        image = await image_crud.get_image_by_id(user_cpf.image)
         image_base64 = convert_image_to_base64(image.byte)
         return {"image": image_base64}
     return None
+
 
 @router.delete('/image/user', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def delete_user_image(user: dict = Depends(verify_user_access_token)):

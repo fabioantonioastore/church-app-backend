@@ -192,3 +192,16 @@ class UserCrud(CRUD):
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
+
+    async def delete_user_image(self, user_id: str):
+        async with self.session() as session:
+            try:
+                statement = select(User).filter(User.id == user_id)
+                user = await session.execute(statement)
+                user = user.scalars().first()
+                user.image = None
+                await session.commit()
+                return User
+            except Exception as error:
+                await session.rollback()
+                raise internal_server_error(f"A error occurs during CRUD: {error!r}")

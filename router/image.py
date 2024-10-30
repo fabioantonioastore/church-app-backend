@@ -4,11 +4,8 @@ from controller.src.image import is_png_or_jpeg_image
 from controller.errors.http.exceptions import not_acceptable
 from controller.crud.user import UserCrud
 from controller.crud.community import CommunityCrud
-from io import BytesIO
-from fastapi.responses import StreamingResponse
 from controller.crud.image import ImageCrud
-from controller.src.image import get_image_bytes, create_image, convert_image_to_base64
-from models.image import Image
+from controller.src.image import create_image, convert_image_to_base64
 
 user_crud = UserCrud()
 community_crud = CommunityCrud()
@@ -66,3 +63,10 @@ async def get_user_image(user: dict = Depends(verify_user_access_token)):
         image_base64 = convert_image_to_base64(image.byte)
         return {"image": image_base64}
     return None
+
+@router.delete('/image/user', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+async def delete_user_image(user: dict = Depends(verify_user_access_token)):
+    user = await user_crud.get_user_by_cpf(user['cpf'])
+    if user.image:
+        await image_crud.delete_image_by_id(user.image)
+        await user_crud.delete_user_image(user.id)

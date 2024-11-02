@@ -26,7 +26,17 @@ async def upload_community_image(patron: str, user: dict = Depends(verify_user_a
         image_data = await file.read()
         image = await create_image(image_data)
         await community_crud.update_community_image(community.id, image.id)
+        return
     raise not_acceptable("Invalid content type")
+
+
+@router.delete("/image/community/{patron}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+async def delete_community_image(patron: str, user: dict = Depends(verify_user_access_token)):
+    user = await user_crud.get_user_by_cpf(user['cpf'])
+    community = await community_crud.get_community_by_patron(patron)
+    if community.image:
+        await image_crud.delete_image_by_id(community.image)
+        await community_crud.delete_community_image(community.id)
 
 
 @router.get("/image/community/{patron}", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])

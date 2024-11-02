@@ -31,6 +31,19 @@ class CommunityCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
+    async def delete_community_image(self, community_id: str) -> Community:
+        async with self.session() as session:
+            try:
+                statement = select(Community).filter(Community.id == community_id)
+                community = await session.execute(statement)
+                community = community.scalars().first()
+                community.image = None
+                await session.commit()
+                return community
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")
+
     async def update_community_image(self, community_id: str, image):
         async with self.session() as session:
             try:

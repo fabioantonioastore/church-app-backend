@@ -5,16 +5,18 @@ from controller.src.login import create_login, verify_user_login
 from controller.crud import LoginCrud
 from controller.crud import UserCrud
 from controller.src.user import create_user
+from controller.src.number import create_number_model
 from controller.auth import jwt
 from controller.errors.http.exceptions import internal_server_error, bad_request
 from controller.src.user import convert_user_to_dict
 from controller.src.dizimo_payment import create_dizimo_payment
-from controller.crud import DizimoPaymentCrud
+from controller.crud import DizimoPaymentCrud, NumberCrud
 
 router = APIRouter()
 login_crud = LoginCrud()
 user_crud = UserCrud()
 dizimo_payment_crud = DizimoPaymentCrud()
+number_crud = NumberCrud()
 
 
 @router.post("/signin", status_code=status.HTTP_200_OK, summary="Login", description="Do Sign In")
@@ -47,4 +49,6 @@ async def signup(sign_data: SignUp):
         raise bad_request(f"User already exist: {error!r}")
     dizimo_payment = await create_dizimo_payment(user)
     await dizimo_payment_crud.create_payment(dizimo_payment)
+    number_model = create_number_model(user.id, user.phone)
+    await number_crud.create_number(number_model)
     return {"access_token": jwt.create_access_token(user.cpf)}

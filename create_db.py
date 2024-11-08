@@ -10,6 +10,7 @@ async def create_db():
         from models.warning import Warning
         from models.community import Community
         from models.image import Image
+        from models.number import Number
 
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)

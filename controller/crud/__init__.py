@@ -5,3 +5,4 @@ from controller.crud.login import LoginCrud
 from controller.crud.warning import WarningCrud
 from controller.crud.dizimo_payment import DizimoPaymentCrud
 from controller.crud.web_push import WebPushCrud
+from controller.crud.number import NumberCrud

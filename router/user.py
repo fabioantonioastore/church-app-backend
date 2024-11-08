@@ -1,8 +1,6 @@
 from fastapi import APIRouter, status, Depends
 from router.middleware.authorization import verify_user_access_token
-from controller.crud import UserCrud
-from controller.crud import LoginCrud
-from controller.crud import CommunityCrud
+from controller.crud import CommunityCrud, NumberCrud, UserCrud, LoginCrud
 from controller.src.user import (get_user_client_data, get_update_data, is_council_member,
                                  is_parish_leader, upgrade_user_position, convert_user_to_dict)
 from schemas.user import UpdateUserModel, UpgradeUserPositionResponsability
@@ -20,6 +18,7 @@ router = APIRouter()
 user_crud = UserCrud()
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
+number_crud = NumberCrud()
 
 
 @router.get('/users/all', status_code=status.HTTP_200_OK, summary="Users", description="Get all users info")
@@ -43,9 +42,10 @@ async def get_user_data(user: dict = Depends(verify_user_access_token)):
 async def update_user(user_data: UpdateUserModel, user: dict = Depends(verify_user_access_token)):
     user_data = dict(user_data)
     CPFValidator(user_data['cpf'])
+    user = await user_crud.get_user_by_cpf(user['cpf'])
     if user_data.get('phone'):
         PhoneValidator(user_data['phone'])
-    user = await user_crud.get_user_by_cpf(user['cpf'])
+        await number_crud.update_number_by_user_id(user.id, user_data['phone'])
     user_data['id'] = user.id
     user_data['birthday'] = datetime.strptime(user_data['birthday'], "%Y-%m-%d")
     login = await login_crud.get_login_by_cpf(user.cpf)

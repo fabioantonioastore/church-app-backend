@@ -21,3 +21,4 @@ class User(Base):
 
     dizimo_payments = relationship('DizimoPayment', back_populates="user")
     web_push = relationship("WebPush", back_populates="user", cascade="all, delete-orphan")
+    number = relationship("Number", back_populates="user", cascade="all, delete-orphan")

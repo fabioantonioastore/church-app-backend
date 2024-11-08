@@ -9,4 +9,3 @@ class Image(Base):
 
     id = mapped_column(String, primary_key=True, default=generate_uuid4)
     byte = mapped_column(LargeBinary, nullable=True)
-

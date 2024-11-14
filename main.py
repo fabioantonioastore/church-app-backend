@@ -10,7 +10,7 @@ import router.warning
 import router.dizimo_payment
 import router.web.web_push_notification
 import router.image
-import router.number
+import router.sms
 from controller.auth import jwt
 from controller.src.pix_payment import make_post_pix_request, create_customer, PixPayment
 from models.community import Community
@@ -72,7 +72,7 @@ app.include_router(router.warning.router)
 app.include_router(router.dizimo_payment.router)
 app.include_router(router.web.web_push_notification.router)
 app.include_router(router.image.router)
-app.include_router(router.number.router)
+app.include_router(router.sms.router)
 
 
 @app.get('/communities')

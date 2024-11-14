@@ -26,7 +26,6 @@ async def verify_recovery_code(cpf: str, code: int):
     number_model = await number_crud.get_number_model_by_number(user.phone)
     if number_model.verification_code:
         if number_model.verification_code == code:
-            user = await user_crud.get_user_by_id(number_model.user_id)
             await login_crud.update_password(user.cpf, DEFAULT_PASSWORD)
             return {"new_password": DEFAULT_PASSWORD}
     raise not_acceptable(f"Invalid code")

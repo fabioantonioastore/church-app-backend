@@ -2,6 +2,7 @@ from sqlalchemy import select
 from models import Login
 from controller.errors.http.exceptions import not_found
 from controller.crud.crud import CRUD
+from controller.auth.password import hash_pasword
 
 
 class LoginCrud(CRUD):
@@ -14,7 +15,7 @@ class LoginCrud(CRUD):
                 statement = select(Login).filter(Login.cpf == cpf)
                 login = await session.execute(statement)
                 login = login.scalars().first()
-                login.password = password
+                login.password = hash_pasword(password)
                 await session.commit()
                 return login
             except Exception as error:

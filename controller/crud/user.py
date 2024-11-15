@@ -157,9 +157,6 @@ class UserCrud(CRUD):
                             user.phone = new_user['phone']
                         case 'community_id':
                             user.community_id = new_user['community_id']
-                        case 'image':
-                            if not (user.image is None):
-                                user.image = new_user['image']
                         case 'active':
                             user.active = new_user['active']
                         case 'community_patron':

@@ -30,7 +30,7 @@ async def get_finance_by_year_router(community_patron: str, year: int, user: dic
     return finances
 
 
-@router.get('/community/{community_patron}/finance/{year}/{month}', dependencies=Depends(verify_user_access_token))
+@router.get('/community/{community_patron}/finance/{year}/{month}', dependencies=[Depends(verify_user_access_token)])
 async def get_finance_by_month_router(community_patron: str, year: int, month: str, user: dict = verify_user_access_token):
     user = await user_crud.get_user_by_cpf(user['cpf'])
     community = await community_crud.get_community_by_patron(community_patron)

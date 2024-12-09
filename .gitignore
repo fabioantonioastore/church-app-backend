@@ -5,6 +5,6 @@ __pycache__
 .vscode
 venv
 firebase_credentials.json
-infra/migrations/alembic.ini
-infra/migrations/alembic
-!infra/migrations/alembic/versions
+alembic.ini
+infra/migrations/*
+!infra/migrations/versions

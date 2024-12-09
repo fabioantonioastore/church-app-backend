@@ -6,5 +6,5 @@ __pycache__
 venv
 firebase_credentials.json
 alembic.ini
-alembic/
+alembic
 !alembic/versions

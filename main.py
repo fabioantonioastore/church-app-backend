@@ -35,6 +35,7 @@ from controller.src.web_push_notification import initiciate_push_notification_jo
 from controller.crud.web_push import WebPushCrud
 from apscheduler.triggers.date import DateTrigger
 from controller.jobs.web_push_notification import execute_notification
+from controller.jobs.finance import calc_community_available_money
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
@@ -50,8 +51,13 @@ async def event_manager(app: FastAPI):
         initialize_firebase()
         scheduler.start()
         initiciate_push_notification_jobs(scheduler)
-        scheduler.add_job(create_month_dizimo_payment_and_transfer_payments_values,
-                          trigger=CronTrigger(day=1, hour=0, minute=0, second=0))
+        scheduler.add_job(
+            create_month_dizimo_payment_and_transfer_payments_values,
+            trigger=CronTrigger(day=1, hour=0, minute=0, second=0))
+        scheduler.add_job(
+            calc_community_available_money,
+            trigger=CronTrigger(day=1, hour=0, minute=0, second=0)
+        )
         yield
     finally:
         scheduler.shutdown()

@@ -11,6 +11,7 @@ import router.dizimo_payment
 import router.web.web_push_notification
 import router.image
 import router.sms
+import router.finance
 from controller.auth import jwt
 from controller.src.pix_payment import make_post_pix_request, create_customer, PixPayment
 from models.community import Community
@@ -73,6 +74,7 @@ app.include_router(router.dizimo_payment.router)
 app.include_router(router.web.web_push_notification.router)
 app.include_router(router.image.router)
 app.include_router(router.sms.router)
+app.include_router(router.finance.router)
 
 
 @app.get('/communities')

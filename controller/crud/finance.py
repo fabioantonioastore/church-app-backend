@@ -2,6 +2,8 @@ from controller.crud.crud import CRUD
 from models.finance import Finance
 from sqlalchemy import select, and_
 from controller.errors.http.exceptions import not_found, internal_server_error
+from datetime import datetime
+import calendar
 
 
 class FinanceCrud(CRUD):
@@ -28,48 +30,44 @@ class FinanceCrud(CRUD):
                 await session.rollback()
                 raise internal_server_error(f"A error occurs during CRUD: {error!r}")
 
-    async def get_finances_by_year(self, year: int, community_id: str = None) -> [Finance]:
+    async def get_finances_by_year(self, year: int, community_id) -> [Finance]:
         async with self.session() as session:
             try:
-                if community_id:
-                    statement = select(Finance).filter(
+                first_month_date = datetime(year, 1, 1)
+                last_month_date = datetime(year, 12, calendar.monthrange(year, 12)[1])
+                last_month_date = last_month_date.replace(hour=23, minute=59, second=59)
+                statement = select(Finance).filter(
+                    and_(
+                        Finance.community_id == community_id,
                         and_(
-                            Finance.year == year,
-                            Finance.community_id == community_id
+                            Finance.date >= first_month_date,
+                            Finance.date <= last_month_date
                         )
                     )
-                    result = await session.execute(statement)
-                    return result.scalars().all()
-                else:
-                    statement = select(Finance).filter(Finance.year == year)
-                    result = await session.execute(statement)
-                    return result.scalars().all()
+                )
+                finances = await session.execute(statement)
+                return finances.scalars().all()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_finance_by_year_and_month(self, year: int, month: str, community_id: str = None) -> [Finance]:
+    async def get_finances_by_month(self, year: int, month: int, community_id: str) -> [Finance]:
         async with self.session() as session:
             try:
-                if community_id:
-                    statement = select(Finance).filter(
+                first_month_day = datetime(year, month, 1)
+                last_month_day = datetime(year, month, calendar.monthrange(year, month)[1])
+                last_month_day = last_month_day.replace(hour=23, minute=59, second=59)
+                statement = select(Finance).filter(
+                    and_(
+                        Finance.community_id == community_id,
                         and_(
-                            Finance.year == year,
-                            Finance.month == month,
-                            Finance.community_id == community_id
+                            Finance.date >= first_month_day,
+                            Finance.date <= last_month_day
                         )
                     )
-                    result = await session.execute(statement)
-                    return result.scalars().all()
-                else:
-                    statement = select(Finance).filter(
-                        and_(
-                            Finance.year == year,
-                            Finance.month == month
-                        )
-                    )
-                    result = await session.execute(statement)
-                    return result.scalars().all()
+                )
+                finances = await session.execute(statement)
+                return finances.scalars().all()
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")

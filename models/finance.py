@@ -1,9 +1,8 @@
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import String, ForeignKey, DateTime, Integer, Float
+from sqlalchemy import String, ForeignKey, DateTime, Float
 from database import Base
 from controller.src.generate_uuid import generate_uuid4
 from datetime import datetime
-
 
 class Finance(Base):
     __tablename__ = 'finances'
@@ -13,9 +12,5 @@ class Finance(Base):
     title = mapped_column(String)
     description = mapped_column(String, nullable=True)
     date = mapped_column(DateTime, default=datetime.now)
-    month = mapped_column(String)
-    year = mapped_column(Integer)
-    value = mapped_column(Float, nullable=True)
-    amount = mapped_column(Integer, nullable=True)
-    hours = mapped_column(Integer, nullable=True)
+    value = mapped_column(Float)
     type = mapped_column(String)

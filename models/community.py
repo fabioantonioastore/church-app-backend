@@ -20,3 +20,4 @@ class Community(Base):
 
     warnings = relationship('Warning', cascade='all, delete-orphan')
     users = relationship('User')
+    finances = relationship("Finance", cascade='all, delete-orphan')

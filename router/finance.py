@@ -25,8 +25,7 @@ async def get_finance_by_year_router(community_patron: str, year: int, user: dic
     user = await user_crud.get_user_by_cpf(user['cpf'])
     community = await community_crud.get_community_by_patron(community_patron)
     finances = await finance_crud.get_finances_by_year(year, community.id)
-    for finance in finances:
-        finance = finance_no_sensitive_data(finance)
+    finances = [finance_no_sensitive_data(finance) for finance in finances]
     return finances
 
 
@@ -36,6 +35,5 @@ async def get_finance_by_month_router(community_patron: str, year: int, month: s
     community = await community_crud.get_community_by_patron(community_patron)
     month = month_to_integer(month)
     finances = await finance_crud.get_finances_by_month(year, month, community.id)
-    for finance in finances:
-        finance = finance_no_sensitive_data(finance)
+    finances = [finance_no_sensitive_data(finance) for finance in finances]
     return finances

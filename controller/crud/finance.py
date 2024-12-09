@@ -5,7 +5,6 @@ from controller.errors.http.exceptions import not_found, internal_server_error
 from datetime import datetime
 import calendar
 
-
 class FinanceCrud(CRUD):
     def __init__(self) -> None:
         super().__init__()
@@ -81,6 +80,30 @@ class FinanceCrud(CRUD):
                 await session.delete(finance)
                 await session.commit()
                 return "deleted"
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")
+
+    async def update_finance_by_id(self, finance_id: str, finance_data: dict) -> Finance:
+        async with self.session() as session:
+            try:
+                statement = select(Finance).filter(Finance.id == finance_id)
+                finance = await session.execute(statement)
+                finance = finance.scalars().first()
+                for key in finance_data:
+                    match key:
+                        case "title":
+                            finance.title = finance_data['title']
+                        case "description":
+                            finance.description = finance_data['description']
+                        case "type":
+                            finance.type = finance_data['type']
+                        case "value":
+                            finance.value = finance_data['value']
+                        case "date":
+                            finance.date = finance_data['date']
+                await session.commit()
+                return finance
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")

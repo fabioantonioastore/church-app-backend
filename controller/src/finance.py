@@ -1,8 +1,10 @@
-from sqlalchemy.util import await_only
-from watchfiles import awatch
-
+from enum import Enum
 from models import Finance
 from controller.crud.finance import FinanceCrud
+
+class FinanceType(Enum):
+    INPUT = "input"
+    OUTPUT = "output"
 
 finance_crud = FinanceCrud()
 
@@ -21,8 +23,15 @@ def create_finance_model(finance_data: dict) -> Finance:
             case "community_id":
                 finance.community_id = finance_data['community_id']
             case "type":
-                finance.type = finance_data['type']
+                if is_available_type(finance_data['type']):
+                    finance.type = finance_data['type']
+                else:
+                    raise "Invalid finance type: (input/output)"
     return finance
+
+def is_available_type(finance_type: str) -> bool:
+    return ((finance_type == FinanceType.INPUT.value()) or
+            (finance_type == FinanceType.OUTPUT.value()))
 
 async def create_finance_in_database(finance_data: dict) -> Finance:
     finance = create_finance_model(finance_data)
@@ -67,3 +76,12 @@ def month_to_integer(month: str) -> int:
             return 12
         case _:
             raise "Month not found"
+
+def get_total_available_money_from_finances_obj(finances: [Finance]) -> float:
+    total_amount = 0
+    for finance in finances:
+        if finance.type == FinanceType.INPUT.value():
+            total_amount += finance.value
+        else:
+            total_amount -= finance.value
+    return total_amount

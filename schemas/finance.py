@@ -10,10 +10,16 @@ class FinanceModel(BaseModel):
     type: str
     date: datetime
 
-
 class CreateFinanceModel(BaseModel):
     title: str
     description: str | None
     value: float
     type: str
+    date: datetime | None
+
+class UpdateFinanceModel(BaseModel):
+    title: str | None
+    description: str | None
+    value: float | None
+    type: str | None
     date: datetime | None

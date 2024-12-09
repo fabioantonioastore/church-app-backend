@@ -34,7 +34,8 @@ def finance_no_sensitive_data(finance: Finance) -> dict:
         "description": finance.description,
         "type": finance.type,
         "value": finance.value,
-        "date": finance.date
+        "date": finance.date,
+        "id": finance.id
     }
 
 def month_to_integer(month: str) -> int:
@@ -62,7 +63,7 @@ def month_to_integer(month: str) -> int:
             return 10
         case "november":
             return 11
-        case "dezember":
+        case "december":
             return 12
         case _:
             raise "Month not found"

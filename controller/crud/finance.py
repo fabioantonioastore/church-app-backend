@@ -71,3 +71,16 @@ class FinanceCrud(CRUD):
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
+
+    async def delete_finance_by_id(self, finance_id: str) -> str:
+        async with self.session() as session:
+            try:
+                statement = select(Finance).filter(Finance.id == finance_id)
+                finance = await session.execute(statement)
+                finance = finance.scalars().first()
+                await session.delete(finance)
+                await session.commit()
+                return "deleted"
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")

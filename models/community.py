@@ -16,7 +16,6 @@ class Community(Base):
     active = mapped_column(Boolean, default=True)
     actual_month_total_payment_value = mapped_column(Float, default=0)
     last_month_total_payment_value = mapped_column(Float, default=0)
-    available_money = mapped_column(Float, default=0)
 
     warnings = relationship('Warning', cascade='all, delete-orphan')
     users = relationship('User')

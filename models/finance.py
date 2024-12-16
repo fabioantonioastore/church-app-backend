@@ -11,6 +11,6 @@ class Finance(Base):
     community_id = mapped_column(String, ForeignKey('communities.id'))
     title = mapped_column(String)
     description = mapped_column(String, nullable=True)
-    date = mapped_column(DateTime, default=datetime.now)
+    date = mapped_column(DateTime(timezone=True), default=datetime.now)
     value = mapped_column(Float)
     type = mapped_column(String)

@@ -37,7 +37,7 @@ async def calc_community_available_money() -> None:
                 minute=59,
                 second=59
             ),
-            "type": FinanceType.INPUT.value()
+            "type": FinanceType.INPUT
         }
 
         await create_finance_in_database(finance_data)
@@ -50,7 +50,7 @@ async def calc_community_available_money() -> None:
             "value": total_available_money,
             "community_id": community.id,
             "date": datetime(year=actual_year, month=actual_month, day=1),
-            "type": FinanceType.INPUT.value()
+            "type": FinanceType.INPUT
         }
 
         await create_finance_in_database(finance_data)

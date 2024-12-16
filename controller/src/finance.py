@@ -1,5 +1,6 @@
 from models import Finance
 from controller.crud.finance import FinanceCrud
+from fastapi import HTTPException, status
 
 class FinanceType:
     INPUT = "input"
@@ -25,7 +26,7 @@ def create_finance_model(finance_data: dict) -> Finance:
                 if is_available_type(finance_data['type']):
                     finance.type = finance_data['type']
                 else:
-                    raise "Invalid finance type: (input/output)"
+                    raise HTTPException(detail="Invalid finance type: (input/output)", status_code=status.HTTP_400_BAD_REQUEST)
     return finance
 
 def is_available_type(finance_type: str) -> bool:

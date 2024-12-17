@@ -6,6 +6,7 @@ from controller.crud.community import CommunityCrud
 from controller.crud.finance import FinanceCrud
 from controller.src.finance import (create_finance_in_database, finance_no_sensitive_data, month_to_integer,
                                     get_total_available_money_from_finances_obj, create_finance_model)
+from typing import Union
 
 community_crud = CommunityCrud()
 user_crud = UserCrud()

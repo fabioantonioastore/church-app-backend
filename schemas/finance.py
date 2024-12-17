@@ -18,7 +18,7 @@ class CreateFinanceModel(BaseModel):
     date: datetime | None
 
 class DictCreateFinanceModel(BaseModel):
-    finance_data: dict[CreateFinanceModel]
+    finance_data: dict[str, CreateFinanceModel]
 
 class UpdateFinanceModel(BaseModel):
     title: str | None

@@ -1,6 +1,7 @@
 from models import Finance
 from controller.crud.finance import FinanceCrud
 from fastapi import HTTPException, status
+from typing import List
 
 class FinanceType:
     INPUT = "input"
@@ -76,7 +77,7 @@ def month_to_integer(month: str) -> int:
         case _:
             raise "Month not found"
 
-def get_total_available_money_from_finances_obj(finances: [Finance] | dict) -> float:
+def get_total_available_money_from_finances_obj(finances: List[Finance] | dict) -> float:
     total_amount = 0
     for finance in finances:
         if type(finance) == dict:
@@ -90,5 +91,5 @@ def get_total_available_money_from_finances_obj(finances: [Finance] | dict) -> f
             else:
                 total_amount -= finance.value
         else:
-            raise HTTPException(detail="A unexpected error occurs, report it to dev", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            raise HTTPException(detail="An unexpected error occurs, report it to dev", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return total_amount

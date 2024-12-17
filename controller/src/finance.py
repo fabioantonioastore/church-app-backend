@@ -77,7 +77,7 @@ def month_to_integer(month: str) -> int:
         case _:
             raise "Month not found"
 
-def get_total_available_money_from_finances_obj(finances: List[Finance] | dict) -> float:
+def get_total_available_money_from_finances_obj(finances: List[Finance] | List[dict] | dict) -> float:
     total_amount = 0
     for finance in finances:
         if type(finance) == dict:

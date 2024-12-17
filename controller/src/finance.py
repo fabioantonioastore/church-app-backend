@@ -92,4 +92,4 @@ def get_total_available_money_from_finances_obj(finances: List[Finance] | dict) 
                 total_amount -= finance.value
         else:
             raise HTTPException(detail="An unexpected error occurs, report it to dev", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    return total_amount
+    return round(float, 2)

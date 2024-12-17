@@ -17,9 +17,12 @@ class CreateFinanceModel(BaseModel):
     type: str
     date: datetime | None
 
+class DictCreateFinanceModel(BaseModel):
+    finance_data: dict[CreateFinanceModel]
+
 class UpdateFinanceModel(BaseModel):
     title: str | None
     description: str | None
-    value: float | None
+    value: float
     type: str | None
     date: datetime | None

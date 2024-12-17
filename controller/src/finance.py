@@ -76,11 +76,19 @@ def month_to_integer(month: str) -> int:
         case _:
             raise "Month not found"
 
-def get_total_available_money_from_finances_obj(finances: [Finance]) -> float:
+def get_total_available_money_from_finances_obj(finances: [Finance] | dict) -> float:
     total_amount = 0
     for finance in finances:
-        if finance.type == FinanceType.INPUT:
-            total_amount += finance.value
+        if type(finance) == dict:
+            if finance['type'] == FinanceType.INPUT:
+                total_amount += finance['value']
+            else:
+                total_amount -= finance['value']
+        elif type(finance) == Finance:
+            if finance.type == FinanceType.INPUT:
+                total_amount += finance.value
+            else:
+                total_amount -= finance.value
         else:
-            total_amount -= finance.value
+            raise HTTPException(detail="A unexpected error occurs, report it to dev", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return total_amount

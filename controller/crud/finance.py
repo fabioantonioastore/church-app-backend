@@ -4,7 +4,8 @@ from sqlalchemy import select, and_, or_
 from controller.errors.http.exceptions import not_found, internal_server_error
 from datetime import datetime
 import calendar
-from controller.jobs.finance import DEFAULT_TITLE
+
+DEFAULT_TITLE = "Last Month"
 
 class FinanceCrud(CRUD):
     def __init__(self) -> None:

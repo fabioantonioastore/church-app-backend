@@ -91,9 +91,8 @@ async def update_finance_by_id(community_patron: str, id: str, finance_data: Upd
             await update_finance_months_by_finance_data(finance_dataclass)
     return finance_no_sensitive_data(finance)
 
-@router.get('/community/{patron}/finance/resume/{year}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
-async def get_finance_resume_by_year(patron: str, year: str, user: dict = Depends(verify_user_access_token)):
-    year = int(year)
+@router.get('/community/{patron}/finance_resume/{year}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+async def get_finance_resume_by_year(patron: str, year: int, user: dict = Depends(verify_user_access_token)):
     community = await community_crud.get_community_by_patron(patron)
     finance_resume = {}
     for i in range(1, 13):
@@ -106,7 +105,7 @@ async def get_finance_resume_by_year(patron: str, year: str, user: dict = Depend
     return finance_resume
 
 
-@router.get('/community/{patron}/finance/resume/{year}/{month}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+@router.get('/community/{patron}/finance_resume/{year}/{month}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_finance_resume_by_year_and_month(patron: str, year: int, month: str, user: dict = Depends(verify_user_access_token)):
     community = await community_crud.get_community_by_patron(patron)
     month = month_to_integer(month)
@@ -116,7 +115,7 @@ async def get_finance_resume_by_year_and_month(patron: str, year: int, month: st
     resume = await get_finance_resume(finances, date)
     return {month: resume}
 
-@router.get('/community/{patron}/finance/resume/csv/{year}/{month}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+@router.get('/community/{patron}/finance_resume/csv/{year}/{month}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_finance_resume_csv_by_year_and_month(patron: str, year: int, month: str, user: dict = Depends(verify_user_access_token)):
     community = await community_crud.get_community_by_patron(patron)
     month = month_to_integer(month)

@@ -56,7 +56,7 @@ async def get_finance_resume(finances: [Finance], date: DateYearMonth) -> dict:
     finance_resume = rounded_resume(finance_resume)
     return finance_resume
 
-def rounded_resume(resume: dict) -> dict:
+def rounded_resume(resume: dict[str, float]) -> dict:
     for key in resume.keys():
         resume[key] = round(resume[key], 2)
     return resume

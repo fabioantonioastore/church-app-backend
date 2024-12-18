@@ -61,6 +61,8 @@ async def delete_finance_by_id_router(community_patron: str, id: str, user: dict
     community = await community_crud.get_community_by_patron(community_patron)
     finance = await finance_crud.get_finance_by_id(id)
     await finance_crud.delete_finance_by_id(id)
+    if is_actual_month_and_year(finance):
+        return
     if finance.type == FinanceType.INPUT:
         finance_data = FinanceData(value=finance.value, type=FinanceType.OUTPUT, date=finance.date)
         await update_finance_months_by_finance_data(finance_data)

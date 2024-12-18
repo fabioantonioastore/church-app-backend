@@ -1,3 +1,6 @@
+import csv
+import io
+
 from watchfiles import awatch
 
 from models import Finance
@@ -6,9 +9,16 @@ from fastapi import HTTPException, status
 from typing import List
 import datetime
 from dataclasses import dataclass
-from typing import Union
+from typing import Union, NamedTuple, TypedDict
+
+class ResumeDict(TypedDict):
+    input: float
+    output: float
+    recipe: float
+    last_month: float
 
 FINANCE_TYPE = Union[dict, Finance]
+DEFAULT_TITLE = "Last Month"
 
 @dataclass
 class FinanceData:
@@ -20,36 +30,68 @@ class FinanceType:
     INPUT = "input"
     OUTPUT = "output"
 
+class DateYearMonth(NamedTuple):
+    year: int
+    month: int
+
 finance_crud = FinanceCrud()
 
 DEFAULT_TITLE = "Last Month"
 
-async def get_finance_resume(finances: [Finance], year: int = None, month: int = None) -> dict:
-    finance_resume = {
-        "input": 0,
-        "output": 0,
-        "last_recipe": 0,
-        "recipe": 0
-    }
+async def get_csv_finance_resume(finances: [Finance], date: DateYearMonth = None):
+   pass
 
+async def get_finance_resume(finances: [Finance], date: DateYearMonth) -> dict:
+    finance_resume = {}
+
+    month = integer_to_month(date.month)
+    finance_resume[month] = ResumeDict(input=0, output=0, last_month=0, recipe=0)
     for finance in finances:
-        match finance.type:
-            case "input":
-                finance_resume['input'] += finance.value
-            case "output":
-                finance_resume['output'] -= finance.value
-
-    finance_resume['recipe'] = finance_resume['input'] - finance_resume['output']
-
-    if year and not month:
-        last_recipe = await finance_crud.get_finance_last_month_obj_by_date(year - 1, 12)
-        if last_recipe:
-            finance_resume['last_recipe'] = last_recipe
-    elif year and month:
-        last_recipe = await finance_crud.get_finance_last_month_obj_by_date(year, month)
-        if last_recipe:
-            finance_resume['last_recipe'] = last_recipe
+        if finance.title == DEFAULT_TITLE:
+            finance_resume[month]['last_month'] = finance.value
+            continue
+        if finance.type == FinanceType.INPUT:
+            finance_resume[month]['input'] += finance.value
+        elif finance.type == FinanceType.OUTPUT:
+            finance_resume[month]['output'] += finance.value
+    recipe = abs(finance_resume[month]['input'] - finance_resume[month]['output'])
+    finance_resume[month]['recipe'] = recipe
+    finance_resume[month] = rounded_resume(finance_resume[month])
     return finance_resume
+
+def rounded_resume(resume: dict) -> dict:
+    for key in resume.keys():
+        resume[key] = round(resume[key], 2)
+    return resume
+
+def integer_to_month(month: int) -> str:
+    match month:
+        case 1:
+            return "january"
+        case 2:
+            return "february"
+        case 3:
+            return "march"
+        case 4:
+            return "april"
+        case 5:
+            return "may"
+        case 6:
+            return "june"
+        case 7:
+            return "july"
+        case 8:
+            return "august"
+        case 9:
+            return "september"
+        case 10:
+            return "october"
+        case 11:
+            return "november"
+        case 12:
+            return "december"
+        case _:
+            raise "Not valid integer month representation (1 - 12)"
 
 async def update_finance_months_by_finance_data(finance_data: FinanceData) -> None:
     finances = await finance_crud.get_finances_where_date_is_greater_than(finance_data.date)

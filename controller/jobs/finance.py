@@ -6,7 +6,7 @@ import calendar
 
 community_crud = CommunityCrud()
 finance_crud = FinanceCrud()
-DEFAULT_TITLE = "Caixa"
+DEFAULT_TITLE = "Last Month"
 
 async def calc_community_available_money() -> None:
     actual_year = datetime.now().year
@@ -18,6 +18,8 @@ async def calc_community_available_money() -> None:
     else:
         last_month = actual_month - 1
         last_year = actual_year
+
+    DEFAULT_TITLE = ""
 
     communities = await community_crud.get_all_communities()
 

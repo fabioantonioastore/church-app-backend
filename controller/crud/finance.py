@@ -1,13 +1,45 @@
 from controller.crud.crud import CRUD
 from models.finance import Finance
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, or_
 from controller.errors.http.exceptions import not_found, internal_server_error
 from datetime import datetime
 import calendar
+from controller.jobs.finance import DEFAULT_TITLE
 
 class FinanceCrud(CRUD):
     def __init__(self) -> None:
         super().__init__()
+
+    async def get_finances_where_date_is_greater_than(self, date: datetime) -> [Finance]:
+        async with self.session() as session:
+            try:
+                statement = select(Finance).filter(
+                    and_(
+                        Finance.title == DEFAULT_TITLE,
+                        or_(
+                            Finance.date.year > date.year,
+                            and_(
+                                Finance.date.year == date.year,
+                                Finance.date.month > date.month
+                            )
+                        )
+                    )
+                )
+                finances = await session.execute(statement)
+                return finances.scalars().all()
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")
+
+    async def get_finance_by_id(self, finance_id: str) -> Finance:
+        async with self.session() as session:
+            try:
+                statement = select(Finance).filter(Finance.id == finance_id)
+                finance = await session.execute(statement)
+                return finance.scalars().first()
+            except Exception as error:
+                await session.rollback()
+                raise not_found(f"A error occurs during CRUD: {error!r}")
 
     async def get_all_finances(self) -> [Finance]:
         async with self.session() as session:

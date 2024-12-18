@@ -2,12 +2,34 @@ from models import Finance
 from controller.crud.finance import FinanceCrud
 from fastapi import HTTPException, status
 from typing import List
+import datetime
+from dataclasses import dataclass
+from typing import Union
+
+FINANCE_TYPE = Union[dict, Finance]
+
+@dataclass
+class FinanceData:
+    value: float
+    type: str
+    date: datetime
 
 class FinanceType:
     INPUT = "input"
     OUTPUT = "output"
 
 finance_crud = FinanceCrud()
+
+async def update_finance_months_by_finance_data(finance_data: FinanceData) -> None:
+    finances = await finance_crud.get_finances_where_date_is_greater_than(finance_data.date)
+    if finance_data.type == FinanceType.INPUT:
+        for finance in finances:
+            update_data = {"value": finance.value + finance_data.value}
+            await finance_crud.update_finance_by_id(finance.id, update_data)
+    elif finance_data.type == FinanceType.OUTPUT:
+        for finance in finances:
+            update_data = {"value": finance.value - finance_data.value}
+            await finance_crud.update_finance_by_id(finance.id, update_data)
 
 def create_finance_model(finance_data: dict) -> Finance:
     finance = Finance()
@@ -93,3 +115,10 @@ def get_total_available_money_from_finances_obj(finances: List[Finance] | List[d
         else:
             raise HTTPException(detail="An unexpected error occurs, report it to dev", status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return round(total_amount, 2)
+
+def is_actual_month_and_year(finance: Finance) -> bool:
+    actual_date = datetime.datetime.now()
+    return (
+        finance.date.month == actual_date.month and
+        finance.date.year == actual_date.year
+    )

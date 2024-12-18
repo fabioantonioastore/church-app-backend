@@ -5,8 +5,9 @@ from controller.crud.user import UserCrud
 from controller.crud.community import CommunityCrud
 from controller.crud.finance import FinanceCrud
 from controller.src.finance import (create_finance_in_database, finance_no_sensitive_data, month_to_integer,
-                                    get_total_available_money_from_finances_obj, create_finance_model)
-from typing import Union
+                                    get_total_available_money_from_finances_obj, create_finance_model,
+                                    is_actual_month_and_year, update_finance_months_by_finance_data,
+                                    FinanceData, FinanceType)
 
 community_crud = CommunityCrud()
 user_crud = UserCrud()
@@ -58,11 +59,29 @@ async def get_finance_by_month_router(community_patron: str, year: int, month: s
 async def delete_finance_by_id_router(community_patron: str, id: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user['cpf'])
     community = await community_crud.get_community_by_patron(community_patron)
-    return await finance_crud.delete_finance_by_id(id)
+    finance = await finance_crud.get_finance_by_id(id)
+    await finance_crud.delete_finance_by_id(id)
+    if finance.type == FinanceType.INPUT:
+        finance_data = FinanceData(value=finance.value, type=FinanceType.OUTPUT, date=finance.date)
+        await update_finance_months_by_finance_data(finance_data)
+    elif finance.type == FinanceType.OUTPUT:
+        finance_data = FinanceData(value=finance.value, type=FinanceType.INPUT, date=finance.date)
+        await update_finance_months_by_finance_data(finance_data)
+    return
 
 @router.put('/community/{community_patron}/finance/{id}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
 async def update_finance_by_id(community_patron: str, id: str, finance_data: UpdateFinanceModel, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(user['cpf'])
     community = await community_crud.get_community_by_patron(community_patron)
+    last_finance = await finance_crud.get_finance_by_id(id)
     finance_data = dict(finance_data)
-    return finance_no_sensitive_data(await finance_crud.update_finance_by_id(id, finance_data))
+    finance = await finance_crud.update_finance_by_id(id, finance_data)
+    if not (is_actual_month_and_year(finance)):
+        abs_value = abs(finance_data['value'] - finance.value)
+        finance_dataclass = FinanceData(value=abs_value, type=finance.type, date=last_finance.date)
+        if not (
+            finance_dataclass.value == 0 and
+            finance_dataclass.type == last_finance.type
+        ):
+            await update_finance_months_by_finance_data(finance_dataclass)
+    return finance_no_sensitive_data(finance)

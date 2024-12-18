@@ -1,6 +1,6 @@
 from controller.crud.crud import CRUD
 from models.finance import Finance
-from sqlalchemy import select, and_, or_
+from sqlalchemy import select, and_, or_, extract
 from controller.errors.http.exceptions import not_found, internal_server_error
 from datetime import datetime
 import calendar
@@ -18,10 +18,10 @@ class FinanceCrud(CRUD):
                     and_(
                         Finance.title == DEFAULT_TITLE,
                         or_(
-                            Finance.date.year > date.year,
+                            extract('year', Finance.date) > date.year,
                             and_(
-                                Finance.date.year == date.year,
-                                Finance.date.month > date.month
+                                extract('year', Finance.date) == date.year,
+                                extract('month', Finance.date) > date.month
                             )
                         )
                     )

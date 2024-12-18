@@ -42,21 +42,18 @@ async def get_csv_finance_resume(finances: [Finance], date: DateYearMonth = None
    pass
 
 async def get_finance_resume(finances: [Finance], date: DateYearMonth) -> dict:
-    finance_resume = {}
-
-    month = integer_to_month(date.month)
-    finance_resume[month] = ResumeDict(input=0, output=0, last_month=0, recipe=0)
+    finance_resume = ResumeDict(input=0, output=0, last_month=0, recipe=0)
     for finance in finances:
         if finance.title == DEFAULT_TITLE:
-            finance_resume[month]['last_month'] = finance.value
+            finance_resume['last_month'] = finance.value
             continue
         if finance.type == FinanceType.INPUT:
-            finance_resume[month]['input'] += finance.value
+            finance_resume['input'] += finance.value
         elif finance.type == FinanceType.OUTPUT:
-            finance_resume[month]['output'] += finance.value
-    recipe = abs(finance_resume[month]['input'] - finance_resume[month]['output'])
-    finance_resume[month]['recipe'] = recipe
-    finance_resume[month] = rounded_resume(finance_resume[month])
+            finance_resume['output'] += finance.value
+    recipe = abs(finance_resume['input'] - finance_resume['output'])
+    finance_resume['recipe'] = recipe
+    finance_resume = rounded_resume(finance_resume)
     return finance_resume
 
 def rounded_resume(resume: dict) -> dict:

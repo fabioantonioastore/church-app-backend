@@ -94,15 +94,15 @@ async def update_finance_by_id(community_patron: str, id: str, finance_data: Upd
 @router.get('/community/{patron}/finance/resume/{year}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_finance_resume_by_year(patron: str, year: int, user: dict = Depends(verify_user_access_token)):
     community = await community_crud.get_community_by_patron(patron)
-    finace_resume = {}
+    finance_resume = {}
     for i in range(1, 13):
         month = integer_to_month(i)
         try:
             finances = await finance_crud.get_finances_by_month(year, i, community.id)
-            finace_resume[month] = get_finance_resume(finances, DateYearMonth(year, i))
+            finance_resume[month] = get_finance_resume(finances, DateYearMonth(year, i))
         except:
-            finace_resume[month] = None
-    return finace_resume
+            finance_resume[month] = None
+    return finance_resume
 
 
 @router.get('/community/{patron}/finance/resume/{year}/{month}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
@@ -111,7 +111,9 @@ async def get_finance_resume_by_year_and_month(patron: str, year: int, month: st
     month = month_to_integer(month)
     finances = await finance_crud.get_finances_by_month(year, month, community.id)
     date = DateYearMonth(year, month)
-    return await get_finance_resume(finances, date)
+    month = integer_to_month(month)
+    resume = await get_finance_resume(finances, date)
+    return {month: resume}
 
 @router.get('/community/{patron}/finance/resume/csv/{year}/{month}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
 async def get_finance_resume_csv_by_year_and_month(patron: str, year: int, month: str, user: dict = Depends(verify_user_access_token)):

@@ -51,7 +51,7 @@ async def get_finance_resume(finances: [Finance], date: DateYearMonth) -> dict:
             finance_resume['input'] += finance.value
         elif finance.type == FinanceType.OUTPUT:
             finance_resume['output'] += finance.value
-    recipe = abs(finance_resume['input'] - finance_resume['output'])
+    recipe = finance_resume['input'] - finance_resume['output']
     finance_resume['recipe'] = recipe
     finance_resume = rounded_resume(finance_resume)
     return finance_resume

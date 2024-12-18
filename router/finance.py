@@ -99,7 +99,7 @@ async def get_finance_resume_by_year(patron: str, year: int, user: dict = Depend
         month = integer_to_month(i)
         try:
             finances = await finance_crud.get_finances_by_month(year, i, community.id)
-            finance_resume[month] = get_finance_resume(finances, DateYearMonth(year, i))
+            finance_resume[month] = get_finance_resume(finances)
         except:
             finance_resume[month] = None
     return finance_resume
@@ -110,9 +110,8 @@ async def get_finance_resume_by_year_and_month(patron: str, year: int, month: st
     community = await community_crud.get_community_by_patron(patron)
     month = month_to_integer(month)
     finances = await finance_crud.get_finances_by_month(year, month, community.id)
-    date = DateYearMonth(year, month)
     month = integer_to_month(month)
-    resume = get_finance_resume(finances, date)
+    resume = get_finance_resume(finances)
     return {month: resume}
 
 @router.get('/community/{patron}/finance_resume_csv/{year}/{month}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])

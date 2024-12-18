@@ -41,7 +41,7 @@ DEFAULT_TITLE = "Last Month"
 async def get_csv_finance_resume(finances: [Finance], date: DateYearMonth = None):
    pass
 
-def get_finance_resume(finances: [Finance], date: DateYearMonth) -> dict:
+def get_finance_resume(finances: [Finance]) -> dict:
     finance_resume = ResumeDict(input=0, output=0, last_month=0, recipe=0)
     for finance in finances:
         if finance.title == DEFAULT_TITLE:

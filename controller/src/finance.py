@@ -22,14 +22,15 @@ finance_crud = FinanceCrud()
 
 async def update_finance_months_by_finance_data(finance_data: FinanceData) -> None:
     finances = await finance_crud.get_finances_where_date_is_greater_than(finance_data.date)
-    if finance_data.type == FinanceType.INPUT:
-        for finance in finances:
-            update_data = {"value": finance.value + finance_data.value}
-            await finance_crud.update_finance_by_id(finance.id, update_data)
-    elif finance_data.type == FinanceType.OUTPUT:
-        for finance in finances:
-            update_data = {"value": finance.value - finance_data.value}
-            await finance_crud.update_finance_by_id(finance.id, update_data)
+    if finances:
+        if finance_data.type == FinanceType.INPUT:
+            for finance in finances:
+                update_data = {"value": finance.value + finance_data.value}
+                await finance_crud.update_finance_by_id(finance.id, update_data)
+        elif finance_data.type == FinanceType.OUTPUT:
+            for finance in finances:
+                update_data = {"value": finance.value - finance_data.value}
+                await finance_crud.update_finance_by_id(finance.id, update_data)
 
 def create_finance_model(finance_data: dict) -> Finance:
     finance = Finance()

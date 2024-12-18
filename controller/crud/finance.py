@@ -11,6 +11,21 @@ class FinanceCrud(CRUD):
     def __init__(self) -> None:
         super().__init__()
 
+    async def get_finance_last_month_obj_by_date(self, year: int, month: int) -> Finance | None:
+        async with self.session() as session:
+            try:
+                statement = select(Finance).filter(
+                    and_(
+                        extract('year', Finance.date) == year,
+                        extract('month', Finance.date) == month
+                    )
+                )
+                finance = await session.execute(statement)
+                return finance.scalars().first()
+            finally:
+                await session.rollback()
+                return None
+
     async def get_finances_where_date_is_greater_than(self, date: datetime) -> [Finance]:
         async with self.session() as session:
             try:

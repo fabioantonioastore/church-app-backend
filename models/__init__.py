@@ -7,4 +7,3 @@ from models.login import Login
 from models.finance import Finance
 from models.image import Image
 from models.number import Number
-from models.finance_resume import FinanceResume

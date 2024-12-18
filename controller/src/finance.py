@@ -1,3 +1,5 @@
+from watchfiles import awatch
+
 from models import Finance
 from controller.crud.finance import FinanceCrud
 from fastapi import HTTPException, status
@@ -19,6 +21,35 @@ class FinanceType:
     OUTPUT = "output"
 
 finance_crud = FinanceCrud()
+
+DEFAULT_TITLE = "Last Month"
+
+async def get_finance_resume(finances: [Finance], year: int = None, month: int = None) -> dict:
+    finance_resume = {
+        "input": 0,
+        "output": 0,
+        "last_recipe": 0,
+        "recipe": 0
+    }
+
+    for finance in finances:
+        match finance.type:
+            case "input":
+                finance_resume['input'] += finance.value
+            case "output":
+                finance_resume['output'] -= finance.value
+
+    finance_resume['recipe'] = finance_resume['input'] - finance_resume['output']
+
+    if year and not month:
+        last_recipe = await finance_crud.get_finance_last_month_obj_by_date(year - 1, 12)
+        if last_recipe:
+            finance_resume['last_recipe'] = last_recipe
+    elif year and month:
+        last_recipe = await finance_crud.get_finance_last_month_obj_by_date(year, month)
+        if last_recipe:
+            finance_resume['last_recipe'] = last_recipe
+    return finance_resume
 
 async def update_finance_months_by_finance_data(finance_data: FinanceData) -> None:
     finances = await finance_crud.get_finances_where_date_is_greater_than(finance_data.date)

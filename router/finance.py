@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, status
+from watchfiles import awatch
+
 from router.middleware.authorization import verify_user_access_token
 from schemas.finance import CreateFinanceModel, UpdateFinanceModel, DictCreateFinanceModel
 from controller.crud.user import UserCrud
@@ -7,7 +9,7 @@ from controller.crud.finance import FinanceCrud
 from controller.src.finance import (create_finance_in_database, finance_no_sensitive_data, month_to_integer,
                                     get_total_available_money_from_finances_obj, create_finance_model,
                                     is_actual_month_and_year, update_finance_months_by_finance_data,
-                                    FinanceData, FinanceType)
+                                    FinanceData, FinanceType, get_finance_resume)
 
 community_crud = CommunityCrud()
 user_crud = UserCrud()
@@ -87,3 +89,16 @@ async def update_finance_by_id(community_patron: str, id: str, finance_data: Upd
         ):
             await update_finance_months_by_finance_data(finance_dataclass)
     return finance_no_sensitive_data(finance)
+
+@router.get('/community/{patron}/finance/resume/{year}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+async def get_finance_resume_by_year(patron: str, year: int, user: dict = Depends(verify_user_access_token)):
+    community = await community_crud.get_community_by_patron(patron)
+    finances = await finance_crud.get_finances_by_year(year, community.id)
+    return await get_finance_resume(finances, year)
+
+@router.get('/community/{patron}/finance/resume/{year}/{month}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+async def get_finance_resume_by_year_and_month(patron: str, year: int, month: str, user: dict = Depends(verify_user_access_token)):
+    community = await community_crud.get_community_by_patron(patron)
+    month = month_to_integer(month)
+    finances = await finance_crud.get_finances_by_month(year, month, community.id)
+    return await get_finance_resume(finances, year, month)

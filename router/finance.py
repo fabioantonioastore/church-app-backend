@@ -92,7 +92,8 @@ async def update_finance_by_id(community_patron: str, id: str, finance_data: Upd
     return finance_no_sensitive_data(finance)
 
 @router.get('/community/{patron}/finance/resume/{year}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
-async def get_finance_resume_by_year(patron: str, year: int, user: dict = Depends(verify_user_access_token)):
+async def get_finance_resume_by_year(patron: str, year: str, user: dict = Depends(verify_user_access_token)):
+    year = int(year)
     community = await community_crud.get_community_by_patron(patron)
     finance_resume = {}
     for i in range(1, 13):

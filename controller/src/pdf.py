@@ -2,7 +2,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate
 from io import BytesIO
 
-class PDF():
+class PDF:
     def __init__(self, in_memory: bool = True) -> None:
         self.in_memory = in_memory
         if self.in_memory:

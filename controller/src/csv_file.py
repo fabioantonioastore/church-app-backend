@@ -28,5 +28,12 @@ class CSVFile:
             return self.csv_file
         raise NotImplemented("Feature not implemented already")
 
+    def close_buffer(self) -> None:
+        if self.in_memory:
+            self.csv_file.close()
+
+    def __del__(self) -> None:
+        self.close_buffer()
+
     def __repr__(self) -> str:
         return f"CSVFile({self.in_memory!r})"

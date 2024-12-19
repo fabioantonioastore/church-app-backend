@@ -44,23 +44,67 @@ def get_pdf_table_finance_resume(finances: [Finance]) -> bytes:
 
     return get_finance_resume_file(finances, pdf_table)
 
+async def get_finance_resume_pdf_year(finances: List[Finance], year: int) -> bytes:
+    pdf_table = PDFTable()
+    pdf_table.set_table_header(FINANCE_HEADER)
+
+    return await get_finance_resume_by_year_file(finances, year, pdf_table)
+
 def get_csv_finance_resume(finances: [Finance]) -> StringIO:
     csv_file = CSVFile()
     csv_file.set_file_header(FINANCE_HEADER)
 
     return get_finance_resume_file(finances, csv_file)
 
-
-def get_finance_resume_file(finances: List[Finance], file):
+async def get_finance_resume_by_year_file(finances: List[Finance], year: int, file):
     recipe = 0
     data = []
+    last_month = await finance_crud.get_finance_last_month_obj_by_date(year - 1, 12)
 
     for finance in finances:
+        if finance.title == DEFAULT_TITLE:
+            continue
         recipe = modify_recipe_by_finance(recipe, finance)
         finance_row = get_finance_row(finance)
         data.append(finance_row)
 
     data = sorted(data, key=parse_date)
+    if last_month:
+        last_month_row = ["", "Last Month", "input", round(last_month.value, 2)]
+        data.insert(0, last_month_row)
+        recipe = modify_recipe_by_finance(recipe, last_month)
+    for row in data:
+        file.write(row)
+
+    recipe_row = ["", "Recipe", "input", round(recipe, 2)]
+    file.write(recipe_row)
+
+    return file.get_file()
+
+async def get_csv_finance_resume_year(finances: List[Finance], year: int) -> StringIO:
+    csv_file = CSVFile()
+    csv_file.set_file_header(FINANCE_HEADER)
+
+    return await get_finance_resume_by_year_file(finances, year, csv_file)
+
+def get_finance_resume_file(finances: List[Finance], file):
+    recipe = 0
+    data = []
+    last_month = None
+
+    for finance in finances:
+        if finance.title == DEFAULT_TITLE:
+            last_month = finance
+            recipe = modify_recipe_by_finance(recipe, finance)
+            continue
+        recipe = modify_recipe_by_finance(recipe, finance)
+        finance_row = get_finance_row(finance)
+        data.append(finance_row)
+
+    data = sorted(data, key=parse_date)
+    if last_month:
+        last_month_row = get_finance_row(last_month)
+        data.insert(last_month_row)
     for row in data:
         file.write(row)
 

@@ -11,7 +11,7 @@ from controller.src.finance import (create_finance_in_database, finance_no_sensi
                                     is_actual_month_and_year, update_finance_months_by_finance_data,
                                     FinanceData, FinanceType, get_finance_resume, get_csv_finance_resume,
                                     DateYearMonth, integer_to_month, get_pdf_table_finance_resume,
-                                    )
+                                    get_finance_resume_pdf_year, get_csv_finance_resume_year)
 
 community_crud = CommunityCrud()
 user_crud = UserCrud()
@@ -120,10 +120,23 @@ async def get_finance_resume_pdf_by_year_and_month(patron: str, year: int, month
     month = month_to_integer(month)
     finances = await finance_crud.get_finances_by_month(year, month, community.id)
     pdf_bytes = get_pdf_table_finance_resume(finances)
+    month = integer_to_month(month)
     response = StreamingResponse(
         BytesIO(pdf_bytes),
         media_type="application/pdf",
-        headers={"Content-Disposition": "attachment; filename=finance_resume.pdf"}
+        headers={"Content-Disposition": f"attachment; filename=finance_resume_{month}.pdf"}
+    )
+    return response
+
+@router.get('/community/{patron}/finance_resume_pdf/{year}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+async def get_finance_resume_pdf_by_year(patron: str, year: int, user: dict = Depends(verify_user_access_token)):
+    community = await community_crud.get_community_by_patron(patron)
+    finances = await finance_crud.get_finances_by_year(year, community.id)
+    pdf_bytes = await get_finance_resume_pdf_year(finances, year)
+    response = StreamingResponse(
+        BytesIO(pdf_bytes),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=finance_resume_{year}.pdf"}
     )
     return response
 
@@ -137,6 +150,20 @@ async def get_finance_resume_csv_by_year_and_month(patron: str, year: int, month
         iter([csv_file.getvalue()]),
         media_type="text/csv"
     )
-    response.headers["Content-Disposition"] = "attachment; filename=finance_resume.csv"
+    month = integer_to_month(month)
+    response.headers["Content-Disposition"] = f"attachment; filename=finance_resume_{month}.csv"
+    csv_file.close()
+    return response
+
+@router.get('/community/{patron}/finance_resume_csv/{year}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+async def get_finance_resume_csv_by_year(patron: str, year: int, user: dict = Depends(verify_user_access_token)):
+    community = await community_crud.get_community_by_patron(patron)
+    finances = await finance_crud.get_finances_by_year(year, community.id)
+    csv_file = await get_csv_finance_resume_year(finances, year)
+    response = StreamingResponse(
+        iter([csv_file.getvalue()]),
+        media_type="text/csv"
+    )
+    response.headers["Content-Disposition"] = f"attachment; filename=finance_resume_{year}.csv"
     csv_file.close()
     return response

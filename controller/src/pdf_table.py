@@ -1,5 +1,4 @@
 from typing_extensions import override
-
 from controller.src.pdf import PDF
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
@@ -22,7 +21,8 @@ class PDFTable(PDF):
         else:
             raise "Table cannot modify it's header"
 
-    def add_row(self, row_items: list) -> None:
+    @override
+    def write(self, row_items: list) -> None:
         if len(row_items) != len(self.table_header):
             raise "Size of row is not equals size of the header"
         self.table_data.append(row_items)
@@ -34,7 +34,7 @@ class PDFTable(PDF):
         super().build([self.table])
 
     @override
-    def get_pdf(self) -> bytes:
+    def get_file(self) -> bytes:
         self.build()
         if self.in_memory:
             self.buffer.seek(0)

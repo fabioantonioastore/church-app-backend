@@ -20,10 +20,13 @@ class PDF:
             data = []
         self.pdf.build(data)
 
-    def get_pdf(self) -> bytes:
+    def get_file(self) -> bytes:
         if self.in_memory:
             self.buffer.seek(0)
             return self.buffer.getvalue()
+
+    def write(self, data) -> None:
+        pass
 
     def close_buffer(self) -> None:
         if self.in_memory:

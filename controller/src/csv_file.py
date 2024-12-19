@@ -22,7 +22,7 @@ class CSVFile:
     def write(self, row_items: list) -> None:
         self.writer.writerow(row_items)
 
-    def get_csv_file(self) -> io.StringIO:
+    def get_file(self) -> io.StringIO:
         if self.in_memory:
             self.csv_file.seek(0)
             return self.csv_file
@@ -31,9 +31,6 @@ class CSVFile:
     def close_buffer(self) -> None:
         if self.in_memory:
             self.csv_file.close()
-
-    def __del__(self) -> None:
-        self.close_buffer()
 
     def __repr__(self) -> str:
         return f"CSVFile({self.in_memory!r})"

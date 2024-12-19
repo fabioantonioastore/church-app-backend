@@ -7,6 +7,7 @@ from typing import List
 import datetime
 from dataclasses import dataclass
 from typing import Union, NamedTuple, TypedDict
+from controller.src.pdf_table import PDFTable
 
 class ResumeDict(TypedDict):
     input: float
@@ -34,12 +35,22 @@ class DateYearMonth(NamedTuple):
 finance_crud = FinanceCrud()
 
 DEFAULT_TITLE = "Last Month"
+FINANCE_HEADER = ["Title", "Type", "Value"]
 
-async def get_csv_finance_resume(finances: [Finance]) -> StringIO:
+def get_pdf_table_finance_resume(finances: [Finance]) -> bytes:
+    pdf_table = PDFTable()
+    pdf_table.set_table_header(FINANCE_HEADER)
+
+    return get_finance_resume_file(finances, pdf_table)
+
+def get_csv_finance_resume(finances: [Finance]) -> StringIO:
     csv_file = CSVFile()
-    header = ["Title", "Type", "Value"]
-    csv_file.set_file_header(header)
+    csv_file.set_file_header(FINANCE_HEADER)
 
+    return get_finance_resume_file(finances, csv_file)
+
+
+def get_finance_resume_file(finances: List[Finance], file):
     recipe = 0
     last_month = None
 
@@ -50,13 +61,16 @@ async def get_csv_finance_resume(finances: [Finance]) -> StringIO:
         else:
             recipe = modify_recipe_by_finance(recipe, finance)
             finance_row = get_finance_row(finance)
-            csv_file.write(finance_row)
+            file.write(finance_row)
 
     if last_month:
         last_month_row = get_finance_row(last_month)
-        csv_file.write(last_month_row)
+        file.write(last_month_row)
 
-    return csv_file.get_csv_file()
+    recipe_row = ["Recipe", "input", round(recipe, 2)]
+    file.write(recipe_row)
+
+    return file.get_file()
 
 
 def get_finance_row(finance: Finance) -> list:

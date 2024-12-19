@@ -17,6 +17,7 @@ class ResumeDict(TypedDict):
 
 FINANCE_TYPE = Union[dict, Finance]
 DEFAULT_TITLE = "Last Month"
+DATE_FORMAT = "%m-%d-%Y"
 
 @dataclass
 class FinanceData:
@@ -35,7 +36,7 @@ class DateYearMonth(NamedTuple):
 finance_crud = FinanceCrud()
 
 DEFAULT_TITLE = "Last Month"
-FINANCE_HEADER = ["Title", "Type", "Value"]
+FINANCE_HEADER = ["Date", "Title", "Type", "Value"]
 
 def get_pdf_table_finance_resume(finances: [Finance]) -> bytes:
     pdf_table = PDFTable()
@@ -52,33 +53,38 @@ def get_csv_finance_resume(finances: [Finance]) -> StringIO:
 
 def get_finance_resume_file(finances: List[Finance], file):
     recipe = 0
-    last_month = None
+    data = []
 
     for finance in finances:
-        if finance.title == DEFAULT_TITLE:
-            last_month = finance
-            recipe = modify_recipe_by_finance(recipe, last_month)
-        else:
-            recipe = modify_recipe_by_finance(recipe, finance)
-            finance_row = get_finance_row(finance)
-            file.write(finance_row)
+        recipe = modify_recipe_by_finance(recipe, finance)
+        finance_row = get_finance_row(finance)
+        data.append(finance_row)
 
-    if last_month:
-        last_month_row = get_finance_row(last_month)
-        file.write(last_month_row)
+    data = sorted(data, key=parse_date)
+    for row in data:
+        file.write(row)
 
-    recipe_row = ["Recipe", "input", round(recipe, 2)]
+    recipe_row = ["", "Recipe", "input", round(recipe, 2)]
     file.write(recipe_row)
 
     return file.get_file()
 
+def parse_date(row) -> datetime:
+    return datetime.datetime.strptime(row[0], DATE_FORMAT)
 
 def get_finance_row(finance: Finance) -> list:
+    date = get_finance_date_str(finance)
     return [
+        date,
         finance.title,
         finance.type,
         finance.value
     ]
+
+def get_finance_date_str(finance: Finance) -> str:
+    date = str(finance.date.month) + "-"
+    date += str(finance.date.day) + "-"
+    return date + str(finance.date.year)
 
 def modify_recipe_by_finance(recipe: float, finance: Finance) -> float:
     if finance.type == FinanceType.INPUT:

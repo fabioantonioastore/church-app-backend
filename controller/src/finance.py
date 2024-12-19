@@ -1,8 +1,5 @@
-import csv
-import io
-
-from watchfiles import awatch
-
+from controller.src.csv_file import CSVFile
+from io import StringIO
 from models import Finance
 from controller.crud.finance import FinanceCrud
 from fastapi import HTTPException, status
@@ -38,8 +35,43 @@ finance_crud = FinanceCrud()
 
 DEFAULT_TITLE = "Last Month"
 
-async def get_csv_finance_resume(finances: [Finance], date: DateYearMonth = None):
-   pass
+async def get_csv_finance_resume(finances: [Finance]) -> StringIO:
+    csv_file = CSVFile()
+    header = ["Title", "Type", "Value"]
+    csv_file.set_file_header(header)
+
+    recipe = 0
+    last_month = None
+
+    for finance in finances:
+        if finance.title == DEFAULT_TITLE:
+            last_month = finance
+            recipe = modify_recipe_by_finance(recipe, last_month.value)
+        else:
+            recipe = modify_recipe_by_finance(recipe, finance.value)
+            finance_row = get_finance_row(finance)
+            csv_file.write(finance_row)
+
+    if last_month:
+        last_month_row = get_finance_row(last_month)
+        csv_file.write(last_month_row)
+
+    return csv_file.get_csv_file()
+
+
+def get_finance_row(finance: Finance) -> list:
+    return [
+        finance.title,
+        finance.type,
+        finance.value
+    ]
+
+def modify_recipe_by_finance(recipe: float, finance: Finance) -> float:
+    if finance.type == FinanceType.INPUT:
+        recipe += finance.value
+    elif finance.type == FinanceType.OUTPUT:
+        recipe -= finance.value
+    return recipe
 
 def get_finance_resume(finances: [Finance]) -> dict:
     finance_resume = ResumeDict(input=0, output=0, last_month=0, recipe=0)
@@ -52,7 +84,7 @@ def get_finance_resume(finances: [Finance]) -> dict:
         elif finance.type == FinanceType.OUTPUT:
             finance_resume['output'] += finance.value
     recipe = finance_resume['input'] - finance_resume['output']
-    finance_resume['recipe'] = recipe
+    finance_resume['recipe'] = recipe + finance_resume['last_month']
     finance_resume = rounded_resume(finance_resume)
     return finance_resume
 

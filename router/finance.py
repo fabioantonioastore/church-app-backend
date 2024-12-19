@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, status
-from watchfiles import awatch
-
+from fastapi.responses import StreamingResponse
 from router.middleware.authorization import verify_user_access_token
 from schemas.finance import CreateFinanceModel, UpdateFinanceModel, DictCreateFinanceModel
 from controller.crud.user import UserCrud
@@ -118,6 +117,11 @@ async def get_finance_resume_by_year_and_month(patron: str, year: int, month: st
 async def get_finance_resume_csv_by_year_and_month(patron: str, year: int, month: str, user: dict = Depends(verify_user_access_token)):
     community = await community_crud.get_community_by_patron(patron)
     month = month_to_integer(month)
-    date = DateYearMonth(year, month)
-    finances = await finance_crud.get_finances_by_year(year, community.id)
-    csv_file = await get_csv_finance_resume()
+    finances = await finance_crud.get_finances_by_month(year, month)
+    csv_file = await get_csv_finance_resume(finances)
+    response = StreamingResponse(
+        iter([csv_file.getvalue()]),
+        media_type="text/csv"
+    )
+    response.headers["Content-Disposition"] = "attachment; filename=finance_resume.csv"
+    return response

@@ -24,7 +24,7 @@ class PDFTable(PDF):
 
     def add_row(self, row_items: list) -> None:
         if len(row_items) != len(self.table_header):
-            raise "size of row is not equals size of the header"
+            raise "Size of row is not equals size of the header"
         self.table_data.append(row_items)
 
     @override
@@ -32,6 +32,13 @@ class PDFTable(PDF):
         self.table = Table(self.table_data)
         self.__set_table_style()
         super().build([self.table])
+
+    @override
+    def get_pdf(self) -> bytes:
+        self.build()
+        if self.in_memory:
+            self.buffer.seek(0)
+            return self.buffer.getvalue()
 
     def set_table_style(self, style: TableStyle = None) -> None:
         if not style:
@@ -48,3 +55,6 @@ class PDFTable(PDF):
 
     def __set_table_style(self) -> None:
         self.table.setStyle(self.style)
+
+    def __repr__(self) -> str:
+        return f"PDFTable({self.in_memory!r})"

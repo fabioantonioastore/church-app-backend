@@ -46,9 +46,9 @@ async def get_csv_finance_resume(finances: [Finance]) -> StringIO:
     for finance in finances:
         if finance.title == DEFAULT_TITLE:
             last_month = finance
-            recipe = modify_recipe_by_finance(recipe, last_month.value)
+            recipe = modify_recipe_by_finance(recipe, last_month)
         else:
-            recipe = modify_recipe_by_finance(recipe, finance.value)
+            recipe = modify_recipe_by_finance(recipe, finance)
             finance_row = get_finance_row(finance)
             csv_file.write(finance_row)
 

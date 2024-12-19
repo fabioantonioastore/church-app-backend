@@ -113,11 +113,11 @@ async def get_finance_resume_by_year_and_month(patron: str, year: int, month: st
     resume = get_finance_resume(finances)
     return {month: resume}
 
-@router.get('/community/{patron}/finance_resume_csv/{year}/{month}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
-async def get_finance_resume_csv_by_year_and_month(patron: str, year: int, month: str, user: dict = Depends(verify_user_access_token)):
+@router.get('/community/{patron}/finance_resume_csv/{year}/{month}', status_code=status.HTTP_200_OK)
+async def get_finance_resume_csv_by_year_and_month(patron: str, year: int, month: str):
     community = await community_crud.get_community_by_patron(patron)
     month = month_to_integer(month)
-    finances = await finance_crud.get_finances_by_month(year, month)
+    finances = await finance_crud.get_finances_by_month(year, month, community.id)
     csv_file = await get_csv_finance_resume(finances)
     response = StreamingResponse(
         iter([csv_file.getvalue()]),

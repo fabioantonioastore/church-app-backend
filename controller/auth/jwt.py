@@ -9,8 +9,8 @@ from controller.errors.http.exceptions import unauthorized
 
 load_dotenv()
 
-SECRET_KEY = getenv('SECRET_KEY')
-ALGORITHM = getenv('ALGORITHM')
+SECRET_KEY = getenv("SECRET_KEY")
+ALGORITHM = getenv("ALGORITHM")
 EXPIRE_MINUTES = 60 * 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/signin")
 

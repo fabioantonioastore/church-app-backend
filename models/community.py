@@ -6,7 +6,7 @@ from controller.src.generate_uuid import generate_uuid4
 
 
 class Community(Base):
-    __tablename__ = 'communities'
+    __tablename__ = "communities"
 
     id = mapped_column(String, primary_key=True, default=generate_uuid4)
     patron = mapped_column(String, unique=True)
@@ -17,6 +17,6 @@ class Community(Base):
     actual_month_total_payment_value = mapped_column(Float, default=0)
     last_month_total_payment_value = mapped_column(Float, default=0)
 
-    warnings = relationship('Warning', cascade='all, delete-orphan')
-    users = relationship('User')
-    finances = relationship("Finance", cascade='all, delete-orphan')
+    warnings = relationship("Warning", cascade="all, delete-orphan")
+    users = relationship("User")
+    finances = relationship("Finance", cascade="all, delete-orphan")

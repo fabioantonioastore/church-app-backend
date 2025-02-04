@@ -9,12 +9,19 @@ class WarningCrud(CRUD):
     def __init__(self) -> None:
         super().__init__()
 
-    async def get_warnings_by_community_id_from_pagination(self, community_id: str, page: int = 1,
-                                                           page_size: int = 100) -> [Warning]:
+    async def get_warnings_by_community_id_from_pagination(
+        self, community_id: str, page: int = 1, page_size: int = 100
+    ) -> [Warning]:
         async with self.session() as session:
             try:
                 offset = (page - 1) * page_size
-                statement = select(Warning).filter(Warning.community_id == community_id).order_by(desc(Warning.posted_at)).offset(offset).limit(page_size)
+                statement = (
+                    select(Warning)
+                    .filter(Warning.community_id == community_id)
+                    .order_by(desc(Warning.posted_at))
+                    .offset(offset)
+                    .limit(page_size)
+                )
                 result = await session.execute(statement)
                 warnings = result.scalars().all()
                 return warnings
@@ -35,7 +42,11 @@ class WarningCrud(CRUD):
     async def get_warning_by_community_id(self, community_id: str, total: int = 10):
         async with self.session() as session:
             try:
-                statement = select(Warning).filter(Warning.community_id == community_id).limit(total)
+                statement = (
+                    select(Warning)
+                    .filter(Warning.community_id == community_id)
+                    .limit(total)
+                )
                 warnings = await session.execute(statement)
                 return warnings.scalars().all()
             except Exception as error:
@@ -55,17 +66,17 @@ class WarningCrud(CRUD):
     async def update_warning(self, new_warning: dict):
         async with self.session() as session:
             try:
-                statement = select(Warning).filter(Warning.id == new_warning['id'])
+                statement = select(Warning).filter(Warning.id == new_warning["id"])
                 warning = await session.execute(statement)
                 warning = warning.scalars().first()
                 for key in new_warning.keys():
                     match key:
-                        case 'scope':
-                            warning.scope = new_warning['scope']
-                        case 'title':
-                            warning.title = new_warning['title']
-                        case 'description':
-                            warning.description = new_warning['description']
+                        case "scope":
+                            warning.scope = new_warning["scope"]
+                        case "title":
+                            warning.title = new_warning["title"]
+                        case "description":
+                            warning.description = new_warning["description"]
                 warning.edited_at = datetime.now()
                 await session.commit()
                 return warning

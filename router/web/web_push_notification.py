@@ -12,8 +12,14 @@ web_push_crud = WebPushCrud()
 user_crud = UserCrud()
 
 
-@router.post("/web_push/subscription", status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_user_access_token)])
-async def subscribe(subscription: PushSubscription, user: dict = Depends(verify_user_access_token)) -> str:
+@router.post(
+    "/web_push/subscription",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(verify_user_access_token)],
+)
+async def subscribe(
+    subscription: PushSubscription, user: dict = Depends(verify_user_access_token)
+) -> str:
     try:
         subscription = dict(subscription)
         user = await user_crud.get_user_by_cpf(user["cpf"])
@@ -34,10 +40,9 @@ async def send_notification(notification: PushNotification):
     try:
         message = messaging.Message(
             notification=messaging.Notification(
-                title=notification.title,
-                body=notification.body
+                title=notification.title, body=notification.body
             ),
-            token=notification.token
+            token=notification.token,
         )
         response = messaging.send(message)
         return {"message_id": response}

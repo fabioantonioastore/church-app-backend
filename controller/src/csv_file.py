@@ -1,6 +1,7 @@
 import csv
 import io
 
+
 class CSVFile:
     def __init__(self, in_memory: bool = True) -> None:
         self.file_header = None
@@ -11,7 +12,9 @@ class CSVFile:
             raise NotImplemented("Feature not implemented already")
         self.writer = csv.writer(self.csv_file)
 
-    def set_file_header(self, file_header: list[str], auto_write_header: bool = True) -> None:
+    def set_file_header(
+        self, file_header: list[str], auto_write_header: bool = True
+    ) -> None:
         self.file_header = file_header
         if auto_write_header:
             self.write_header()

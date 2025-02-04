@@ -9,7 +9,7 @@ login_crud = LoginCrud()
 user_crud = UserCrud()
 
 
-@router.get('/password_recovery/{cpf}', status_code=status.HTTP_200_OK)
+@router.get("/password_recovery/{cpf}", status_code=status.HTTP_200_OK)
 async def get_password_recovery_code(cpf: str):
     user = await user_crud.get_user_by_cpf(cpf)
     code = generate_verification_code()
@@ -19,7 +19,7 @@ async def get_password_recovery_code(cpf: str):
     return {"phone": user.phone}
 
 
-@router.get('/password_recovery/{cpf}/{code}', status_code=status.HTTP_200_OK)
+@router.get("/password_recovery/{cpf}/{code}", status_code=status.HTTP_200_OK)
 async def verify_recovery_code(cpf: str, code: int):
     DEFAULT_PASSWORD = "Re1234@@"
     user = await user_crud.get_user_by_cpf(cpf)

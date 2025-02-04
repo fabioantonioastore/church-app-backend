@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
+
 class LoginModel(BaseModel):
     id: str
     cpf: str
@@ -12,7 +13,7 @@ class LoginModel(BaseModel):
             "example": {
                 "id": "uuid4",
                 "cpf": "cpf of the user",
-                "password": "password of the user"
+                "password": "password of the user",
             }
-        }
+        },
     )

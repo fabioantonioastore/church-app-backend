@@ -3,11 +3,7 @@ from random import randint
 
 
 def send_message(destination_number: str, message: str) -> None:
-    client.messages.create(
-        body=message,
-        to=destination_number,
-        from_=TWILIO_NUMBER
-    )
+    client.messages.create(body=message, to=destination_number, from_=TWILIO_NUMBER)
 
 
 def generate_verification_code() -> int:

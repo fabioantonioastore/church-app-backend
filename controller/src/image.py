@@ -29,7 +29,7 @@ async def create_image(image_data) -> Image:
 
 
 def convert_image_to_base64(image_data):
-    return base64.b64encode(image_data).decode('utf-8')
+    return base64.b64encode(image_data).decode("utf-8")
 
 
 def create_image_model(image_data) -> Image:

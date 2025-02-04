@@ -6,7 +6,7 @@ from models.web_push import WebPush
 
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = mapped_column(String, primary_key=True, default=generate_uuid4)
     cpf = mapped_column(String, unique=True)
@@ -16,9 +16,11 @@ class User(Base):
     position = mapped_column(String, default="user")
     image = mapped_column(String, nullable=True)
     active = mapped_column(Boolean, default=True)
-    community_id = mapped_column(String, ForeignKey('communities.id'))
+    community_id = mapped_column(String, ForeignKey("communities.id"))
     responsibility = mapped_column(String, default="faithful")
 
-    dizimo_payments = relationship('DizimoPayment', back_populates="user")
-    web_push = relationship("WebPush", back_populates="user", cascade="all, delete-orphan")
+    dizimo_payments = relationship("DizimoPayment", back_populates="user")
+    web_push = relationship(
+        "WebPush", back_populates="user", cascade="all, delete-orphan"
+    )
     number = relationship("Number", back_populates="user", cascade="all, delete-orphan")

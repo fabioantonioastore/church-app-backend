@@ -7,17 +7,20 @@ import calendar
 
 DEFAULT_TITLE = "Last Month"
 
+
 class FinanceCrud(CRUD):
     def __init__(self) -> None:
         super().__init__()
 
-    async def get_finance_last_month_obj_by_date(self, year: int, month: int) -> Finance | None:
+    async def get_finance_last_month_obj_by_date(
+        self, year: int, month: int
+    ) -> Finance | None:
         async with self.session() as session:
             try:
                 statement = select(Finance).filter(
                     and_(
-                        extract('year', Finance.date) == year,
-                        extract('month', Finance.date) == month
+                        extract("year", Finance.date) == year,
+                        extract("month", Finance.date) == month,
                     )
                 )
                 finance = await session.execute(statement)
@@ -26,19 +29,21 @@ class FinanceCrud(CRUD):
                 await session.rollback()
                 return None
 
-    async def get_finances_where_date_is_greater_than(self, date: datetime) -> [Finance]:
+    async def get_finances_where_date_is_greater_than(
+        self, date: datetime
+    ) -> [Finance]:
         async with self.session() as session:
             try:
                 statement = select(Finance).filter(
                     and_(
                         Finance.title == DEFAULT_TITLE,
                         or_(
-                            extract('year', Finance.date) > date.year,
+                            extract("year", Finance.date) > date.year,
                             and_(
-                                extract('year', Finance.date) == date.year,
-                                extract('month', Finance.date) > date.month
-                            )
-                        )
+                                extract("year", Finance.date) == date.year,
+                                extract("month", Finance.date) > date.month,
+                            ),
+                        ),
                     )
                 )
                 finances = await session.execute(statement)
@@ -88,8 +93,8 @@ class FinanceCrud(CRUD):
                         Finance.community_id == community_id,
                         and_(
                             Finance.date >= first_month_date,
-                            Finance.date <= last_month_date
-                        )
+                            Finance.date <= last_month_date,
+                        ),
                     )
                 )
                 finances = await session.execute(statement)
@@ -98,19 +103,23 @@ class FinanceCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_finances_by_month(self, year: int, month: int, community_id: str) -> [Finance]:
+    async def get_finances_by_month(
+        self, year: int, month: int, community_id: str
+    ) -> [Finance]:
         async with self.session() as session:
             try:
                 first_month_day = datetime(year, month, 1)
-                last_month_day = datetime(year, month, calendar.monthrange(year, month)[1])
+                last_month_day = datetime(
+                    year, month, calendar.monthrange(year, month)[1]
+                )
                 last_month_day = last_month_day.replace(hour=23, minute=59, second=59)
                 statement = select(Finance).filter(
                     and_(
                         Finance.community_id == community_id,
                         and_(
                             Finance.date >= first_month_day,
-                            Finance.date <= last_month_day
-                        )
+                            Finance.date <= last_month_day,
+                        ),
                     )
                 )
                 finances = await session.execute(statement)
@@ -132,7 +141,9 @@ class FinanceCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def update_finance_by_id(self, finance_id: str, finance_data: dict) -> Finance:
+    async def update_finance_by_id(
+        self, finance_id: str, finance_data: dict
+    ) -> Finance:
         async with self.session() as session:
             try:
                 statement = select(Finance).filter(Finance.id == finance_id)
@@ -141,15 +152,15 @@ class FinanceCrud(CRUD):
                 for key in finance_data:
                     match key:
                         case "title":
-                            finance.title = finance_data['title']
+                            finance.title = finance_data["title"]
                         case "description":
-                            finance.description = finance_data['description']
+                            finance.description = finance_data["description"]
                         case "type":
-                            finance.type = finance_data['type']
+                            finance.type = finance_data["type"]
                         case "value":
-                            finance.value = finance_data['value']
+                            finance.value = finance_data["value"]
                         case "date":
-                            finance.date = finance_data['date']
+                            finance.date = finance_data["date"]
                 await session.commit()
                 return finance
             except Exception as error:

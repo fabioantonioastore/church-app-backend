@@ -14,11 +14,18 @@ image_crud = ImageCrud()
 router = APIRouter()
 
 
-@router.patch("/image/community/{patron}", status_code=status.HTTP_204_NO_CONTENT,
-              dependencies=[Depends(verify_user_access_token)])
-async def upload_community_image(patron: str, user: dict = Depends(verify_user_access_token), file: UploadFile = File(...)):
+@router.patch(
+    "/image/community/{patron}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(verify_user_access_token)],
+)
+async def upload_community_image(
+    patron: str,
+    user: dict = Depends(verify_user_access_token),
+    file: UploadFile = File(...),
+):
     if is_png_or_jpeg_image(file):
-        user = await user_crud.get_user_by_cpf(user['cpf'])
+        user = await user_crud.get_user_by_cpf(user["cpf"])
         community = await community_crud.get_community_by_patron(patron)
         if community.image:
             await image_crud.delete_image_by_id(community.image)
@@ -30,18 +37,30 @@ async def upload_community_image(patron: str, user: dict = Depends(verify_user_a
     raise not_acceptable("Invalid content type")
 
 
-@router.delete("/image/community/{patron}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
-async def delete_community_image(patron: str, user: dict = Depends(verify_user_access_token)):
-    user = await user_crud.get_user_by_cpf(user['cpf'])
+@router.delete(
+    "/image/community/{patron}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(verify_user_access_token)],
+)
+async def delete_community_image(
+    patron: str, user: dict = Depends(verify_user_access_token)
+):
+    user = await user_crud.get_user_by_cpf(user["cpf"])
     community = await community_crud.get_community_by_patron(patron)
     if community.image:
         await image_crud.delete_image_by_id(community.image)
         await community_crud.delete_community_image(community.id)
 
 
-@router.get("/image/community/{patron}", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
-async def get_community_image(patron: str, user: dict = Depends(verify_user_access_token)):
-    user = await user_crud.get_user_by_cpf(user['cpf'])
+@router.get(
+    "/image/community/{patron}",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(verify_user_access_token)],
+)
+async def get_community_image(
+    patron: str, user: dict = Depends(verify_user_access_token)
+):
+    user = await user_crud.get_user_by_cpf(user["cpf"])
     community = await community_crud.get_community_by_patron(patron)
     if community.image:
         image = await image_crud.get_image_by_id(community.image)
@@ -50,9 +69,16 @@ async def get_community_image(patron: str, user: dict = Depends(verify_user_acce
     return None
 
 
-@router.patch("/image/user/{cpf}", status_code=status.HTTP_204_NO_CONTENT,
-              dependencies=[Depends(verify_user_access_token)])
-async def upload_user_image(cpf: str, user: dict = Depends(verify_user_access_token), file: UploadFile = File(...)):
+@router.patch(
+    "/image/user/{cpf}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(verify_user_access_token)],
+)
+async def upload_user_image(
+    cpf: str,
+    user: dict = Depends(verify_user_access_token),
+    file: UploadFile = File(...),
+):
     if is_png_or_jpeg_image(file):
         user_cpf = await user_crud.get_user_by_cpf(cpf)
         if user_cpf.image:
@@ -65,7 +91,11 @@ async def upload_user_image(cpf: str, user: dict = Depends(verify_user_access_to
     raise not_acceptable("Invalid content type")
 
 
-@router.get('/image/user/{cpf}', status_code=status.HTTP_200_OK, dependencies=[Depends(verify_user_access_token)])
+@router.get(
+    "/image/user/{cpf}",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(verify_user_access_token)],
+)
 async def get_user_image(cpf: str, user: dict = Depends(verify_user_access_token)):
     user_cpf = await user_crud.get_user_by_cpf(cpf)
     if user_cpf.image:
@@ -75,7 +105,11 @@ async def get_user_image(cpf: str, user: dict = Depends(verify_user_access_token
     return None
 
 
-@router.delete('/image/user/{cpf}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(verify_user_access_token)])
+@router.delete(
+    "/image/user/{cpf}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(verify_user_access_token)],
+)
 async def delete_user_image(cpf: str, user: dict = Depends(verify_user_access_token)):
     user_cpf = await user_crud.get_user_by_cpf(cpf)
     if user_cpf.image:

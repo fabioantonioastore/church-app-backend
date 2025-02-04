@@ -3,11 +3,13 @@ from reportlab.platypus import SimpleDocTemplate
 from io import BytesIO
 from typing import NamedTuple
 
+
 class Margins(NamedTuple):
     top: float
     left: float
     right: float
     bottom: float
+
 
 class PDF:
     def __init__(self, in_memory: bool = True) -> None:
@@ -19,14 +21,9 @@ class PDF:
             NotImplemented("Feature not implemented yet")
         self.set_pdf_style()
 
-    def set_pdf_style(self, style = None) -> None:
+    def set_pdf_style(self, style=None) -> None:
         self.pdf.pagesize = A4
-        margins = Margins(
-            top=10,
-            left=10,
-            right=10,
-            bottom=10
-        )
+        margins = Margins(top=10, left=10, right=10, bottom=10)
         self.set_pdf_margin(margins)
 
     def set_pdf_margin(self, margins: Margins) -> None:

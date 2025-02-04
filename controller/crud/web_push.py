@@ -21,13 +21,18 @@ class WebPushCrud(CRUD):
                 await session.rollback()
                 raise internal_server_error(str(error))
 
-    async def get_web_pushes_paginated(self, page: int = 1, page_size: int = 100) -> AsyncIterator:
+    async def get_web_pushes_paginated(
+        self, page: int = 1, page_size: int = 100
+    ) -> AsyncIterator:
         async with self.session() as session:
             try:
                 offset = (page - 1) * page_size
-                statement = select(WebPush).options(
-                    selectinload(WebPush.user)
-                ).offset(offset).limit(page_size)
+                statement = (
+                    select(WebPush)
+                    .options(selectinload(WebPush.user))
+                    .offset(offset)
+                    .limit(page_size)
+                )
                 web_pushes = await session.execute(statement)
                 web_pushes = web_pushes.scalars().all()
                 yield web_pushes
@@ -66,7 +71,7 @@ class WebPushCrud(CRUD):
                 return "deleted"
             except Exception as error:
                 await session.rollback()
-                raise error                
+                raise error
 
     async def get_all_tokens(self) -> [WebPush]:
         async with self.session() as session:

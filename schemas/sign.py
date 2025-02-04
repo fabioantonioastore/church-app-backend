@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict, validator
 
+
 class SignIn(BaseModel):
     cpf: str
     password: str
@@ -7,12 +8,10 @@ class SignIn(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={
-            "example": {
-                "cpf": "cpf of the user",
-                "password": "password of the user"
-            }
-        }
+            "example": {"cpf": "cpf of the user", "password": "password of the user"}
+        },
     )
+
 
 class SignInAdmin(SignIn):
     position: str
@@ -23,10 +22,11 @@ class SignInAdmin(SignIn):
             "example": {
                 "cpf": "cpf of the user",
                 "password": "password of the user",
-                "position": "position of the user"
+                "position": "position of the user",
             }
-        }
+        },
     )
+
 
 class SignUp(BaseModel):
     cpf: str
@@ -45,7 +45,7 @@ class SignUp(BaseModel):
                 "password": "password of the user",
                 "birthday": "birthday of the user",
                 "community": "community patron",
-                "phone": "phone number"
+                "phone": "phone number",
             }
-        }
+        },
     )

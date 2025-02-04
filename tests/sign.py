@@ -1,5 +1,6 @@
 from controller.validators.sign_validator import SignUpValidator
 
+
 class TestSign:
     def __init__(self):
         pass
@@ -8,7 +9,8 @@ class TestSign:
         try:
             SignUpValidator(sign_up_data)
             return True
-        except: return False
+        except:
+            return False
 
     def sign_in(self, sign_in_data: dict) -> bool:
         pass

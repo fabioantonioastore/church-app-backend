@@ -68,17 +68,17 @@ class LoginCrud(CRUD):
     async def update_login(self, new_login: dict):
         async with self.session() as session:
             try:
-                statement = select(Login).filter(Login.id == new_login['id'])
+                statement = select(Login).filter(Login.id == new_login["id"])
                 login = await session.execute(statement)
                 login = login.scalars().first()
                 for key in new_login.keys():
                     match key:
-                        case 'cpf':
-                            login.cpf = new_login['cpf']
-                        case 'password':
-                            login.password = new_login['password']
-                        case 'position':
-                            login.profile = new_login['position']
+                        case "cpf":
+                            login.cpf = new_login["cpf"]
+                        case "password":
+                            login.password = new_login["password"]
+                        case "position":
+                            login.profile = new_login["position"]
                 await session.commit()
                 return login
             except Exception as error:

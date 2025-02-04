@@ -12,7 +12,9 @@ class UserCrud(CRUD):
     def __init__(self) -> None:
         super().__init__()
 
-    async def get_users_paginated(self, page: int = 1, page_size: int = 100) -> AsyncIterator:
+    async def get_users_paginated(
+        self, page: int = 1, page_size: int = 100
+    ) -> AsyncIterator:
         async with self.session() as session:
             try:
                 offset = (page - 1) * page_size
@@ -55,8 +57,8 @@ class UserCrud(CRUD):
                         User.community_id == community_id,
                         or_(
                             User.position == "parish leader",
-                            User.position == "council member"
-                        )
+                            User.position == "council member",
+                        ),
                     )
                 )
                 users = await session.execute(statement)
@@ -141,26 +143,28 @@ class UserCrud(CRUD):
     async def update_user(self, new_user: dict):
         async with self.session() as session:
             try:
-                statement = select(User).filter(User.id == new_user['id'])
+                statement = select(User).filter(User.id == new_user["id"])
                 user = await session.execute(statement)
                 user = user.scalars().first()
                 for key in new_user.keys():
                     match key:
-                        case 'cpf':
-                            if new_user['cpf'] != user.cpf:
-                                user.cpf = new_user['cpf']
-                        case 'name':
-                            user.name = new_user['name']
-                        case 'birthday':
-                            user.birthday = new_user['birthday']
-                        case 'phone':
-                            user.phone = new_user['phone']
-                        case 'community_id':
-                            user.community_id = new_user['community_id']
-                        case 'active':
-                            user.active = new_user['active']
-                        case 'community_patron':
-                            community = await community_crud.get_community_by_patron(new_user['community_patron'])
+                        case "cpf":
+                            if new_user["cpf"] != user.cpf:
+                                user.cpf = new_user["cpf"]
+                        case "name":
+                            user.name = new_user["name"]
+                        case "birthday":
+                            user.birthday = new_user["birthday"]
+                        case "phone":
+                            user.phone = new_user["phone"]
+                        case "community_id":
+                            user.community_id = new_user["community_id"]
+                        case "active":
+                            user.active = new_user["active"]
+                        case "community_patron":
+                            community = await community_crud.get_community_by_patron(
+                                new_user["community_patron"]
+                            )
                             user.community_id = community.id
                 await session.commit()
                 return user

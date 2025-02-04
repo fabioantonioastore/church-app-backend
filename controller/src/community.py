@@ -4,7 +4,15 @@ from models import User
 
 
 def get_users_friendly_data(users: [User]) -> list[dict]:
-    return [{"name": user.name, "birthday": user.birthday, "email": user.email, "cpf": user.cpf} for user in users]
+    return [
+        {
+            "name": user.name,
+            "birthday": user.birthday,
+            "email": user.email,
+            "cpf": user.cpf,
+        }
+        for user in users
+    ]
 
 
 def get_patrons(communities: [Community]) -> list:
@@ -12,7 +20,10 @@ def get_patrons(communities: [Community]) -> list:
 
 
 def get_community_list(communities: [Community]) -> list:
-    return [{"patron": community.patron, "location": community.location} for community in communities]
+    return [
+        {"patron": community.patron, "location": community.location}
+        for community in communities
+    ]
 
 
 def create_community_data(community_data: dict) -> Community:
@@ -20,26 +31,37 @@ def create_community_data(community_data: dict) -> Community:
     for key in community_data:
         match key:
             case "patron":
-                community.patron = community_data['patron']
+                community.patron = community_data["patron"]
             case "image":
-                community.image = community_data['image']
+                community.image = community_data["image"]
             case "location":
-                community.location = community_data['location']
+                community.location = community_data["location"]
             case "email":
-                community.email = community_data['email']
+                community.email = community_data["email"]
     community.id = str(uuid4())
     return community
 
 
 def convert_to_dict(community: Community) -> dict:
-    new_community = {'id': community.id, 'patron': community.patron, 'email': community.email, 'image': community.image,
-                     'location': community.location, 'active': community.active}
+    new_community = {
+        "id": community.id,
+        "patron": community.patron,
+        "email": community.email,
+        "image": community.image,
+        "location": community.location,
+        "active": community.active,
+    }
     return new_community
 
 
 def get_community_client_data(community: Community) -> dict:
-    community_data = {'patron': community.patron, 'location': community.location, 'email': community.email,
-                      'image': community.image, 'active': community.active}
+    community_data = {
+        "patron": community.patron,
+        "location": community.location,
+        "email": community.email,
+        "image": community.image,
+        "active": community.active,
+    }
     return community_data
 
 
@@ -47,13 +69,13 @@ def update_community_data(community: Community, data: dict) -> dict:
     for key in data:
         match key:
             case "patron":
-                community.patron = data['patron']
+                community.patron = data["patron"]
             case "email":
-                community.email = data['email']
+                community.email = data["email"]
             case "location":
-                community.location = data['location']
+                community.location = data["location"]
             case "image":
-                community.image = data['image']
+                community.image = data["image"]
     return convert_to_dict(community)
 
 

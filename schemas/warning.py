@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
+
 class WarningModel(BaseModel):
     id: str
     scope: str
@@ -9,6 +10,7 @@ class WarningModel(BaseModel):
     edited_at: str
     community_id: str
     image: str
+
 
 class CreateWarningModel(BaseModel):
     scope: str
@@ -23,10 +25,11 @@ class CreateWarningModel(BaseModel):
                 "scope": "all or private",
                 "title": "title of the warning",
                 "description": "description of the warning",
-                "image": "image of the warning or None"
+                "image": "image of the warning or None",
             }
-        }
+        },
     )
+
 
 class UpdateWarningModel(BaseModel):
     title: str | None = None
@@ -41,19 +44,15 @@ class UpdateWarningModel(BaseModel):
                 "title": "new title or None",
                 "description": "new description or None",
                 "scope": "all or private or None",
-                "image": "image of warning or None"
+                "image": "image of warning or None",
             }
-        }
+        },
     )
+
 
 class DeleteWarningModel(BaseModel):
     id: str
 
     model_config = ConfigDict(
-        from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "id": "id of the warning"
-            }
-        }
+        from_attributes=True, json_schema_extra={"example": {"id": "id of the warning"}}
     )

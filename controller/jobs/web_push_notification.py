@@ -10,11 +10,7 @@ dizimo_payment_crud = DizimoPaymentCrud()
 def execute_notification(token: str, title: str, body: str) -> NoReturn:
     try:
         message = messaging.Message(
-            notification=messaging.Notification(
-                title=title,
-                body=body
-            ),
-            token=token
+            notification=messaging.Notification(title=title, body=body), token=token
         )
         messaging.send(message)
     except Exception as error:
@@ -23,7 +19,11 @@ def execute_notification(token: str, title: str, body: str) -> NoReturn:
 
 async def send_notification() -> NoReturn:
     try:
-        from controller.src.web_push_notification import get_web_pushes, is_first_month_day
+        from controller.src.web_push_notification import (
+            get_web_pushes,
+            is_first_month_day,
+        )
+
         web_pushes = await get_web_pushes()
         for web_push in web_pushes:
             user = web_push.user
@@ -31,7 +31,9 @@ async def send_notification() -> NoReturn:
             month = convert_to_month(datetime.month)
             year = datetime.year
             day = datetime.day
-            dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, year, user.id)
+            dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(
+                month, year, user.id
+            )
             if is_first_month_day(day):
                 title = f"E-Igreja"
                 body = f"Pagamento de {month} ja disponivel"
@@ -43,7 +45,9 @@ async def send_notification() -> NoReturn:
                 execute_notification(token, title, body)
                 return
             title = f"E-Igreja"
-            body = f"Convide amigos para fazer parte! Agradecemos pela sua contribuicao!"
+            body = (
+                f"Convide amigos para fazer parte! Agradecemos pela sua contribuicao!"
+            )
             execute_notification(token, title, body)
     except:
         pass

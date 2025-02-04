@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
+
 class UserModel(BaseModel):
     id: str
     cpf: str
@@ -11,8 +12,10 @@ class UserModel(BaseModel):
     community_id: str
     active: bool
 
+
 class CreateUserModel(UserModel):
     pass
+
 
 class UpdateUserModel(BaseModel):
     cpf: str
@@ -33,10 +36,11 @@ class UpdateUserModel(BaseModel):
                 "community_patron": "new community of the user",
                 "password": "new password of the user",
                 "birthday": "new birthday of the user",
-                "image": "image of the user"
+                "image": "image of the user",
             }
-        }
+        },
     )
+
 
 class UpgradeUserPositionResponsability(BaseModel):
     cpf: str
@@ -49,7 +53,7 @@ class UpgradeUserPositionResponsability(BaseModel):
             "example": {
                 "cpf": "cpf of the user",
                 "position": "new position of the user",
-                "responsibility": "responsibility of the user or None"
+                "responsibility": "responsibility of the user or None",
             }
-        }
+        },
     )

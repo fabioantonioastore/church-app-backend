@@ -19,20 +19,29 @@ dizimo_payment_crud = DizimoPaymentCrud()
 number_crud = NumberCrud()
 
 
-@router.post("/signin", status_code=status.HTTP_200_OK, summary="Login", description="Do Sign In")
+@router.post(
+    "/signin", status_code=status.HTTP_200_OK, summary="Login", description="Do Sign In"
+)
 async def signin(sign_data: SignIn):
     sign_data = dict(sign_data)
     if await verify_user_login(sign_data):
-        user = await user_crud.get_user_by_cpf(sign_data['cpf'])
+        user = await user_crud.get_user_by_cpf(sign_data["cpf"])
         if not (user.active):
             user.active = True
             user = convert_user_to_dict(user)
             await user_crud.update_user(user)
-        return {"access_token": jwt.create_access_token(sign_data['cpf'], user.position)}
+        return {
+            "access_token": jwt.create_access_token(sign_data["cpf"], user.position)
+        }
     return bad_request("Password or CPF is not correct")
 
 
-@router.post("/signup", status_code=status.HTTP_201_CREATED, summary="Login", description="Create user account")
+@router.post(
+    "/signup",
+    status_code=status.HTTP_201_CREATED,
+    summary="Login",
+    description="Create user account",
+)
 async def signup(sign_data: SignUp):
     sign_data = dict(sign_data)
     SignUpValidator(sign_data)

@@ -3,6 +3,7 @@ from controller.src.pdf import PDF
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
 
+
 class PDFTable(PDF):
     def __init__(self, in_memory: bool = True) -> None:
         super().__init__(in_memory)
@@ -28,7 +29,7 @@ class PDFTable(PDF):
         self.table_data.append(row_items)
 
     @override
-    def build(self, data = None) -> None:
+    def build(self, data=None) -> None:
         self.table = Table(self.table_data)
         self.__set_table_style()
         super().build([self.table])
@@ -42,15 +43,17 @@ class PDFTable(PDF):
 
     def set_table_style(self, style: TableStyle = None) -> None:
         if not style:
-            style = TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ])
+            style = TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                    ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+                    ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+                    ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                ]
+            )
         self.style = style
 
     def __set_table_style(self) -> None:

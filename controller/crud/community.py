@@ -8,7 +8,9 @@ class CommunityCrud(CRUD):
     def __init__(self) -> None:
         super().__init__()
 
-    async def get_communities_paginated(self, page: int = 1, page_size: int = 100) -> [Community]:
+    async def get_communities_paginated(
+        self, page: int = 1, page_size: int = 100
+    ) -> [Community]:
         async with self.session() as session:
             try:
                 offset = (page - 1) * page_size
@@ -57,11 +59,18 @@ class CommunityCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_all_community_users_paginated(self, community_id: str, page: int = 1, page_size: int = 100) -> [User]:
+    async def get_all_community_users_paginated(
+        self, community_id: str, page: int = 1, page_size: int = 100
+    ) -> [User]:
         async with self.session() as session:
             try:
                 offset = (page - 1) * page_size
-                statement = select(User).filter(User.community_id == community_id).offset(offset).limit(page_size)
+                statement = (
+                    select(User)
+                    .filter(User.community_id == community_id)
+                    .offset(offset)
+                    .limit(page_size)
+                )
                 result = await session.execute(statement)
                 users = result.scalars().all()
                 return users
@@ -82,7 +91,9 @@ class CommunityCrud(CRUD):
     async def get_community_by_patron(self, community_patron: str):
         async with self.session() as session:
             try:
-                statement = select(Community).filter(Community.patron == community_patron)
+                statement = select(Community).filter(
+                    Community.patron == community_patron
+                )
                 community = await session.execute(statement)
                 return community.scalars().first()
             except Exception as error:
@@ -112,23 +123,25 @@ class CommunityCrud(CRUD):
     async def update_community(self, new_community: dict):
         async with self.session() as session:
             try:
-                statement = select(Community).filter(Community.id == new_community['id'])
+                statement = select(Community).filter(
+                    Community.id == new_community["id"]
+                )
                 community = await session.execute(statement)
                 community = community.scalars().one()
                 for key in new_community.keys():
                     match key:
-                        case 'name':
-                            community.name = new_community['name']
-                        case 'patron':
-                            community.patron = new_community['patron']
-                        case 'email':
-                            community.email = new_community['email']
-                        case 'image':
-                            community.image = new_community['image']
-                        case 'location':
-                            community.location = new_community['location']
-                        case 'active':
-                            community.active = new_community['active']
+                        case "name":
+                            community.name = new_community["name"]
+                        case "patron":
+                            community.patron = new_community["patron"]
+                        case "email":
+                            community.email = new_community["email"]
+                        case "image":
+                            community.image = new_community["image"]
+                        case "location":
+                            community.location = new_community["location"]
+                        case "active":
+                            community.active = new_community["active"]
                 await session.commit()
                 return community
             except Exception as error:
@@ -158,8 +171,9 @@ class CommunityCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def increase_actual_month_payment_value(self,
-                                                  community_id: str, value: int) -> Community:
+    async def increase_actual_month_payment_value(
+        self, community_id: str, value: int
+    ) -> Community:
         async with self.session() as session:
             try:
                 statement = select(Community).filter(Community.id == community_id)
@@ -172,14 +186,17 @@ class CommunityCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def transfer_actual_to_last_month_and_reset_actual(self,
-                                                             community_id: str) -> Community:
+    async def transfer_actual_to_last_month_and_reset_actual(
+        self, community_id: str
+    ) -> Community:
         async with self.session() as session:
             try:
                 statement = select(Community).filter(Community.id == community_id)
                 community = await session.execute(statement)
                 community = community.scalars().first()
-                community.last_month_total_payment_value = community.actual_month_total_payment_value
+                community.last_month_total_payment_value = (
+                    community.actual_month_total_payment_value
+                )
                 community.actual_month_total_payment_value = 0
                 await session.commit()
                 return community

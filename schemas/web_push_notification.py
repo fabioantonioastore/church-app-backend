@@ -6,11 +6,7 @@ class PushSubscription(BaseModel):
 
     model_config = ConfigDict(
         from_attributes=True,
-        json_schema_extra={
-            "example": {
-                "token": "Token of device"
-            }
-        }
+        json_schema_extra={"example": {"token": "Token of device"}},
     )
 
 
@@ -25,7 +21,7 @@ class PushNotification(BaseModel):
             "example": {
                 "title": "Title of the notification",
                 "body": "Body of the notification",
-                "token": "Token of the device"
+                "token": "Token of the device",
             }
-        }
+        },
     )

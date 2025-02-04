@@ -21,12 +21,18 @@ class DizimoPaymentCrud(CRUD):
                 await session.rollback()
                 raise internal_server_error(f"A error occurs during CRUD")
 
-    async def get_all_user_dizimo_payment(self, user_id: str, page: int = 1, page_size: int = 100) -> AsyncIterator:
+    async def get_all_user_dizimo_payment(
+        self, user_id: str, page: int = 1, page_size: int = 100
+    ) -> AsyncIterator:
         async with self.session() as session:
             try:
                 offset = (page - 1) * page_size
-                statement = select(DizimoPayment).filter(DizimoPayment.user_id == user_id).offset(offset).limit(
-                    page_size)
+                statement = (
+                    select(DizimoPayment)
+                    .filter(DizimoPayment.user_id == user_id)
+                    .offset(offset)
+                    .limit(page_size)
+                )
                 dizimo_payments = await session.execute(statement)
                 dizimo_payments = dizimo_payments.scalars().all()
                 yield dizimo_payments
@@ -47,7 +53,9 @@ class DizimoPaymentCrud(CRUD):
     async def get_payment_by_correlation_id(self, correlation_id: str) -> DizimoPayment:
         async with self.session() as session:
             try:
-                statement = select(DizimoPayment).filter(DizimoPayment.correlation_id == correlation_id)
+                statement = select(DizimoPayment).filter(
+                    DizimoPayment.correlation_id == correlation_id
+                )
                 payment = await session.execute(statement)
                 return payment.scalars().first()
             except Exception as error:
@@ -57,7 +65,9 @@ class DizimoPaymentCrud(CRUD):
     async def get_payment_by_identifier(self, identifier: str) -> DizimoPayment:
         async with self.session() as session:
             try:
-                statement = select(DizimoPayment).filter(DizimoPayment.identifier == identifier)
+                statement = select(DizimoPayment).filter(
+                    DizimoPayment.identifier == identifier
+                )
                 payment = await session.execute(statement)
                 return payment.scalars().first()
             except Exception as error:
@@ -84,14 +94,13 @@ class DizimoPaymentCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_payments_by_year_and_user_id(self, year: int, user_id: str) -> [DizimoPayment]:
+    async def get_payments_by_year_and_user_id(
+        self, year: int, user_id: str
+    ) -> [DizimoPayment]:
         async with self.session() as session:
             try:
                 statement = select(DizimoPayment).filter(
-                    and_(
-                        DizimoPayment.year == year,
-                        DizimoPayment.user_id == user_id
-                    )
+                    and_(DizimoPayment.year == year, DizimoPayment.user_id == user_id)
                 )
                 payments = await session.execute(statement)
                 return payments.scalars().all()
@@ -99,14 +108,13 @@ class DizimoPaymentCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_payments_by_month_and_user_id(self, month: str, user_id: str) -> [DizimoPayment]:
+    async def get_payments_by_month_and_user_id(
+        self, month: str, user_id: str
+    ) -> [DizimoPayment]:
         async with self.session() as session:
             try:
                 statement = select(DizimoPayment).filter(
-                    and_(
-                        DizimoPayment.month == month,
-                        DizimoPayment.user_id == user_id
-                    )
+                    and_(DizimoPayment.month == month, DizimoPayment.user_id == user_id)
                 )
                 payments = await session.execute(statement)
                 return payments.scalars().all()
@@ -114,15 +122,16 @@ class DizimoPaymentCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_payment_by_month_year_and_user_id(self, month: str, year: int, user_id: str) -> [DizimoPayment]:
+    async def get_payment_by_month_year_and_user_id(
+        self, month: str, year: int, user_id: str
+    ) -> [DizimoPayment]:
         async with self.session() as session:
             try:
                 statement = select(DizimoPayment).filter(
-                    and_(DizimoPayment.user_id == user_id,
-                         and_(
-                             DizimoPayment.month == month,
-                             DizimoPayment.year == year
-                         ))
+                    and_(
+                        DizimoPayment.user_id == user_id,
+                        and_(DizimoPayment.month == month, DizimoPayment.year == year),
+                    )
                 )
                 payment = await session.execute(statement)
                 return payment.scalars().first()
@@ -143,33 +152,41 @@ class DizimoPaymentCrud(CRUD):
     async def update_payment(self, payment_data: dict) -> DizimoPayment:
         async with self.session() as session:
             try:
-                statement = select(DizimoPayment).filter(DizimoPayment.id == payment_data['id'])
+                statement = select(DizimoPayment).filter(
+                    DizimoPayment.id == payment_data["id"]
+                )
                 payment = await session.execute(statement)
                 payment = payment.scalars().first()
                 for key in payment_data.keys():
                     match key:
                         case "status":
-                            if is_valid_payment_status(payment_data['status']):
-                                payment.status = payment_data['status']
+                            if is_valid_payment_status(payment_data["status"]):
+                                payment.status = payment_data["status"]
                         case "correlation_id":
-                            payment.correlation_id = payment_data['correlation_id']
+                            payment.correlation_id = payment_data["correlation_id"]
                         case "value":
-                            payment.value = payment_data['value']
+                            payment.value = payment_data["value"]
                         case "identifier":
-                            payment.identifier = payment_data['identifier']
+                            payment.identifier = payment_data["identifier"]
                 await session.commit()
                 return payment
             except Exception as error:
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def complete_dizimo_payment(self, dizimo_payment: DizimoPayment) -> DizimoPayment:
+    async def complete_dizimo_payment(
+        self, dizimo_payment: DizimoPayment
+    ) -> DizimoPayment:
         async with self.session() as session:
             try:
-                statement = select(DizimoPayment).filter(DizimoPayment.id == dizimo_payment.id)
+                statement = select(DizimoPayment).filter(
+                    DizimoPayment.id == dizimo_payment.id
+                )
                 actual_dizimo_payment = await session.execute(statement)
                 actual_dizimo_payment = actual_dizimo_payment.scalars().one()
-                actual_dizimo_payment = pass_data_to(dizimo_payment, actual_dizimo_payment)
+                actual_dizimo_payment = pass_data_to(
+                    dizimo_payment, actual_dizimo_payment
+                )
                 await session.commit()
                 return actual_dizimo_payment
             except Exception as error:
@@ -202,7 +219,9 @@ class DizimoPaymentCrud(CRUD):
     async def update_status(self, dizimo_payment_id: str, status: str) -> DizimoPayment:
         async with self.session() as session:
             try:
-                statement = select(DizimoPayment).filter(DizimoPayment.id == dizimo_payment_id)
+                statement = select(DizimoPayment).filter(
+                    DizimoPayment.id == dizimo_payment_id
+                )
                 payment = await session.execute(statement)
                 payment = payment.scalars().first()
                 if is_valid_payment_status(status):
@@ -213,10 +232,14 @@ class DizimoPaymentCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def update_correlation_id(self, dizimo_payment_id: str, correlation_id: str = None) -> DizimoPayment:
+    async def update_correlation_id(
+        self, dizimo_payment_id: str, correlation_id: str = None
+    ) -> DizimoPayment:
         async with self.session() as session:
             try:
-                statement = select(DizimoPayment).filter(DizimoPayment.id == dizimo_payment_id)
+                statement = select(DizimoPayment).filter(
+                    DizimoPayment.id == dizimo_payment_id
+                )
                 payment = await session.execute(statement)
                 payment = payment.scalars().first()
                 payment.correlation_id = correlation_id
@@ -226,10 +249,14 @@ class DizimoPaymentCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def update_correlation_id_to_none(self, dizimo_payment_id: str) -> DizimoPayment:
+    async def update_correlation_id_to_none(
+        self, dizimo_payment_id: str
+    ) -> DizimoPayment:
         async with self.session() as session:
             try:
-                statement = select(DizimoPayment).filter(DizimoPayment.id == dizimo_payment_id)
+                statement = select(DizimoPayment).filter(
+                    DizimoPayment.id == dizimo_payment_id
+                )
                 payment = await session.execute(statement)
                 payment = payment.scalars().first()
                 payment.correlation_id = None

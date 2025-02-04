@@ -13,7 +13,11 @@ import router.image
 import router.sms
 import router.finance
 from controller.auth import jwt
-from controller.src.pix_payment import make_post_pix_request, create_customer, PixPayment
+from controller.src.pix_payment import (
+    make_post_pix_request,
+    create_customer,
+    PixPayment,
+)
 from models.community import Community
 from controller.crud.community import CommunityCrud
 from controller.crud.user import UserCrud
@@ -27,10 +31,16 @@ from controller.src.user import create_user
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
 from apscheduler.triggers.cron import CronTrigger
-from controller.jobs.dizimo_payment import create_month_dizimo_payment_and_transfer_payments_values
+from controller.jobs.dizimo_payment import (
+    create_month_dizimo_payment_and_transfer_payments_values,
+)
 from controller.crud.dizimo_payment import DizimoPaymentCrud
 from router.middleware.authorization import verify_user_access_token
-from controller.src.dizimo_payment import is_valid_payment_status, test_create_dizimo_payment, complete_dizimo_payment
+from controller.src.dizimo_payment import (
+    is_valid_payment_status,
+    test_create_dizimo_payment,
+    complete_dizimo_payment,
+)
 from controller.src.web_push_notification import initiciate_push_notification_jobs
 from controller.crud.web_push import WebPushCrud
 from apscheduler.triggers.date import DateTrigger
@@ -53,10 +63,11 @@ async def event_manager(app: FastAPI):
         initiciate_push_notification_jobs(scheduler)
         scheduler.add_job(
             create_month_dizimo_payment_and_transfer_payments_values,
-            trigger=CronTrigger(day=1, hour=0, minute=0, second=0))
+            trigger=CronTrigger(day=1, hour=0, minute=0, second=0),
+        )
         scheduler.add_job(
             calc_community_available_money,
-            trigger=CronTrigger(day=1, hour=0, minute=0, second=0)
+            trigger=CronTrigger(day=1, hour=0, minute=0, second=0),
         )
         yield
     finally:
@@ -66,10 +77,7 @@ async def event_manager(app: FastAPI):
 app = FastAPI(lifespan=event_manager)
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"]
+    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 )
 
 app.include_router(router.user.router)
@@ -83,12 +91,12 @@ app.include_router(router.sms.router)
 app.include_router(router.finance.router)
 
 
-@app.get('/communities')
+@app.get("/communities")
 async def get_all():
     return await community_crud.get_all_communities()
 
 
-@app.get('/abcd')
+@app.get("/abcd")
 async def get_all_pay():
     return await dizimo_payment_crud.get_all()
 
@@ -97,7 +105,7 @@ async def get_all_pay():
 async def create_community():
     a = Community()
     a.id = str(uuid.uuid4())
-    a.name = 'community'
+    a.name = "community"
     a.email = "a@gmail.com"
     a.image = None
     a.patron = "hello"
@@ -106,7 +114,7 @@ async def create_community():
     return await community_crud.create_community(a)
 
 
-@app.post('/council')
+@app.post("/council")
 async def signup(sign_data: SignUp):
     sign_data = dict(sign_data)
     SignUpValidator(sign_data)
@@ -123,10 +131,12 @@ async def signup(sign_data: SignUp):
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
-    return {"access_token": jwt.create_access_token(user.cpf, position='council member')}
+    return {
+        "access_token": jwt.create_access_token(user.cpf, position="council member")
+    }
 
 
-@app.post('/parish')
+@app.post("/parish")
 async def signup(sign_data: SignUp):
     sign_data = dict(sign_data)
     SignUpValidator(sign_data)
@@ -143,39 +153,57 @@ async def signup(sign_data: SignUp):
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
-    return {"access_token": jwt.create_access_token(user.cpf, position='parish leader')}
+    return {"access_token": jwt.create_access_token(user.cpf, position="parish leader")}
 
 
-@app.patch('/make_payment/{year}/{month}/{status}', dependencies=[Depends(verify_user_access_token)])
-async def make_payment(year: int, month: str, status: str, user: dict = Depends(verify_user_access_token)):
+@app.patch(
+    "/make_payment/{year}/{month}/{status}",
+    dependencies=[Depends(verify_user_access_token)],
+)
+async def make_payment(
+    year: int, month: str, status: str, user: dict = Depends(verify_user_access_token)
+):
     if not (is_valid_payment_status(status)):
         raise "Invalid status: active, paid, expired"
-    user = await user_crud.get_user_by_cpf(user['cpf'])
-    dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, int(year), user.id)
+    user = await user_crud.get_user_by_cpf(user["cpf"])
+    dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(
+        month, int(year), user.id
+    )
     await dizimo_payment_crud.update_status(dizimo.id, status)
     return "Ok"
 
 
-@app.post("/create/dizimo_payment/{year}/{month}", dependencies=[Depends(verify_user_access_token)])
-async def create_payment_router(year: int, month: str, user: dict = Depends(verify_user_access_token)):
+@app.post(
+    "/create/dizimo_payment/{year}/{month}",
+    dependencies=[Depends(verify_user_access_token)],
+)
+async def create_payment_router(
+    year: int, month: str, user: dict = Depends(verify_user_access_token)
+):
     user = await user_crud.get_user_by_cpf(user["cpf"])
     dizimo = await test_create_dizimo_payment(user, int(year), month)
     pix_payment = PixPayment(
-        value = 10,
-        customer = create_customer(user),
-        correlationID = str(uuid.uuid4())
+        value=10, customer=create_customer(user), correlationID=str(uuid.uuid4())
     )
     pix_payment = make_post_pix_request(pix_payment)
     dizimo = complete_dizimo_payment(dizimo, pix_payment)
     return await dizimo_payment_crud.create_payment(dizimo)
 
 
-@app.delete("/delete/dizimo_payment/{year}/{month}", dependencies=[Depends(verify_user_access_token)])
-async def delete_payment_router(year: int, month: str, user: dict = Depends(verify_user_access_token)):
+@app.delete(
+    "/delete/dizimo_payment/{year}/{month}",
+    dependencies=[Depends(verify_user_access_token)],
+)
+async def delete_payment_router(
+    year: int, month: str, user: dict = Depends(verify_user_access_token)
+):
     user = await user_crud.get_user_by_cpf(user["cpf"])
-    dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(month, int(year), user.id)
+    dizimo = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(
+        month, int(year), user.id
+    )
     await dizimo_payment_crud.delete_payment_by_id(dizimo.id)
     return "Deleted"
+
 
 @app.get("/abcde")
 async def a():
@@ -184,8 +212,16 @@ async def a():
 
 @app.get("/test/message/{token}")
 async def test_async_message(token: str):
-    scheduler.add_job(execute_notification, trigger=DateTrigger(datetime.datetime.now()), args=[token, "hello", "hello"])
+    scheduler.add_job(
+        execute_notification,
+        trigger=DateTrigger(datetime.datetime.now()),
+        args=[token, "hello", "hello"],
+    )
     for i in range(1, 5):
         TIME = datetime.datetime.now() + datetime.timedelta(minutes=i)
-        scheduler.add_job(execute_notification, trigger=DateTrigger(TIME), args=[token, "hello", "hello"])
+        scheduler.add_job(
+            execute_notification,
+            trigger=DateTrigger(TIME),
+            args=[token, "hello", "hello"],
+        )
     return "Ok"

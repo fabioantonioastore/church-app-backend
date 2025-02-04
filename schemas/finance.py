@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+
 class FinanceModel(BaseModel):
     id: str
     title: str
@@ -10,6 +11,7 @@ class FinanceModel(BaseModel):
     type: str
     date: datetime
 
+
 class CreateFinanceModel(BaseModel):
     title: str
     description: str | None
@@ -17,8 +19,10 @@ class CreateFinanceModel(BaseModel):
     type: str
     date: datetime | None
 
+
 class DictCreateFinanceModel(BaseModel):
     finance_data: dict[str | int, CreateFinanceModel]
+
 
 class UpdateFinanceModel(BaseModel):
     title: str | None

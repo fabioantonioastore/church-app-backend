@@ -70,7 +70,9 @@ class FinanceCrud(CRUD):
                 return result.scalars().all()
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
+                raise internal_server_error(
+                    f"A error occurs during CRUD: {error!r}"
+                )
 
     async def create_finance(self, finance: Finance) -> Finance:
         async with self.session() as session:
@@ -80,14 +82,20 @@ class FinanceCrud(CRUD):
                 return finance
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
+                raise internal_server_error(
+                    f"A error occurs during CRUD: {error!r}"
+                )
 
     async def get_finances_by_year(self, year: int, community_id) -> [Finance]:
         async with self.session() as session:
             try:
                 first_month_date = datetime(year, 1, 1)
-                last_month_date = datetime(year, 12, calendar.monthrange(year, 12)[1])
-                last_month_date = last_month_date.replace(hour=23, minute=59, second=59)
+                last_month_date = datetime(
+                    year, 12, calendar.monthrange(year, 12)[1]
+                )
+                last_month_date = last_month_date.replace(
+                    hour=23, minute=59, second=59
+                )
                 statement = select(Finance).filter(
                     and_(
                         Finance.community_id == community_id,
@@ -112,7 +120,9 @@ class FinanceCrud(CRUD):
                 last_month_day = datetime(
                     year, month, calendar.monthrange(year, month)[1]
                 )
-                last_month_day = last_month_day.replace(hour=23, minute=59, second=59)
+                last_month_day = last_month_day.replace(
+                    hour=23, minute=59, second=59
+                )
                 statement = select(Finance).filter(
                     and_(
                         Finance.community_id == community_id,

@@ -1,6 +1,9 @@
 from datetime import datetime
 from controller.crud.dizimo_payment import DizimoPaymentCrud
-from controller.src.dizimo_payment import convert_to_month, dizimo_payment_is_active
+from controller.src.dizimo_payment import (
+    convert_to_month,
+    dizimo_payment_is_active,
+)
 from firebase_admin import messaging
 from typing import NoReturn
 
@@ -10,7 +13,8 @@ dizimo_payment_crud = DizimoPaymentCrud()
 def execute_notification(token: str, title: str, body: str) -> NoReturn:
     try:
         message = messaging.Message(
-            notification=messaging.Notification(title=title, body=body), token=token
+            notification=messaging.Notification(title=title, body=body),
+            token=token,
         )
         messaging.send(message)
     except Exception as error:
@@ -45,9 +49,7 @@ async def send_notification() -> NoReturn:
                 execute_notification(token, title, body)
                 return
             title = f"E-Igreja"
-            body = (
-                f"Convide amigos para fazer parte! Agradecemos pela sua contribuicao!"
-            )
+            body = f"Convide amigos para fazer parte! Agradecemos pela sua contribuicao!"
             execute_notification(token, title, body)
     except:
         pass

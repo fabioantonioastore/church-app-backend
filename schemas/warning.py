@@ -54,5 +54,6 @@ class DeleteWarningModel(BaseModel):
     id: str
 
     model_config = ConfigDict(
-        from_attributes=True, json_schema_extra={"example": {"id": "id of the warning"}}
+        from_attributes=True,
+        json_schema_extra={"example": {"id": "id of the warning"}},
     )

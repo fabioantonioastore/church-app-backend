@@ -20,12 +20,16 @@ class CommunityCrud(CRUD):
                 return communities
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
+                raise internal_server_error(
+                    f"A error occurs during CRUD: {error!r}"
+                )
 
     async def get_community_image(self, community_id: str):
         async with self.session() as session:
             try:
-                statement = select(Community).filter(Community.id == community_id)
+                statement = select(Community).filter(
+                    Community.id == community_id
+                )
                 community = await session.execute(statement)
                 community = community.scalars().first()
                 return community.image
@@ -36,7 +40,9 @@ class CommunityCrud(CRUD):
     async def delete_community_image(self, community_id: str) -> Community:
         async with self.session() as session:
             try:
-                statement = select(Community).filter(Community.id == community_id)
+                statement = select(Community).filter(
+                    Community.id == community_id
+                )
                 community = await session.execute(statement)
                 community = community.scalars().first()
                 community.image = None
@@ -49,7 +55,9 @@ class CommunityCrud(CRUD):
     async def update_community_image(self, community_id: str, image):
         async with self.session() as session:
             try:
-                statement = select(Community).filter(Community.id == community_id)
+                statement = select(Community).filter(
+                    Community.id == community_id
+                )
                 community = await session.execute(statement)
                 community = community.scalars().first()
                 community.image = image
@@ -76,7 +84,9 @@ class CommunityCrud(CRUD):
                 return users
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
+                raise internal_server_error(
+                    f"A error occurs during CRUD: {error!r}"
+                )
 
     async def get_all_communities(self):
         async with self.session() as session:
@@ -103,7 +113,9 @@ class CommunityCrud(CRUD):
     async def get_community_by_id(self, community_id: str):
         async with self.session() as session:
             try:
-                statement = select(Community).filter(Community.id == community_id)
+                statement = select(Community).filter(
+                    Community.id == community_id
+                )
                 community = await session.execute(statement)
                 return community.scalars().first()
             except Exception as error:
@@ -161,7 +173,9 @@ class CommunityCrud(CRUD):
     async def delete_community_by_id(self, community_id: str):
         async with self.session() as session:
             try:
-                statement = select(Community).filter(Community.id == community_id)
+                statement = select(Community).filter(
+                    Community.id == community_id
+                )
                 community = await session.execute(statement)
                 community = community.scalars().first()
                 await session.delete(community)
@@ -176,7 +190,9 @@ class CommunityCrud(CRUD):
     ) -> Community:
         async with self.session() as session:
             try:
-                statement = select(Community).filter(Community.id == community_id)
+                statement = select(Community).filter(
+                    Community.id == community_id
+                )
                 community = await session.execute(statement)
                 community = community.scalars().first()
                 community.actual_month_total_payment_value += value
@@ -191,7 +207,9 @@ class CommunityCrud(CRUD):
     ) -> Community:
         async with self.session() as session:
             try:
-                statement = select(Community).filter(Community.id == community_id)
+                statement = select(Community).filter(
+                    Community.id == community_id
+                )
                 community = await session.execute(statement)
                 community = community.scalars().first()
                 community.last_month_total_payment_value = (

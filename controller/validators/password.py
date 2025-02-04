@@ -13,7 +13,9 @@ class PasswordValidator:
 
     def has_minimium_characters(self):
         if len(self.password) < 8:
-            raise bad_request("Password have to have a minimium of 8 characteres")
+            raise bad_request(
+                "Password have to have a minimium of 8 characteres"
+            )
 
     def has_space(self):
         if " " in self.password:

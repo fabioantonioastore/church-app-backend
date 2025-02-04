@@ -51,9 +51,13 @@ class NumberCrud(CRUD):
                 return number
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
+                raise internal_server_error(
+                    f"A error occurs during CRUD: {error!r}"
+                )
 
-    async def update_number_number(self, number: str, new_number: str) -> Number:
+    async def update_number_number(
+        self, number: str, new_number: str
+    ) -> Number:
         async with self.session() as session:
             try:
                 statement = select(Number).filter(Number.number == number)
@@ -66,7 +70,9 @@ class NumberCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def update_number_by_user_id(self, user_id: str, new_number: str) -> Number:
+    async def update_number_by_user_id(
+        self, user_id: str, new_number: str
+    ) -> Number:
         async with self.session() as session:
             try:
                 statement = select(Number).filter(Number.user_id == user_id)

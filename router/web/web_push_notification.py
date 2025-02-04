@@ -18,7 +18,8 @@ user_crud = UserCrud()
     dependencies=[Depends(verify_user_access_token)],
 )
 async def subscribe(
-    subscription: PushSubscription, user: dict = Depends(verify_user_access_token)
+    subscription: PushSubscription,
+    user: dict = Depends(verify_user_access_token),
 ) -> str:
     try:
         subscription = dict(subscription)

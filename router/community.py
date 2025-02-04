@@ -36,8 +36,12 @@ user_crud = UserCrud()
     description="Get community list",
 )
 async def communities_list(page: int, page_size: int):
-    communities = await community_crud.get_communities_paginated(page, page_size)
-    communities = [get_community_client_data(community) for community in communities]
+    communities = await community_crud.get_communities_paginated(
+        page, page_size
+    )
+    communities = [
+        get_community_client_data(community) for community in communities
+    ]
     return communities
 
 
@@ -60,7 +64,8 @@ async def get_all_patrons():
     description="Create a community",
 )
 async def create_community(
-    community: CreateCommunityModel, user: dict = Depends(verify_user_access_token)
+    community: CreateCommunityModel,
+    user: dict = Depends(verify_user_access_token),
 ):
     # if is_parish_leader(user['position']):
     community = create_community_data(dict(community))
@@ -178,6 +183,8 @@ async def get_community_council_members(
     users = await user_crud.get_all_community_council_and_parish(community.id)
     if user["position"] == "user":
         return get_user_name_and_responsability(users)
-    if is_parish_leader(user["position"]) or is_council_member(user["position"]):
+    if is_parish_leader(user["position"]) or is_council_member(
+        user["position"]
+    ):
         return get_user_name_and_responsability_and_cpf(users)
     raise unauthorized("You can't access this")

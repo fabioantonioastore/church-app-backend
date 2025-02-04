@@ -8,7 +8,10 @@ class SignIn(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={
-            "example": {"cpf": "cpf of the user", "password": "password of the user"}
+            "example": {
+                "cpf": "cpf of the user",
+                "password": "password of the user",
+            }
         },
     )
 

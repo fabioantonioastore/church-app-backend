@@ -29,7 +29,9 @@ def upgrade() -> None:
         sa.Column("email", sa.String(), nullable=True),
         sa.Column("image", sa.String(), nullable=True),
         sa.Column("active", sa.Boolean(), nullable=True),
-        sa.Column("actual_month_total_payment_value", sa.Float(), nullable=True),
+        sa.Column(
+            "actual_month_total_payment_value", sa.Float(), nullable=True
+        ),
         sa.Column("last_month_total_payment_value", sa.Float(), nullable=True),
         sa.Column("available_money", sa.Float(), nullable=True),
         sa.PrimaryKeyConstraint("id"),

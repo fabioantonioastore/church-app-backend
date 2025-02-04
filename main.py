@@ -23,7 +23,10 @@ from controller.crud.community import CommunityCrud
 from controller.crud.user import UserCrud
 from models.user import User
 from schemas.sign import SignUp
-from controller.errors.http.exceptions import internal_server_error, bad_request
+from controller.errors.http.exceptions import (
+    internal_server_error,
+    bad_request,
+)
 from controller.validators.sign_validator import SignUpValidator
 from controller.crud.login import LoginCrud
 from controller.src.login import create_login
@@ -41,7 +44,9 @@ from controller.src.dizimo_payment import (
     test_create_dizimo_payment,
     complete_dizimo_payment,
 )
-from controller.src.web_push_notification import initiciate_push_notification_jobs
+from controller.src.web_push_notification import (
+    initiciate_push_notification_jobs,
+)
 from controller.crud.web_push import WebPushCrud
 from apscheduler.triggers.date import DateTrigger
 from controller.jobs.web_push_notification import execute_notification
@@ -77,7 +82,10 @@ async def event_manager(app: FastAPI):
 app = FastAPI(lifespan=event_manager)
 
 app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(router.user.router)
@@ -132,7 +140,9 @@ async def signup(sign_data: SignUp):
     except:
         raise bad_request("User already exist")
     return {
-        "access_token": jwt.create_access_token(user.cpf, position="council member")
+        "access_token": jwt.create_access_token(
+            user.cpf, position="council member"
+        )
     }
 
 
@@ -153,7 +163,11 @@ async def signup(sign_data: SignUp):
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
-    return {"access_token": jwt.create_access_token(user.cpf, position="parish leader")}
+    return {
+        "access_token": jwt.create_access_token(
+            user.cpf, position="parish leader"
+        )
+    }
 
 
 @app.patch(
@@ -161,7 +175,10 @@ async def signup(sign_data: SignUp):
     dependencies=[Depends(verify_user_access_token)],
 )
 async def make_payment(
-    year: int, month: str, status: str, user: dict = Depends(verify_user_access_token)
+    year: int,
+    month: str,
+    status: str,
+    user: dict = Depends(verify_user_access_token),
 ):
     if not (is_valid_payment_status(status)):
         raise "Invalid status: active, paid, expired"
@@ -183,7 +200,9 @@ async def create_payment_router(
     user = await user_crud.get_user_by_cpf(user["cpf"])
     dizimo = await test_create_dizimo_payment(user, int(year), month)
     pix_payment = PixPayment(
-        value=10, customer=create_customer(user), correlationID=str(uuid.uuid4())
+        value=10,
+        customer=create_customer(user),
+        correlationID=str(uuid.uuid4()),
     )
     pix_payment = make_post_pix_request(pix_payment)
     dizimo = complete_dizimo_payment(dizimo, pix_payment)

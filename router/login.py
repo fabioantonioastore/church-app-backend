@@ -7,7 +7,10 @@ from controller.crud import UserCrud
 from controller.src.user import create_user
 from controller.src.number import create_number_model
 from controller.auth import jwt
-from controller.errors.http.exceptions import internal_server_error, bad_request
+from controller.errors.http.exceptions import (
+    internal_server_error,
+    bad_request,
+)
 from controller.src.user import convert_user_to_dict
 from controller.src.dizimo_payment import create_dizimo_payment
 from controller.crud import DizimoPaymentCrud, NumberCrud
@@ -20,7 +23,10 @@ number_crud = NumberCrud()
 
 
 @router.post(
-    "/signin", status_code=status.HTTP_200_OK, summary="Login", description="Do Sign In"
+    "/signin",
+    status_code=status.HTTP_200_OK,
+    summary="Login",
+    description="Do Sign In",
 )
 async def signin(sign_data: SignIn):
     sign_data = dict(sign_data)
@@ -31,7 +37,9 @@ async def signin(sign_data: SignIn):
             user = convert_user_to_dict(user)
             await user_crud.update_user(user)
         return {
-            "access_token": jwt.create_access_token(sign_data["cpf"], user.position)
+            "access_token": jwt.create_access_token(
+                sign_data["cpf"], user.position
+            )
         }
     return bad_request("Password or CPF is not correct")
 
@@ -53,7 +61,9 @@ async def signup(sign_data: SignUp):
             await login_crud.create_login(login)
         except Exception as error:
             await user_crud.delete_user(user)
-            raise internal_server_error(f"Database failed to create user: {error!r}")
+            raise internal_server_error(
+                f"Database failed to create user: {error!r}"
+            )
     except Exception as error:
         raise bad_request(f"User already exist: {error!r}")
     dizimo_payment = await create_dizimo_payment(user)

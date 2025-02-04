@@ -30,7 +30,9 @@ async def get_ten_community_warnings(
     user: dict = Depends(verify_user_access_token),
 ):
     community = await community_crud.get_community_by_patron(community_patron)
-    warnings = await warning_crud.get_warning_by_community_id(community.id, total)
+    warnings = await warning_crud.get_warning_by_community_id(
+        community.id, total
+    )
     new_warning = []
     for warning in warnings:
         new_warning.append(get_warning_client_data(warning))
@@ -67,7 +69,8 @@ async def get_all_community_warnings_by_pagination(
     description="Get warning by id",
 )
 async def get_community_warning(
-    warning_id: str | None = None, user: dict = Depends(verify_user_access_token)
+    warning_id: str | None = None,
+    user: dict = Depends(verify_user_access_token),
 ):
     # if warning_id == None: raise bad_request(f"No warning was send")
     user = await user_crud.get_user_by_cpf(user["cpf"])
@@ -96,7 +99,8 @@ async def create_community_warning(
     users = True
     page = 1
     message = MessageNotification(
-        title="E-Igreja", body="Novo aviso postado na comunidade! Venha conferir."
+        title="E-Igreja",
+        body="Novo aviso postado na comunidade! Venha conferir.",
     )
     while users:
         users = await community_crud.get_all_community_users_paginated(

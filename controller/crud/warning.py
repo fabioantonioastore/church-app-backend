@@ -27,7 +27,9 @@ class WarningCrud(CRUD):
                 return warnings
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
+                raise internal_server_error(
+                    f"A error occurs during CRUD: {error!r}"
+                )
 
     async def get_warning_by_id(self, warning_id: str):
         async with self.session() as session:
@@ -39,7 +41,9 @@ class WarningCrud(CRUD):
                 await session.rollback()
                 raise not_found(f"A error occurs during CRUD: {error!r}")
 
-    async def get_warning_by_community_id(self, community_id: str, total: int = 10):
+    async def get_warning_by_community_id(
+        self, community_id: str, total: int = 10
+    ):
         async with self.session() as session:
             try:
                 statement = (
@@ -51,7 +55,9 @@ class WarningCrud(CRUD):
                 return warnings.scalars().all()
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
+                raise internal_server_error(
+                    f"A error occurs during CRUD: {error!r}"
+                )
 
     async def create_warning(self, warning: Warning):
         async with self.session() as session:
@@ -66,7 +72,9 @@ class WarningCrud(CRUD):
     async def update_warning(self, new_warning: dict):
         async with self.session() as session:
             try:
-                statement = select(Warning).filter(Warning.id == new_warning["id"])
+                statement = select(Warning).filter(
+                    Warning.id == new_warning["id"]
+                )
                 warning = await session.execute(statement)
                 warning = warning.scalars().first()
                 for key in new_warning.keys():

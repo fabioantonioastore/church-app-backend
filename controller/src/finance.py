@@ -52,7 +52,9 @@ def get_pdf_table_finance_resume(finances: [Finance]) -> bytes:
     return get_finance_resume_file(finances, pdf_table)
 
 
-async def get_finance_resume_pdf_year(finances: List[Finance], year: int) -> bytes:
+async def get_finance_resume_pdf_year(
+    finances: List[Finance], year: int
+) -> bytes:
     pdf_table = PDFTable()
     pdf_table.set_table_header(FINANCE_HEADER)
 
@@ -66,10 +68,14 @@ def get_csv_finance_resume(finances: [Finance]) -> StringIO:
     return get_finance_resume_file(finances, csv_file)
 
 
-async def get_finance_resume_by_year_file(finances: List[Finance], year: int, file):
+async def get_finance_resume_by_year_file(
+    finances: List[Finance], year: int, file
+):
     recipe = 0
     data = []
-    last_month = await finance_crud.get_finance_last_month_obj_by_date(year - 1, 12)
+    last_month = await finance_crud.get_finance_last_month_obj_by_date(
+        year - 1, 12
+    )
 
     for finance in finances:
         if finance.title == DEFAULT_TITLE:
@@ -80,7 +86,12 @@ async def get_finance_resume_by_year_file(finances: List[Finance], year: int, fi
 
     data = sorted(data, key=parse_date)
     if last_month:
-        last_month_row = ["", "Last Month", "input", round(last_month.value, 2)]
+        last_month_row = [
+            "",
+            "Last Month",
+            "input",
+            round(last_month.value, 2),
+        ]
         data.insert(0, last_month_row)
         recipe = modify_recipe_by_finance(recipe, last_month)
     for row in data:
@@ -92,7 +103,9 @@ async def get_finance_resume_by_year_file(finances: List[Finance], year: int, fi
     return file.get_file()
 
 
-async def get_csv_finance_resume_year(finances: List[Finance], year: int) -> StringIO:
+async def get_csv_finance_resume_year(
+    finances: List[Finance], year: int
+) -> StringIO:
     csv_file = CSVFile()
     csv_file.set_file_header(FINANCE_HEADER)
 
@@ -201,7 +214,9 @@ def integer_to_month(month: int) -> str:
             raise "Not valid integer month representation (1 - 12)"
 
 
-async def update_finance_months_by_finance_data(finance_data: FinanceData) -> None:
+async def update_finance_months_by_finance_data(
+    finance_data: FinanceData,
+) -> None:
     finances = await finance_crud.get_finances_where_date_is_greater_than(
         finance_data.date
     )
@@ -209,11 +224,15 @@ async def update_finance_months_by_finance_data(finance_data: FinanceData) -> No
         if finance_data.type == FinanceType.INPUT:
             for finance in finances:
                 update_data = {"value": finance.value + finance_data.value}
-                await finance_crud.update_finance_by_id(finance.id, update_data)
+                await finance_crud.update_finance_by_id(
+                    finance.id, update_data
+                )
         elif finance_data.type == FinanceType.OUTPUT:
             for finance in finances:
                 update_data = {"value": finance.value - finance_data.value}
-                await finance_crud.update_finance_by_id(finance.id, update_data)
+                await finance_crud.update_finance_by_id(
+                    finance.id, update_data
+                )
 
 
 def create_finance_model(finance_data: dict) -> Finance:
@@ -242,7 +261,9 @@ def create_finance_model(finance_data: dict) -> Finance:
 
 
 def is_available_type(finance_type: str) -> bool:
-    return finance_type == FinanceType.INPUT or finance_type == FinanceType.OUTPUT
+    return (
+        finance_type == FinanceType.INPUT or finance_type == FinanceType.OUTPUT
+    )
 
 
 async def create_finance_in_database(finance_data: dict) -> Finance:

@@ -35,7 +35,8 @@ def is_first_month_day(day: int) -> bool:
 
 def initiciate_push_notification_jobs(scheduler: AsyncIOScheduler) -> NoReturn:
     scheduler.add_job(
-        send_notification, trigger=CronTrigger(day=1, hour=0, minute=0, second=0)
+        send_notification,
+        trigger=CronTrigger(day=1, hour=0, minute=0, second=0),
     )
     for i in range(1, 31):
         for j in range(6, 19, 6):
@@ -45,7 +46,9 @@ def initiciate_push_notification_jobs(scheduler: AsyncIOScheduler) -> NoReturn:
             )
 
 
-async def send_notification_to_user(user_id: str, message: MessageNotification) -> None:
+async def send_notification_to_user(
+    user_id: str, message: MessageNotification
+) -> None:
     try:
         web_push = await web_push_crud.get_web_push_by_user_id(user_id)
         token = web_push.token

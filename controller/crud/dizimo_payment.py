@@ -19,7 +19,7 @@ class DizimoPaymentCrud(CRUD):
                 return payments.scalars().all()
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error(f"A error occurs during CRUD")
+                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
 
     async def get_all_user_dizimo_payment(
         self, user_id: str, page: int = 1, page_size: int = 100

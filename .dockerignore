@@ -1,0 +1,9 @@
+.dev-venv
+.venv
+.env
+infra/migrations/versions
+tests
+dev-requirements.txt
+.gitignore
+__pycache__
+.idea

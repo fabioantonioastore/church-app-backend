@@ -7,3 +7,4 @@ dev-requirements.txt
 .gitignore
 __pycache__
 .idea
+firebase_credentials.json

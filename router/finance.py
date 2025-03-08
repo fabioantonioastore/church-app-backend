@@ -35,6 +35,11 @@ finance_crud = FinanceCrud()
 router = APIRouter()
 
 
+@router.get("/finance/all")
+async def get_all_finances():
+    return await finance_crud.get_all_finances()
+
+
 @router.post(
     "/community/{community_patron}/finance",
     status_code=status.HTTP_201_CREATED,

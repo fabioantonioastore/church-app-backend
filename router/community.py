@@ -1,3 +1,5 @@
+import datetime
+
 from fastapi import APIRouter, status, Depends
 from controller.crud import CommunityCrud
 from fastapi.responses import StreamingResponse
@@ -11,6 +13,8 @@ from controller.src.community import (
     get_community_list,
     get_community_patron,
 )
+from controller.src.finance import finance_crud
+from models import Finance
 from router.middleware.authorization import verify_user_access_token
 from schemas.community import CreateCommunityModel, UpdateCommunityModel
 from controller.src.user import (
@@ -59,20 +63,23 @@ async def get_all_patrons():
 @router.post(
     "/community",
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(verify_user_access_token)],
     summary="Community",
     description="Create a community",
 )
 async def create_community(
     community: CreateCommunityModel,
-    user: dict = Depends(verify_user_access_token),
 ):
-    # if is_parish_leader(user['position']):
+    # if await is_parish_leader(user['position']):
     community = create_community_data(dict(community))
     community = await community_crud.create_community(community)
+    finance = Finance()
+    finance.community_id = community.id
+    finance.value = float(0)
+    finance.title = "Caixa"
+    finance.type = "input"
+    await finance_crud.create_finance(finance)
     return get_community_client_data(community)
     # raise unauthorized("You can't create the community")
-
 
 @router.get(
     "/community/{community_patron}",
@@ -98,7 +105,7 @@ async def update_community(
     community_data: UpdateCommunityModel,
     user: dict = Depends(verify_user_access_token),
 ):
-    # if is_parish_leader(user['position']) or is_council_member(user['position']):
+    # if await is_parish_leader(user['position']) or await is_council_member(user['position']):
     # user = await user_crud.get_user_by_cpf(user['cpf'])
     community = await community_crud.get_community_by_patron(community_patron)
     # if user.community_id == community.id:
@@ -120,7 +127,7 @@ async def update_community(
 async def deactivate_community(
     community_patron: str, user: dict = Depends(verify_user_access_token)
 ):
-    # if is_parish_leader(user['position']):
+    # if await is_parish_leader(user['position']):
     # user = await user_crud.get_user_by_cpf(user['cpf'])
     community = await community_crud.get_community_by_patron(community_patron)
     # if user.community_id == community.id:
@@ -141,7 +148,7 @@ async def deactivate_community(
 async def get_community_users(
     community_patron: str, user: dict = Depends(verify_user_access_token)
 ):
-    # if is_council_member(user['position']) or is_parish_leader(user['position']):
+    # if await is_council_member(user['position']) or await is_parish_leader(user['position']):
     # user = await user_crud.get_user_by_cpf(user['cpf'])
     community = await community_crud.get_community_by_patron(community_patron)
     users = await user_crud.get_users_by_community_id(community.id)
@@ -160,7 +167,7 @@ async def get_community_users(
 async def active_community(
     community_patron: str, user: dict = Depends(verify_user_access_token)
 ):
-    # if is_parish_leader(user['position']):
+    # if await is_parish_leader(user['position']):
     # user = await user_crud.get_user_by_cpf(user['cpf'])
     community = await community_crud.get_community_by_patron(community_patron)
     # if user.community_id == community.id:
@@ -183,7 +190,7 @@ async def get_community_council_members(
     users = await user_crud.get_all_community_council_and_parish(community.id)
     if user["position"] == "user":
         return get_user_name_and_responsability(users)
-    if is_parish_leader(user["position"]) or is_council_member(
+    if await is_parish_leader(user["position"]) or await is_council_member(
         user["position"]
     ):
         return get_user_name_and_responsability_and_cpf(users)

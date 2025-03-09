@@ -94,6 +94,27 @@ async def create_dizimo_payment_router(
 
 
 @router.get(
+    "/dizimo_payment/{cpf}/{year}",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(verify_user_access_token)],
+)
+async def get_dizimo_payment_by_year_and_cpf_user_verify(
+    cpf: str, year: int, user: dict = Depends(verify_user_access_token)
+):
+    user = await user_crud.get_user_by_cpf(user["cpf"])
+    user_verify = await user_crud.get_user_by_cpf(cpf)
+    dizimo_payments = (
+        await dizimo_payment_crud.get_payments_by_year_and_user_id(
+            year, user_verify.id
+        )
+    )
+    return [
+        get_dizimo_payment_no_sensitive_data(payment)
+        for payment in dizimo_payments
+    ]
+
+
+@router.get(
     "/dizimo_payment/{year}",
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(verify_user_access_token)],

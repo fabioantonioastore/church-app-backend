@@ -47,7 +47,6 @@ async def create_dizimo_payment_router(
         scheduler.start()
     except Exception as error:
         pass
-    print(pix_data.value)
     user = await user_crud.get_user_by_cpf(user["cpf"])
     pix_data = dict(pix_data)
     month = pix_data["month"]
@@ -65,7 +64,7 @@ async def create_dizimo_payment_router(
         pix_payment = get_pix_payment_from_correlation_id(
             dizimo_payment.correlation_id
         )
-        if is_pix_active(pix_payment):
+        if is_pix_active(pix_payment, pix_data["value"]):
             await pix_notification_message(
                 "Pix ja foi gerado", "Realize o pagamento", user.id
             )

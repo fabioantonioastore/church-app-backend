@@ -6,6 +6,6 @@ class DizimoPaymentModel(BaseModel):
 
 
 class CreateDizimoPaymentModel(BaseModel):
-    value: int
+    value: float
     month: str
     year: int

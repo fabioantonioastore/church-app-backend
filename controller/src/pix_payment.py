@@ -90,4 +90,4 @@ def is_pix_paid(pix: dict) -> bool:
 
 
 def get_pix_value(pix: dict) -> int:
-    return pix["charge"]["value"]
+    return pix["charge"]["value"] / 100

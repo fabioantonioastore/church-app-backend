@@ -47,6 +47,7 @@ async def create_dizimo_payment_router(
         scheduler.start()
     except Exception as error:
         pass
+    print(pix_data.value)
     user = await user_crud.get_user_by_cpf(user["cpf"])
     pix_data = dict(pix_data)
     month = pix_data["month"]

@@ -49,6 +49,8 @@ async def create_dizimo_payment_router(
         pass
     user = await user_crud.get_user_by_cpf(user["cpf"])
     pix_data = dict(pix_data)
+    if pix_data["value"] < 1:
+        raise bad_request("Value must be greater or equal than 1")
     pix_data["value"] *= 100
     month = pix_data["month"]
     year = pix_data["year"]

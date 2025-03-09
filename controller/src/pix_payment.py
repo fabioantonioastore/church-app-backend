@@ -51,7 +51,7 @@ def verify_if_is_payment_paid(pix: dict) -> bool:
 
 def get_pix_no_sensitive_data(pix: dict) -> dict:
     return {
-        "value": pix["charge"]["value"],
+        "value": pix["charge"]["value"] / 100,
         "status": pix["charge"]["status"],
         "expiresDate": pix["charge"]["expiresDate"],
         "expiresIn": pix["charge"]["expiresIn"],

@@ -17,6 +17,8 @@ async def create_warning(warning: dict) -> Warning:
                 new_warning.scope = warning["scope"]
             case "community_id":
                 new_warning.community_id = warning["community_id"]
+            case "posted_by":
+                new_warning.posted_by = warning["posted_by"]
     new_warning.id = str(uuid4())
     new_warning.posted_at = datetime.now()
     return new_warning
@@ -31,5 +33,6 @@ def get_warning_client_data(warning: Warning) -> dict:
         "image": warning.image,
         "scope": warning.scope,
         "edited_at": warning.edited_at,
+        "posted_by": warning.posted_by
     }
     return new_warning

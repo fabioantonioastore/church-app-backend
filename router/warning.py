@@ -92,6 +92,7 @@ async def create_community_warning(
     # if is_parish_leader(user['position']) or is_council_member(user['position']):
     user = await user_crud.get_user_by_cpf(user["cpf"])
     warning = dict(warning)
+    warning["posted_by"] = user.name
     WarningValidator(warning)
     warning["community_id"] = user.community_id
     warning = await create_warning(warning)
@@ -102,13 +103,13 @@ async def create_community_warning(
         title="E-Igreja",
         body="Novo aviso postado na comunidade! Venha conferir.",
     )
-    while users:
+    '''while users:
         users = await community_crud.get_all_community_users_paginated(
             warning.community_id, page
         )
         for user in users:
             await send_notification_to_user(user.id, message)
-        page += 1
+        page += 1'''
     return get_warning_client_data(warning)
     # raise unauthorized(f"You can't create a warning")
 
@@ -130,6 +131,7 @@ async def update_community_warning(
     warning["id"] = warning_id
     WarningValidator(warning)
     user = await user_crud.get_user_by_cpf(user["cpf"])
+    warning["posted_by"] = user.name
     db_warning = await warning_crud.get_warning_by_id(warning["id"])
     # if user.community_id == db_warning.community_id:
     warning = await warning_crud.update_warning(warning)

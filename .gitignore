@@ -9,3 +9,4 @@ alembic.ini
 infra/migrations/*
 !infra/migrations/versions
 .dev-venv
+alembic

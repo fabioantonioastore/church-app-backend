@@ -1,6 +1,6 @@
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import String, Text, ForeignKey, DateTime, LargeBinary
-from datetime import datetime, timezone
+from datetime import datetime
 from database import Base
 from controller.src.generate_uuid import generate_uuid4
 

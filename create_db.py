@@ -12,6 +12,7 @@ async def create_db():
         from models.image import Image
         from models.number import Number
         from models.finance import Finance
+        from models.warning_view import WarningView
 
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)

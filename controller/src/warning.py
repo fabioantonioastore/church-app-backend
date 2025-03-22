@@ -1,6 +1,7 @@
 from models import Warning
 from uuid import uuid4
 from datetime import datetime
+from controller.src.warning_view import get_warning_view_no_sensitive_data
 
 
 async def create_warning(warning: dict) -> Warning:
@@ -24,7 +25,7 @@ async def create_warning(warning: dict) -> Warning:
     return new_warning
 
 
-def get_warning_client_data(warning: Warning) -> dict:
+async def get_warning_client_data(warning: Warning, client: bool = True) -> dict:
     new_warning = {
         "id": warning.id,
         "title": warning.title,
@@ -33,6 +34,7 @@ def get_warning_client_data(warning: Warning) -> dict:
         "image": warning.image,
         "scope": warning.scope,
         "edited_at": warning.edited_at,
-        "posted_by": warning.posted_by
+        "posted_by": warning.posted_by,
+        "views": await get_warning_view_no_sensitive_data(warning.id, client)
     }
     return new_warning

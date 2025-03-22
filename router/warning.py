@@ -2,6 +2,7 @@ from fastapi import APIRouter, status, Depends, Query
 from controller.crud import WarningCrud
 from controller.crud import UserCrud
 from controller.crud import CommunityCrud
+from controller.crud import WarningViewCRUD
 from router.middleware.authorization import verify_user_access_token
 from schemas.warning import CreateWarningModel, UpdateWarningModel
 from controller.src.warning import create_warning, get_warning_client_data
@@ -10,11 +11,13 @@ from controller.src.web_push_notification import (
     send_notification_to_user,
     MessageNotification,
 )
+from controller.src.warning_view import create_warning_view
 
 router = APIRouter()
 warning_crud = WarningCrud()
 user_crud = UserCrud()
 community_crud = CommunityCrud()
+warning_view_crud = WarningViewCRUD()
 
 
 @router.get(
@@ -35,7 +38,7 @@ async def get_ten_community_warnings(
     )
     new_warning = []
     for warning in warnings:
-        new_warning.append(get_warning_client_data(warning))
+        new_warning.append(await get_warning_client_data(warning))
     return new_warning
 
 
@@ -57,7 +60,7 @@ async def get_all_community_warnings_by_pagination(
     warnings = await warning_crud.get_warnings_by_community_id_from_pagination(
         community.id, page, page_size
     )
-    warnings = [get_warning_client_data(warning) for warning in warnings]
+    warnings = [await get_warning_client_data(warning) for warning in warnings]
     return warnings
 
 
@@ -74,9 +77,15 @@ async def get_community_warning(
 ):
     # if warning_id == None: raise bad_request(f"No warning was send")
     user = await user_crud.get_user_by_cpf(user["cpf"])
+    try:
+        await warning_view_crud.get_warning_view_by_cpf_and_warning_id(user.cpf, warning_id)
+    except:
+        await create_warning_view(warning_id, user)
     warning = await warning_crud.get_warning_by_id(warning_id)
     # if user.community_id != warning.community_id: raise not_found("Warning not found")
-    return get_warning_client_data(warning)
+    if user.position == "council member" or user.position == "parish leader":
+        return await get_warning_client_data(warning, client=False)
+    return await get_warning_client_data(warning)
 
 
 @router.post(
@@ -110,7 +119,7 @@ async def create_community_warning(
         for user in users:
             await send_notification_to_user(user.id, message)
         page += 1
-    return get_warning_client_data(warning)
+    return await get_warning_client_data(warning)
     # raise unauthorized(f"You can't create a warning")
 
 
@@ -135,7 +144,7 @@ async def update_community_warning(
     db_warning = await warning_crud.get_warning_by_id(warning["id"])
     # if user.community_id == db_warning.community_id:
     warning = await warning_crud.update_warning(warning)
-    return get_warning_client_data(warning)
+    return await get_warning_client_data(warning)
     # raise unauthorized(f"You can't update this warning")
 
 
@@ -152,6 +161,7 @@ async def delete_community_warning(
     # if is_parish_leader(user['position']) or is_council_member(user['position']):
     user = await user_crud.get_user_by_cpf(user["cpf"])
     warning = await warning_crud.get_warning_by_id(warning_id)
+    await warning_view_crud.delete_warnings_view_by_warning_id(warning_id)
     # if user.community_id == warning.community_id:
     return await warning_crud.delete_warning(warning)
     # raise unauthorized(f"You can't delete this warning")

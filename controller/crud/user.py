@@ -3,8 +3,10 @@ from models import User
 from controller.errors.http.exceptions import not_found, internal_server_error
 from controller.crud.community import CommunityCrud
 from controller.crud.crud import CRUD
+from controller.crud.warning_view import WarningViewCRUD
 from typing import AsyncIterator
 
+warning_crud = WarningViewCRUD()
 community_crud = CommunityCrud()
 
 
@@ -150,11 +152,13 @@ class UserCrud(CRUD):
                 statement = select(User).filter(User.id == new_user["id"])
                 user = await session.execute(statement)
                 user = user.scalars().first()
+                update_cpf = False
                 for key in new_user.keys():
                     match key:
                         case "cpf":
                             if new_user["cpf"] != user.cpf:
                                 user.cpf = new_user["cpf"]
+                                update_cpf = True
                         case "name":
                             user.name = new_user["name"]
                         case "birthday":
@@ -172,6 +176,8 @@ class UserCrud(CRUD):
                                 )
                             )
                             user.community_id = community.id
+                if update_cpf:
+                    await warning_crud.update_warnings_view_cpf(user.cpf, new_user["cpf"])
                 await session.commit()
                 return user
             except Exception as error:

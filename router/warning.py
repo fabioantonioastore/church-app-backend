@@ -116,8 +116,8 @@ async def create_community_warning(
         users = await community_crud.get_all_community_users_paginated(
             warning.community_id, page
         )
-        for user in users:
-            await send_notification_to_user(user.id, message)
+        #for user in users:
+         #   await send_notification_to_user(user.id, message)
         page += 1
     return await get_warning_client_data(warning)
     # raise unauthorized(f"You can't create a warning")

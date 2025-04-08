@@ -1,5 +1,8 @@
 import datetime
 import uuid
+
+from sqlalchemy.util import await_only
+
 from controller.auth.firebase import initialize_firebase
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -51,6 +54,7 @@ from controller.crud.web_push import WebPushCrud
 from apscheduler.triggers.date import DateTrigger
 from controller.jobs.web_push_notification import execute_notification
 from controller.jobs.finance import calc_community_available_money
+from controller.jobs.dizimo_payment import set_dizimo_payments_expired
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
@@ -73,6 +77,10 @@ async def event_manager(app: FastAPI):
         scheduler.add_job(
             calc_community_available_money,
             trigger=CronTrigger(day=1, hour=0, minute=0, second=0),
+        )
+        scheduler.add_job(
+            set_dizimo_payments_expired,
+            trigger=CronTrigger(day="last", hour=23, minute=59),
         )
         yield
     finally:

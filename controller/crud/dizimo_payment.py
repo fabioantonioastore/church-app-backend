@@ -21,6 +21,32 @@ class DizimoPaymentCrud(CRUD):
                 await session.rollback()
                 raise internal_server_error(f"A error occurs during CRUD: {error!r}")
 
+    async def get_payments_by_status(self, status: str) -> list[DizimoPayment]:
+        async with self.session() as session:
+            try:
+                statement = select(DizimoPayment.status == status)
+                result = await session.execute(statement)
+                return result.scalars().all()
+            except Exception as error:
+                await session.rollback()
+                raise error
+
+    async def get_payments_by_status_paginated(
+        self, status: str, page: int = 1, page_size: int = 100
+    ) -> AsyncIterator:
+        async with self.session() as session:
+            try:
+                offset = (page - 1) * page_size
+                statement = select(DizimoPayment).filter(DizimoPayment.status == status).offset(offset).limit(page_size)
+                result = await session.execute(statement)
+                result = result.scalars().all()
+                yield result
+            except Exception as error:
+                await session.rollback()
+                raise internal_server_error(
+                    f"A error occurs during CRUD: {error!r}"
+                )
+
     async def get_all_user_dizimo_payment(
         self, user_id: str, page: int = 1, page_size: int = 100
     ) -> AsyncIterator:

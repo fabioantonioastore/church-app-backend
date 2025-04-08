@@ -1,3 +1,4 @@
+import datetime
 from typing import NoReturn
 from controller.crud.dizimo_payment import DizimoPaymentCrud
 from controller.src.pix_payment import get_pix_payment_from_correlation_id
@@ -16,6 +17,7 @@ from controller.crud.community import CommunityCrud
 from controller.src.dizimo_payment import (
     create_dizimo_payment,
     get_dizimo_status,
+    convert_to_month,
 )
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from firebase_admin import messaging
@@ -125,3 +127,18 @@ async def create_month_dizimo_payment_and_transfer_payments_values() -> (
             await community_crud.transfer_actual_to_last_month_and_reset_actual(
                 community.id
             )
+
+
+async def set_dizimo_payments_expired() -> None:
+    month = datetime.datetime.now().month
+    month = convert_to_month(month)
+    async for dizimo_payments in dizimo_payment_crud.get_payments_by_status_paginated("active"):
+        for dizimo in dizimo_payments:
+            if dizimo.month != month:
+                continue
+            dizimo_payment_update = {
+                "id": dizimo.id,
+                "correlation_id": None,
+                "status": "expired"
+            }
+            await dizimo_payment_crud.update_payment(dizimo_payment_update)

@@ -23,6 +23,4 @@ class User(Base):
     web_push = relationship(
         "WebPush", back_populates="user", cascade="all, delete-orphan"
     )
-    number = relationship(
-        "Number", back_populates="user", cascade="all, delete-orphan"
-    )
+    number = relationship("Number", back_populates="user", cascade="all, delete-orphan")

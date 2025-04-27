@@ -6,21 +6,15 @@ def not_found(message: str = None):
 
 
 def bad_request(message: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST, detail=message
-    )
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
 
 
 def unauthorized(message: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED, detail=message
-    )
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=message)
 
 
 def payment_required(message: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=message
-    )
+    raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=message)
 
 
 def forbidden(message: str = None):
@@ -28,21 +22,15 @@ def forbidden(message: str = None):
 
 
 def method_not_allowed(message: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail=message
-    )
+    raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail=message)
 
 
 def not_acceptable(message: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=message
-    )
+    raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=message)
 
 
 def request_timeout(message: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_408_REQUEST_TIMEOUT, detail=message
-    )
+    raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail=message)
 
 
 def unsupported_media_type(message: str = None):
@@ -52,9 +40,7 @@ def unsupported_media_type(message: str = None):
 
 
 def im_a_teapot(message: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_418_IM_A_TEAPOT, detail=message
-    )
+    raise HTTPException(status_code=status.HTTP_418_IM_A_TEAPOT, detail=message)
 
 
 def unprocessable_content(message: str = None):
@@ -68,9 +54,7 @@ def locked(message: str = None):
 
 
 def failed_dependency(message: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_424_FAILED_DEPENDENCY, detail=message
-    )
+    raise HTTPException(status_code=status.HTTP_424_FAILED_DEPENDENCY, detail=message)
 
 
 def too_early(message: str = None):
@@ -84,9 +68,7 @@ def precondition_required(message: str = None):
 
 
 def too_many_requests(message: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=message
-    )
+    raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=message)
 
 
 def internal_server_error(message: str = None):
@@ -96,27 +78,19 @@ def internal_server_error(message: str = None):
 
 
 def not_implemented(message: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED, detail=message
-    )
+    raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail=message)
 
 
 def bad_gateway(messsage: str = None):
-    raise HTTPException(
-        status_code=status.WS_1014_BAD_GATEWAY, detail=messsage
-    )
+    raise HTTPException(status_code=status.WS_1014_BAD_GATEWAY, detail=messsage)
 
 
 def service_unavailable(message: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=message
-    )
+    raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=message)
 
 
 def gateway_timeout(message: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_504_GATEWAY_TIMEOUT, detail=message
-    )
+    raise HTTPException(status_code=status.HTTP_504_GATEWAY_TIMEOUT, detail=message)
 
 
 def http_version_not_supported(message: str = None):
@@ -126,9 +100,7 @@ def http_version_not_supported(message: str = None):
 
 
 def loop_detected(messasge: str = None):
-    raise HTTPException(
-        status_code=status.HTTP_508_LOOP_DETECTED, detail=messasge
-    )
+    raise HTTPException(status_code=status.HTTP_508_LOOP_DETECTED, detail=messasge)
 
 
 def network_authentication_required(message: str = None):

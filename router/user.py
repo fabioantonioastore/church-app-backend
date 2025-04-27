@@ -74,9 +74,7 @@ async def update_user(
         PhoneValidator(user_data["phone"])
         await number_crud.update_number_by_user_id(user.id, user_data["phone"])
     user_data["id"] = user.id
-    user_data["birthday"] = datetime.strptime(
-        user_data["birthday"], "%Y-%m-%d"
-    )
+    user_data["birthday"] = datetime.strptime(user_data["birthday"], "%Y-%m-%d")
     login = await login_crud.get_login_by_cpf(user.cpf)
     await login_crud.delete_login(login)
     try:
@@ -117,9 +115,7 @@ async def patch_upgrade_user_position(
         await user_crud.upgrade_user(
             position_data.cpf, position_data.position, "faithful"
         )
-        await login_crud.update_position(
-            position_data.cpf, position_data.position
-        )
+        await login_crud.update_position(position_data.cpf, position_data.position)
         return
     if position_data.position == "council member":
         if position_data.responsibility:
@@ -128,17 +124,13 @@ async def patch_upgrade_user_position(
                 position_data.position,
                 position_data.responsibility,
             )
-            await login_crud.update_position(
-                position_data.cpf, position_data.position
-            )
+            await login_crud.update_position(position_data.cpf, position_data.position)
             return
         else:
             await user_crud.upgrade_user(
                 position_data.cpf, position_data.position, "member"
             )
-            await login_crud.update_position(
-                position_data.cpf, position_data.position
-            )
+            await login_crud.update_position(position_data.cpf, position_data.position)
             return
     raise bad_request(f"Rule {position_data.position!r} doesn't exists")
     # raise unauthorized(f"You can't upgrade user position")
@@ -168,9 +160,7 @@ async def deactivate_user_account(
     summary="Users",
     description="Get user info by CPF",
 )
-async def get_user_by_cpf(
-    cpf: str, user: dict = Depends(verify_user_access_token)
-):
+async def get_user_by_cpf(cpf: str, user: dict = Depends(verify_user_access_token)):
     user = await user_crud.get_user_by_cpf(cpf)
     return await get_user_client_data(user)
 

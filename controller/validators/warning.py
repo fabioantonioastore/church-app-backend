@@ -9,6 +9,4 @@ class WarningValidator:
     def validate_scope(self) -> NoReturn:
         scope = self.warning_data["scope"]
         if scope != "public" or scope != "private":
-            raise bad_request(
-                f"Invalid scope {scope}, scope must be public or private"
-            )
+            raise bad_request(f"Invalid scope {scope}, scope must be public or private")

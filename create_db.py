@@ -1,21 +1,11 @@
 from database.db import Base, engine
 import asyncio
+from sqlalchemy import text
 
 
 async def create_db():
     async with engine.begin() as conn:
-        from models.user import User
-        from models.login import Login
-        from models.dizimo_payment import DizimoPayment
-        from models.warning import Warning
-        from models.community import Community
-        from models.image import Image
-        from models.number import Number
-        from models.finance import Finance
-        from models.warning_view import WarningView
-
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.execute(text("DROP TABLE alembic_version;"))
 
     await engine.dispose()
 

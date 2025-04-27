@@ -40,9 +40,7 @@ async def update_payment_and_push_notification(
     dizimo_payment = await dizimo_payment_crud.get_payment_by_correlation_id(
         correlation_id
     )
-    pix_payment = get_pix_payment_from_correlation_id(
-        dizimo_payment.correlation_id
-    )
+    pix_payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
     user = await user_crud.get_user_by_id(dizimo_payment.user_id)
     if get_dizimo_status(dizimo_payment) == ACTIVE:
         if is_pix_paid(pix_payment):
@@ -61,9 +59,7 @@ async def update_payment_and_push_notification(
             return
         if is_pix_expired(pix_payment):
             delete_pix_by_correlation_id(dizimo_payment.correlation_id)
-            await dizimo_payment_crud.update_correlation_id_to_none(
-                dizimo_payment.id
-            )
+            await dizimo_payment_crud.update_correlation_id_to_none(dizimo_payment.id)
             await pix_notification_message(
                 "E-Igreja", "Pix expirado, por favor gerar outro pix", user.id
             )
@@ -72,13 +68,7 @@ async def update_payment_and_push_notification(
             )
             return
         if is_pix_active(pix_payment):
-            if (
-                count == 5
-                or count == 10
-                or count == 15
-                or count == 20
-                or count == 25
-            ):
+            if count == 5 or count == 10 or count == 15 or count == 20 or count == 25:
                 await pix_notification_message(
                     "E-Igreja",
                     f"Realize o pagamento, ainda falta {30 - count} minutos para realizar o pagamento",
@@ -86,14 +76,10 @@ async def update_payment_and_push_notification(
                 )
             return
     if get_dizimo_status(dizimo_payment) == PAID:
-        remove_jobs_by_function(
-            update_payment_and_push_notification, correlation_id
-        )
+        remove_jobs_by_function(update_payment_and_push_notification, correlation_id)
 
 
-async def pix_notification_message(
-    title: str, body: str, user_id: str
-) -> NoReturn:
+async def pix_notification_message(title: str, body: str, user_id: str) -> NoReturn:
     try:
         web_push = await web_push_crud.get_web_push_by_user_id(user_id)
         message = messaging.Message(
@@ -108,16 +94,11 @@ async def pix_notification_message(
 def remove_jobs_by_function(func, correlation_id: str) -> NoReturn:
     jobs = scheduler.get_jobs()
     for job in jobs:
-        if (
-            job.func == func
-            and job.kwargs.get("correlation_id") == correlation_id
-        ):
+        if job.func == func and job.kwargs.get("correlation_id") == correlation_id:
             scheduler.remove_job(job.id)
 
 
-async def create_month_dizimo_payment_and_transfer_payments_values() -> (
-    NoReturn
-):
+async def create_month_dizimo_payment_and_transfer_payments_values() -> NoReturn:
     async for users in user_crud.get_users_paginated():
         for user in users:
             dizimo_payment = await create_dizimo_payment(user)
@@ -132,13 +113,15 @@ async def create_month_dizimo_payment_and_transfer_payments_values() -> (
 async def set_dizimo_payments_expired() -> None:
     month = datetime.datetime.now().month
     month = convert_to_month(month)
-    async for dizimo_payments in dizimo_payment_crud.get_payments_by_status_paginated("active"):
+    async for dizimo_payments in dizimo_payment_crud.get_payments_by_status_paginated(
+        "active"
+    ):
         for dizimo in dizimo_payments:
             if dizimo.month != month:
                 continue
             dizimo_payment_update = {
                 "id": dizimo.id,
                 "correlation_id": None,
-                "status": "expired"
+                "status": "expired",
             }
             await dizimo_payment_crud.update_payment(dizimo_payment_update)

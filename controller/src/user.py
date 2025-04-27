@@ -34,17 +34,13 @@ async def create_user(user_data: dict) -> User:
             case "position":
                 user.position = user_data["position"]
             case "birthday":
-                user.birthday = datetime.strptime(
-                    user_data["birthday"], "%Y-%m-%d"
-                )
+                user.birthday = datetime.strptime(user_data["birthday"], "%Y-%m-%d")
             case "phone":
                 user.phone = user_data["phone"]
             case "image":
                 user.image = user_data["image"]
             case "community":
-                user_data["community"] = await get_community_id(
-                    user_data["community"]
-                )
+                user_data["community"] = await get_community_id(user_data["community"])
                 user.community_id = user_data["community"]
             case "responsibility":
                 user.responsibility = user_data["responsibility"]
@@ -104,8 +100,7 @@ def convert_user_to_dict(user: User) -> dict:
 
 def get_user_name_and_responsability(users: [User]) -> list[dict]:
     return [
-        {"name": user.name, "responsability": user.responsibility}
-        for user in users
+        {"name": user.name, "responsability": user.responsibility} for user in users
     ]
 
 

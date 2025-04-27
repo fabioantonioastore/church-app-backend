@@ -38,9 +38,7 @@ class WebPushCrud(CRUD):
                 yield web_pushes
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error(
-                    f"A error occurs during CRUD: {error!r}"
-                )
+                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
 
     async def get_web_push_by_user_id(self, user_id: str) -> WebPush:
         async with self.session() as session:

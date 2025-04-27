@@ -39,9 +39,7 @@ def create_customer(user: User) -> dict:
 
 
 def make_post_pix_request(pix: PixPayment) -> dict:
-    result = requests.post(
-        url=PIX_COB_URL, headers=header, json=pix.__dict__()
-    )
+    result = requests.post(url=PIX_COB_URL, headers=header, json=pix.__dict__())
     return result.json()
 
 
@@ -77,7 +75,9 @@ def delete_pix_by_correlation_id(correlation_id: str) -> NoReturn:
 
 def is_pix_active(pix: dict, value: int | None) -> bool:
     if value:
-        return (pix["charge"]["status"] == ACTIVE) and (get_pix_value(pix) == (value / 100))
+        return (pix["charge"]["status"] == ACTIVE) and (
+            get_pix_value(pix) == (value / 100)
+        )
     return pix["charge"]["status"] == ACTIVE
 
 

@@ -54,19 +54,15 @@ async def create_dizimo_payment_router(
     pix_data["value"] *= 100
     month = pix_data["month"]
     year = pix_data["year"]
-    dizimo_payment = (
-        await dizimo_payment_crud.get_payment_by_month_year_and_user_id(
-            month, year, user.id
-        )
+    dizimo_payment = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(
+        month, year, user.id
     )
     if dizimo_payment_is_paid(dizimo_payment):
         raise bad_request(f"Payment already paid")
     if dizimo_payment_is_expired(dizimo_payment):
         raise not_acceptable(f"Payment is expired")
     if dizimo_payment.correlation_id:
-        pix_payment = get_pix_payment_from_correlation_id(
-            dizimo_payment.correlation_id
-        )
+        pix_payment = get_pix_payment_from_correlation_id(dizimo_payment.correlation_id)
         if is_pix_active(pix_payment, pix_data["value"]):
             await pix_notification_message(
                 "Pix ja foi gerado", "Realize o pagamento", user.id
@@ -103,14 +99,11 @@ async def get_dizimo_payment_by_year_and_cpf_user_verify(
 ):
     user = await user_crud.get_user_by_cpf(user["cpf"])
     user_verify = await user_crud.get_user_by_cpf(cpf)
-    dizimo_payments = (
-        await dizimo_payment_crud.get_payments_by_year_and_user_id(
-            year, user_verify.id
-        )
+    dizimo_payments = await dizimo_payment_crud.get_payments_by_year_and_user_id(
+        year, user_verify.id
     )
     return [
-        get_dizimo_payment_no_sensitive_data(payment)
-        for payment in dizimo_payments
+        get_dizimo_payment_no_sensitive_data(payment) for payment in dizimo_payments
     ]
 
 
@@ -123,14 +116,11 @@ async def get_dizimo_payment_by_year(
     year: int, user: dict = Depends(verify_user_access_token)
 ):
     user = await user_crud.get_user_by_cpf(user["cpf"])
-    dizimo_payments = (
-        await dizimo_payment_crud.get_payments_by_year_and_user_id(
-            year, user.id
-        )
+    dizimo_payments = await dizimo_payment_crud.get_payments_by_year_and_user_id(
+        year, user.id
     )
     return [
-        get_dizimo_payment_no_sensitive_data(payment)
-        for payment in dizimo_payments
+        get_dizimo_payment_no_sensitive_data(payment) for payment in dizimo_payments
     ]
 
 
@@ -143,10 +133,8 @@ async def get_dizimo_payment_by_year_and_month(
     year: int, month: str, user: dict = Depends(verify_user_access_token)
 ):
     user = await user_crud.get_user_by_cpf(user["cpf"])
-    dizimo_payment = (
-        await dizimo_payment_crud.get_payment_by_month_year_and_user_id(
-            month, year, user.id
-        )
+    dizimo_payment = await dizimo_payment_crud.get_payment_by_month_year_and_user_id(
+        month, year, user.id
     )
     return get_dizimo_payment_no_sensitive_data(dizimo_payment)
 
@@ -160,9 +148,9 @@ async def get_all_user_payments(
     user: dict = Depends(verify_user_access_token),
 ):
     user = await user_crud.get_user_by_cpf(user["cpf"])
-    async for (
-        dizimo_payments
-    ) in dizimo_payment_crud.get_all_user_dizimo_payment(user.id):
+    async for dizimo_payments in dizimo_payment_crud.get_all_user_dizimo_payment(
+        user.id
+    ):
 
         async def dizimo_payment_generator():
             for dizimo_payment in dizimo_payments:
@@ -171,6 +159,4 @@ async def get_all_user_payments(
                 )
                 yield json.dumps(get_pix_no_sensitive_data(payment)) + "\n"
 
-    return StreamingResponse(
-        dizimo_payment_generator(), media_type="application/json"
-    )
+    return StreamingResponse(dizimo_payment_generator(), media_type="application/json")

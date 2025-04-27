@@ -37,9 +37,7 @@ async def signin(sign_data: SignIn):
             user = convert_user_to_dict(user)
             await user_crud.update_user(user)
         return {
-            "access_token": jwt.create_access_token(
-                sign_data["cpf"], user.position
-            )
+            "access_token": jwt.create_access_token(sign_data["cpf"], user.position)
         }
     return bad_request("Password or CPF is not correct")
 
@@ -61,9 +59,7 @@ async def signup(sign_data: SignUp):
             await login_crud.create_login(login)
         except Exception as error:
             await user_crud.delete_user(user)
-            raise internal_server_error(
-                f"Database failed to create user: {error!r}"
-            )
+            raise internal_server_error(f"Database failed to create user: {error!r}")
     except Exception as error:
         raise bad_request(f"User already exist: {error!r}")
     dizimo_payment = await create_dizimo_payment(user)

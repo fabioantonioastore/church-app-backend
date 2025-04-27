@@ -106,9 +106,7 @@ async def get_finance_by_month_router(
     user = await user_crud.get_user_by_cpf(user["cpf"])
     community = await community_crud.get_community_by_patron(community_patron)
     month = month_to_integer(month)
-    finances = await finance_crud.get_finances_by_month(
-        year, month, community.id
-    )
+    finances = await finance_crud.get_finances_by_month(year, month, community.id)
     finances = [finance_no_sensitive_data(finance) for finance in finances]
     return {
         "finances": finances,
@@ -167,8 +165,7 @@ async def update_finance_by_id(
             value=abs_value, type=finance.type, date=last_finance.date
         )
         if not (
-            finance_dataclass.value == 0
-            and finance_dataclass.type == last_finance.type
+            finance_dataclass.value == 0 and finance_dataclass.type == last_finance.type
         ):
             await update_finance_months_by_finance_data(finance_dataclass)
     return finance_no_sensitive_data(finance)
@@ -187,9 +184,7 @@ async def get_finance_resume_by_year(
     for i in range(1, 13):
         month = integer_to_month(i)
         try:
-            finances = await finance_crud.get_finances_by_month(
-                year, i, community.id
-            )
+            finances = await finance_crud.get_finances_by_month(year, i, community.id)
             finance_resume[month] = get_finance_resume(finances)
         except:
             finance_resume[month] = None
@@ -209,9 +204,7 @@ async def get_finance_resume_by_year_and_month(
 ):
     community = await community_crud.get_community_by_patron(patron)
     month = month_to_integer(month)
-    finances = await finance_crud.get_finances_by_month(
-        year, month, community.id
-    )
+    finances = await finance_crud.get_finances_by_month(year, month, community.id)
     month = integer_to_month(month)
     resume = get_finance_resume(finances)
     return {month: resume}
@@ -230,9 +223,7 @@ async def get_finance_resume_pdf_by_year_and_month(
 ):
     community = await community_crud.get_community_by_patron(patron)
     month = month_to_integer(month)
-    finances = await finance_crud.get_finances_by_month(
-        year, month, community.id
-    )
+    finances = await finance_crud.get_finances_by_month(year, month, community.id)
     pdf_bytes = get_pdf_table_finance_resume(finances)
     month = integer_to_month(month)
     response = StreamingResponse(
@@ -279,13 +270,9 @@ async def get_finance_resume_csv_by_year_and_month(
 ):
     community = await community_crud.get_community_by_patron(patron)
     month = month_to_integer(month)
-    finances = await finance_crud.get_finances_by_month(
-        year, month, community.id
-    )
+    finances = await finance_crud.get_finances_by_month(year, month, community.id)
     csv_file = get_csv_finance_resume(finances)
-    response = StreamingResponse(
-        iter([csv_file.getvalue()]), media_type="text/csv"
-    )
+    response = StreamingResponse(iter([csv_file.getvalue()]), media_type="text/csv")
     month = integer_to_month(month)
     response.headers["Content-Disposition"] = (
         f"attachment; filename=finance_resume_{month}.csv"
@@ -305,9 +292,7 @@ async def get_finance_resume_csv_by_year(
     community = await community_crud.get_community_by_patron(patron)
     finances = await finance_crud.get_finances_by_year(year, community.id)
     csv_file = await get_csv_finance_resume_year(finances, year)
-    response = StreamingResponse(
-        iter([csv_file.getvalue()]), media_type="text/csv"
-    )
+    response = StreamingResponse(iter([csv_file.getvalue()]), media_type="text/csv")
     response.headers["Content-Disposition"] = (
         f"attachment; filename=finance_resume_{year}.csv"
     )

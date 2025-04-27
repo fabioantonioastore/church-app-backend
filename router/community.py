@@ -40,12 +40,8 @@ user_crud = UserCrud()
     description="Get community list",
 )
 async def communities_list(page: int, page_size: int):
-    communities = await community_crud.get_communities_paginated(
-        page, page_size
-    )
-    communities = [
-        get_community_client_data(community) for community in communities
-    ]
+    communities = await community_crud.get_communities_paginated(page, page_size)
+    communities = [get_community_client_data(community) for community in communities]
     return communities
 
 
@@ -80,6 +76,7 @@ async def create_community(
     await finance_crud.create_finance(finance)
     return get_community_client_data(community)
     # raise unauthorized("You can't create the community")
+
 
 @router.get(
     "/community/{community_patron}",

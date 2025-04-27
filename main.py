@@ -1,8 +1,6 @@
 import datetime
 import uuid
 
-from sqlalchemy.util import await_only
-
 from controller.auth.firebase import initialize_firebase
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,6 +13,7 @@ import router.web.web_push_notification
 import router.image
 import router.sms
 import router.finance
+import router.clean
 from controller.auth import jwt
 from controller.src.pix_payment import (
     make_post_pix_request,
@@ -55,6 +54,7 @@ from apscheduler.triggers.date import DateTrigger
 from controller.jobs.web_push_notification import execute_notification
 from controller.jobs.finance import calc_community_available_money
 from controller.jobs.dizimo_payment import set_dizimo_payments_expired
+from controller.jobs.clean import create_new_cleaning
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
@@ -82,6 +82,9 @@ async def event_manager(app: FastAPI):
             set_dizimo_payments_expired,
             trigger=CronTrigger(day="last", hour=23, minute=59),
         )
+        scheduler.add_job(
+            create_new_cleaning, trigger=CronTrigger(day=1, hour=0, minute=0, second=0)
+        )
         yield
     finally:
         scheduler.shutdown()
@@ -105,6 +108,7 @@ app.include_router(router.web.web_push_notification.router)
 app.include_router(router.image.router)
 app.include_router(router.sms.router)
 app.include_router(router.finance.router)
+app.include_router(router.clean.router)
 
 
 @app.get("/communities")
@@ -148,9 +152,7 @@ async def signup(sign_data: SignUp):
     except:
         raise bad_request("User already exist")
     return {
-        "access_token": jwt.create_access_token(
-            user.cpf, position="council member"
-        )
+        "access_token": jwt.create_access_token(user.cpf, position="council member")
     }
 
 
@@ -171,11 +173,7 @@ async def signup(sign_data: SignUp):
             raise internal_server_error("Database failed to create user")
     except:
         raise bad_request("User already exist")
-    return {
-        "access_token": jwt.create_access_token(
-            user.cpf, position="parish leader"
-        )
-    }
+    return {"access_token": jwt.create_access_token(user.cpf, position="parish leader")}
 
 
 @app.patch(

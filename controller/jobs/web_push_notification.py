@@ -49,7 +49,9 @@ async def send_notification() -> NoReturn:
                 execute_notification(token, title, body)
                 return
             title = f"E-Igreja"
-            body = f"Convide amigos para fazer parte! Agradecemos pela sua contribuicao!"
+            body = (
+                f"Convide amigos para fazer parte! Agradecemos pela sua contribuicao!"
+            )
             execute_notification(token, title, body)
     except:
         pass

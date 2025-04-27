@@ -35,6 +35,6 @@ async def get_warning_client_data(warning: Warning, client: bool = True) -> dict
         "scope": warning.scope,
         "edited_at": warning.edited_at,
         "posted_by": warning.posted_by,
-        "views": await get_warning_view_no_sensitive_data(warning.id, client)
+        "views": await get_warning_view_no_sensitive_data(warning.id, client),
     }
     return new_warning

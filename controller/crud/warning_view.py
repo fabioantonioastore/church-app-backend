@@ -3,14 +3,19 @@ from sqlalchemy import select, and_
 from models import WarningView, User
 from controller.crud import CRUD
 
+
 class WarningViewCRUD(CRUD):
     def __init__(self) -> None:
         super().__init__()
 
-    async def get_warnings_view_by_warning_id(self, warning_id: str) -> list[WarningView]:
+    async def get_warnings_view_by_warning_id(
+        self, warning_id: str
+    ) -> list[WarningView]:
         async with self.session() as session:
             try:
-                statement = select(WarningView).filter(WarningView.warning_id == warning_id)
+                statement = select(WarningView).filter(
+                    WarningView.warning_id == warning_id
+                )
                 result = await session.execute(statement)
 
                 return result.scalars().all()
@@ -18,17 +23,13 @@ class WarningViewCRUD(CRUD):
                 await session.rollback()
                 raise error
 
-    async def get_warning_view_by_cpf_and_warning_id(self, cpf: str, warning_id: str) -> WarningView:
+    async def get_warning_view_by_cpf_and_warning_id(
+        self, cpf: str, warning_id: str
+    ) -> WarningView:
         async with self.session() as session:
             try:
-                statement = (
-                    select(WarningView)
-                    .filter(
-                        and_(
-                            WarningView.cpf == cpf,
-                            WarningView.warning_id == warning_id
-                        )
-                    )
+                statement = select(WarningView).filter(
+                    and_(WarningView.cpf == cpf, WarningView.warning_id == warning_id)
                 )
                 result = await session.execute(statement)
                 return result.scalars().one()
@@ -36,7 +37,9 @@ class WarningViewCRUD(CRUD):
                 await session.rollback()
                 raise error
 
-    async def update_warnings_view_cpf(self, cpf: str, new_cpf: str) -> list[WarningView]:
+    async def update_warnings_view_cpf(
+        self, cpf: str, new_cpf: str
+    ) -> list[WarningView]:
         async with self.session() as session:
             try:
                 statement = select(WarningView).filter(WarningView.cpf == cpf)
@@ -48,7 +51,7 @@ class WarningViewCRUD(CRUD):
                     session.add(warning_view)
 
                 await session.commit()
-                return  warnings_view
+                return warnings_view
             except Exception as error:
                 await session.rollback()
                 raise error

@@ -33,9 +33,7 @@ async def get_ten_community_warnings(
     user: dict = Depends(verify_user_access_token),
 ):
     community = await community_crud.get_community_by_patron(community_patron)
-    warnings = await warning_crud.get_warning_by_community_id(
-        community.id, total
-    )
+    warnings = await warning_crud.get_warning_by_community_id(community.id, total)
     new_warning = []
     for warning in warnings:
         new_warning.append(await get_warning_client_data(warning))
@@ -78,7 +76,9 @@ async def get_community_warning(
     # if warning_id == None: raise bad_request(f"No warning was send")
     user = await user_crud.get_user_by_cpf(user["cpf"])
     try:
-        await warning_view_crud.get_warning_view_by_cpf_and_warning_id(user.cpf, warning_id)
+        await warning_view_crud.get_warning_view_by_cpf_and_warning_id(
+            user.cpf, warning_id
+        )
     except:
         await create_warning_view(warning_id, user)
     warning = await warning_crud.get_warning_by_id(warning_id)

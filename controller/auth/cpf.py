@@ -27,9 +27,7 @@ def encrypt(message: str, password: str = CRYPTO_KEY) -> str:
     salt = os.urandom(16)
     key = derive_key(password, salt)
     nonce = os.urandom(12)
-    cipher = Cipher(
-        algorithms.AES(key), modes.GCM(nonce), backend=default_backend()
-    )
+    cipher = Cipher(algorithms.AES(key), modes.GCM(nonce), backend=default_backend())
     encryptor = cipher.encryptor()
 
     padder = padding.PKCS7(algorithms.AES.block_size).padder()

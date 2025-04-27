@@ -26,9 +26,7 @@ class UserCrud(CRUD):
                 yield users
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error(
-                    f"A error occurs during CRUD: {error!r}"
-                )
+                raise internal_server_error(f"A error occurs during CRUD: {error!r}")
 
     async def get_all_users(self) -> [User]:
         async with self.session() as session:
@@ -74,9 +72,7 @@ class UserCrud(CRUD):
     async def get_users_by_community_id(self, community_id: str):
         async with self.session() as session:
             try:
-                statement = select(User).filter(
-                    User.community_id == community_id
-                )
+                statement = select(User).filter(User.community_id == community_id)
                 users = await session.execute(statement)
                 return users.scalars().all()
             except Exception as error:
@@ -170,14 +166,14 @@ class UserCrud(CRUD):
                         case "active":
                             user.active = new_user["active"]
                         case "community_patron":
-                            community = (
-                                await community_crud.get_community_by_patron(
-                                    new_user["community_patron"]
-                                )
+                            community = await community_crud.get_community_by_patron(
+                                new_user["community_patron"]
                             )
                             user.community_id = community.id
                 if update_cpf:
-                    await warning_crud.update_warnings_view_cpf(user.cpf, new_user["cpf"])
+                    await warning_crud.update_warnings_view_cpf(
+                        user.cpf, new_user["cpf"]
+                    )
                 await session.commit()
                 return user
             except Exception as error:
@@ -218,6 +214,4 @@ class UserCrud(CRUD):
                 return User
             except Exception as error:
                 await session.rollback()
-                raise internal_server_error(
-                    f"A error occurs during CRUD: {error!r}"
-                )
+                raise internal_server_error(f"A error occurs during CRUD: {error!r}")

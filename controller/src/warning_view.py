@@ -26,11 +26,15 @@ async def get_users_name_from_warning_id(warning_id: str) -> list[str]:
     return users_names
 
 
-async def get_warning_view_no_sensitive_data(warning_id: str, client: bool = False) -> list[dict] | None:
+async def get_warning_view_no_sensitive_data(
+    warning_id: str, client: bool = False
+) -> list[dict] | None:
     result = []
 
     try:
-        warnings_view = await warning_view_crud.get_warnings_view_by_warning_id(warning_id)
+        warnings_view = await warning_view_crud.get_warnings_view_by_warning_id(
+            warning_id
+        )
     except:
         return result
 

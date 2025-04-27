@@ -22,9 +22,13 @@ async def clean_post_router(name: str, setor: int):
     return await clean_crud.create_clean(clean)
 
 
-@router.put("/clean/{id}")
-async def update_clean_payed(id: str):
-    return await clean_crud.upgrade_payed(id)
+@router.put("/clean/{id}/{value}")
+async def update_clean_payed(id: str, value: int):
+    if value >= 1:
+        value = True
+    else:
+        value = False
+    return await clean_crud.upgrade_payed(id, value)
 
 
 @router.get("/clean/by_setor/{setor}")

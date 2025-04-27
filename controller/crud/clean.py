@@ -39,12 +39,12 @@ class CleanCRUD(CRUD):
             result = await session.execute(statement)
             return result.scalars().all()
 
-    async def upgrade_payed(self, id: str) -> Cleaning:
+    async def upgrade_payed(self, id: str, value: bool) -> Cleaning:
         async with self.session() as session:
             statement = select(Cleaning).filter(Cleaning.id == id)
             result = await session.execute(statement)
             clean = result.scalars().one()
-            clean.payed = True
+            clean.payed = value
             session.add(clean)
             await session.commit()
             return clean

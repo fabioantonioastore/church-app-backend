@@ -3,6 +3,7 @@ from controller.crud.clean import CleanCRUD
 from models.cleaning import Cleaning
 from controller.src.dizimo_payment import convert_to_month
 from typing import NamedTuple
+from asyncio import run
 
 
 class NameAndSetor(NamedTuple):

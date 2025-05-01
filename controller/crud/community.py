@@ -2,6 +2,7 @@ from sqlalchemy import select
 from models import Community, User
 from controller.crud.crud import CRUD
 from controller.errors.http.exceptions import not_found, internal_server_error
+from typing import AsyncIterator
 
 
 class CommunityCrud(CRUD):
@@ -10,14 +11,14 @@ class CommunityCrud(CRUD):
 
     async def get_communities_paginated(
         self, page: int = 1, page_size: int = 100
-    ) -> [Community]:
+    ) -> AsyncIterator:
         async with self.session() as session:
             try:
                 offset = (page - 1) * page_size
                 statement = select(Community).offset(offset).limit(page_size)
                 communities = await session.execute(statement)
                 communities = communities.scalars().all()
-                return communities
+                yield communities
             except Exception as error:
                 await session.rollback()
                 raise internal_server_error(f"A error occurs during CRUD: {error!r}")

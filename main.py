@@ -20,6 +20,7 @@ from controller.src.pix_payment import (
     create_customer,
     PixPayment,
 )
+from asyncio import run
 from models.community import Community
 from controller.crud.community import CommunityCrud
 from controller.crud.user import UserCrud
@@ -98,6 +99,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 app.include_router(router.user.router)
 app.include_router(router.community.router)

@@ -7,6 +7,7 @@ from controller.src.finance import (
     FinanceType,
 )
 import calendar
+from asyncio import run
 
 community_crud = CommunityCrud()
 finance_crud = FinanceCrud()

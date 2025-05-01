@@ -11,6 +11,19 @@ class DizimoPaymentCrud(CRUD):
     def __init__(self) -> None:
         super().__init__()
 
+    async def delete(self):
+        async with self.session() as session:
+            try:
+                statement = select(DizimoPayment).filter(DizimoPayment.month == "may")
+                result = await session.execute(statement)
+                pays = result.scalars().all()
+                for p in pays:
+                    await session.delete(p)
+                await session.commit()
+                return "ok"
+            except Exception as error:
+                return error
+
     async def get_all(self):
         async with self.session() as session:
             try:

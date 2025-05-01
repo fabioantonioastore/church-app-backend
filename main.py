@@ -1,6 +1,8 @@
 import datetime
 import uuid
 
+from sqlalchemy.util import await_only
+
 from controller.auth.firebase import initialize_firebase
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -56,6 +58,7 @@ from controller.jobs.web_push_notification import execute_notification
 from controller.jobs.finance import calc_community_available_money
 from controller.jobs.dizimo_payment import set_dizimo_payments_expired
 from controller.jobs.clean import create_new_cleaning
+from controller.crud.clean import CleanCRUD
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
@@ -63,6 +66,7 @@ user_crud = UserCrud()
 dizimo_payment_crud = DizimoPaymentCrud()
 scheduler = AsyncIOScheduler()
 web_push_crud = WebPushCrud()
+clean_crud = CleanCRUD()
 
 
 @asynccontextmanager
@@ -111,6 +115,16 @@ app.include_router(router.image.router)
 app.include_router(router.sms.router)
 app.include_router(router.finance.router)
 app.include_router(router.clean.router)
+
+
+@app.get("/dizimo/get_all")
+async def get_all_dizimo():
+    return await dizimo_payment_crud.get_all()
+
+
+@app.get("/clean/get_all")
+async def get_all_clean():
+    return await clean_crud.get_all()
 
 
 @app.get("/communities")
@@ -252,3 +266,11 @@ async def test_async_message(token: str):
             args=[token, "hello", "hello"],
         )
     return "Ok"
+
+
+async def main():
+    await create_new_cleaning()
+
+
+if __name__ == "__main__":
+    run(main())

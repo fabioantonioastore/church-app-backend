@@ -13,7 +13,7 @@ MONTHS = (
     "february",
     "march",
     "april",
-    "nay",
+    "may",
     "june",
     "july",
     "august",

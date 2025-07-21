@@ -69,7 +69,7 @@ async def update_payment_and_push_notification(
                 update_payment_and_push_notification, correlation_id
             )
             return
-        if is_pix_active(pix_payment):
+        if is_pix_active(pix_payment, None):
             if count == 5 or count == 10 or count == 15 or count == 20 or count == 25:
                 await pix_notification_message(
                     "E-Igreja",

@@ -24,7 +24,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from firebase_admin import messaging
 from controller.crud.web_push import WebPushCrud
 
-from asyncio import run
 
 dizimo_payment_crud = DizimoPaymentCrud()
 user_crud = UserCrud()

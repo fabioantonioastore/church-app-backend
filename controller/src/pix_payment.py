@@ -105,7 +105,7 @@ def delete_pix_by_correlation_id(correlation_id: str) -> NoReturn:
     return requests.delete(URL, headers=header)
 
 
-def is_pix_active(pix: dict, value: int) -> bool:
+def is_pix_active(pix: dict, value: int = None) -> bool:
     if value:
         return (pix["charge"]["status"] == ACTIVE) and (
             get_pix_value(pix) == (value / 100)

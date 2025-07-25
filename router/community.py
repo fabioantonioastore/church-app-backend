@@ -181,7 +181,7 @@ async def active_community(
 )
 async def registry_community_pix_key(community_patron: str, pix_key: str, key_type: str):
     community = await community_crud.get_community_by_patron(community_patron)
-    return await community_crud.update_community_pix_key(community.id, pix_key)
+    await community_crud.update_community_pix_key(community.id, pix_key)
 
 
 @router.get(

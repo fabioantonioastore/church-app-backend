@@ -3,6 +3,13 @@ from uuid import uuid4
 from models import User
 
 
+def create_subccount(pix_key: str, name: str) -> dict:
+    return {
+        "pixKey": pix_key,
+        "name": str
+    }
+
+
 def get_users_friendly_data(users: [User]) -> list[dict]:
     return [
         {

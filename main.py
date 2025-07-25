@@ -20,7 +20,8 @@ from controller.auth import jwt
 from controller.src.pix_payment import (
     make_post_pix_request,
     create_customer,
-    PixPayment
+    PixPayment,
+    create_subaccount
 )
 from asyncio import run
 from models.community import Community

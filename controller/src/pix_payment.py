@@ -40,8 +40,8 @@ class PixPayment:
 
 def create_subaccount(name: str, pix_key: str) -> dict:
     data = {
-        "name": name,
-        "pixKey": pix_key
+        "pixKey": pix_key,
+        "name": name
     }
     result = requests.post(url=SUBACCOUNT_URL, headers=header, json=data)
     return result.json()

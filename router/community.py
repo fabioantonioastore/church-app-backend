@@ -185,7 +185,7 @@ async def registry_community_pix_key(community_patron: str, pix_key: str, key_ty
     community = await community_crud.get_community_by_patron(community_patron)
     withdraw_from_subaccount(pix_key)
     delete_subaccount(community.pix_key)
-    create_subaccount(community.patron, pix_key)
+    create_subaccount(community_patron, pix_key)
     await community_crud.update_community_pix_key(community.id, pix_key)
 
 

@@ -6,6 +6,7 @@ from controller.src.pix_payment import (
     is_pix_paid,
     is_pix_expired,
     is_pix_active,
+    withdraw_from_subaccount
 )
 from controller.src.pix_payment import (
     delete_pix_by_correlation_id,
@@ -58,6 +59,8 @@ async def update_payment_and_push_notification(
             remove_jobs_by_function(
                 update_payment_and_push_notification, correlation_id
             )
+            community = await community_crud.get_community_by_id(user.community_id)
+            withdraw_from_subaccount(community.pix_key)
             return
         if is_pix_expired(pix_payment):
             delete_pix_by_correlation_id(dizimo_payment.correlation_id)

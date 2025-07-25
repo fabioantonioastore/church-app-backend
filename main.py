@@ -20,8 +20,7 @@ from controller.auth import jwt
 from controller.src.pix_payment import (
     make_post_pix_request,
     create_customer,
-    PixPayment,
-    PixInfo
+    PixPayment
 )
 from asyncio import run
 from models.community import Community
@@ -223,15 +222,11 @@ async def create_payment_router(
     user = await user_crud.get_user_by_cpf(user["cpf"])
     dizimo = await test_create_dizimo_payment(user, int(year), month)
     community = await community_crud.get_community_by_id(user.community_id)
-    pix_info = PixInfo(
-        value=10,
-        pixKey=community.pix_key
-    )
     pix_payment = PixPayment(
         value=10,
         customer=create_customer(user),
         correlationID=str(uuid.uuid4()),
-        splits=[pix_info]
+        subaccount=community.pix_key
     )
     pix_payment = make_post_pix_request(pix_payment)
     dizimo = complete_dizimo_payment(dizimo, pix_payment)

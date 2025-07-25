@@ -8,6 +8,7 @@ from typing import NoReturn
 
 load_dotenv()
 
+SUBACCOUNT_URL = "https://api.openpix.com.br/api/v1/subaccount"
 PIX_COB_URL = getenv("PIX_COB_URL")
 header = {"Authorization": getenv("APP_ID"), "type": "application/json"}
 PAID = "COMPLETED"
@@ -17,17 +18,11 @@ EXPIRE_TIME = 30 * 60
 
 
 @dataclass
-class PixInfo:
-    value: int | float
-    pixKey: str
-
-
-@dataclass
 class PixPayment:
     value: int | float
     customer: dict
     correlationID: str
-    splits: list[PixInfo]
+    subaccount: str
     expiresIn: int = EXPIRE_TIME
     type: str = "DYNAMIC"
 
@@ -39,10 +34,36 @@ class PixPayment:
             "expireIn": self.expiresIn,
             "type": self.type,
             "correlationID": self.correlationID,
-            "splits": [
-                {"value": split.value, "pixKey": split.pixKey} for split in self.splits
-            ]
+            "subaccount": self.subaccount
         }
+
+
+def create_subaccount(name: str, pix_key: str) -> dict:
+    data = {
+        "name": name,
+        "pixKey": pix_key
+    }
+    result = requests.post(url=SUBACCOUNT_URL, headers=header, json=data)
+    return result.json()
+
+
+def delete_subaccount(pix_key: str) -> dict:
+    result = requests.delete(url=SUBACCOUNT_URL + f"/{pix_key}", headers=header)
+    return result.json()
+
+
+def get_subaccount_details(pix_key: str) -> dict:
+    result = requests.get(url=SUBACCOUNT_URL + f"/{pix_key}", headers=header)
+    return result.json()
+
+
+def withdraw_from_subaccount(pix_key: str, value: int | float = None) -> dict:
+    if not value:
+        subaccount = get_subaccount_details(pix_key)
+        value = subaccount["balance"]
+    data = {"value": value}
+    result = requests.post(url=SUBACCOUNT_URL + f"/{pix_key}/withdraw", headers=header, json=data)
+    return result.json()
 
 
 def create_customer(user: User) -> dict:
@@ -50,9 +71,7 @@ def create_customer(user: User) -> dict:
 
 
 def make_post_pix_request(pix: PixPayment) -> dict:
-    print(pix)
     result = requests.post(url=PIX_COB_URL, headers=header, json=pix.__dict__())
-    print(result.json())
     return result.json()
 
 

@@ -13,6 +13,7 @@ from controller.src.community import (
     get_community_list,
     get_community_patron,
 )
+from controller.src.pix_payment import create_subaccount, delete_subaccount, withdraw_from_subaccount
 from controller.src.finance import finance_crud
 from models import Finance
 from router.middleware.authorization import verify_user_access_token
@@ -67,6 +68,7 @@ async def create_community(
 ):
     # if await is_parish_leader(user['position']):
     community = create_community_data(dict(community))
+    create_subaccount(community.patron, community.pix_key)
     community = await community_crud.create_community(community)
     finance = Finance()
     finance.community_id = community.id
@@ -181,6 +183,9 @@ async def active_community(
 )
 async def registry_community_pix_key(community_patron: str, pix_key: str, key_type: str):
     community = await community_crud.get_community_by_patron(community_patron)
+    withdraw_from_subaccount(pix_key)
+    delete_subaccount(community.pix_key)
+    create_subaccount(community.patron, pix_key)
     await community_crud.update_community_pix_key(community.id, pix_key)
 
 

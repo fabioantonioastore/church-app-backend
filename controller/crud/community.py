@@ -28,7 +28,7 @@ class CommunityCrud(CRUD):
             try:
                 statement = select(Community).filter(Community.id == community_id)
                 community = await session.execute(statement)
-                community = community.scalars().firts()
+                community = community.scalars().first()
                 community.pix_key = pix_key
                 await session.commit()
                 return "pix key updated"

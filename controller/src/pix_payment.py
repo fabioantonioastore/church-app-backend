@@ -50,7 +50,9 @@ def create_customer(user: User) -> dict:
 
 
 def make_post_pix_request(pix: PixPayment) -> dict:
+    print(pix)
     result = requests.post(url=PIX_COB_URL, headers=header, json=pix.__dict__())
+    print(result)
     return result.json()
 
 

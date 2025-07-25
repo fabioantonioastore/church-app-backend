@@ -17,17 +17,11 @@ EXPIRE_TIME = 30 * 60
 
 
 @dataclass
-class PixInfo:
-    value: int | float
-    pix_key: str
-
-
-@dataclass
 class PixPayment:
     value: int | float
     customer: dict
     correlationID: str
-    splits: list[PixInfo]
+    subaccount: str
     expiresIn: int = EXPIRE_TIME
     type: str = "DYNAMIC"
 
@@ -39,6 +33,7 @@ class PixPayment:
             "expireIn": self.expiresIn,
             "type": self.type,
             "correlationID": self.correlationID,
+            "subaccount": self.subaccount
         }
 
 

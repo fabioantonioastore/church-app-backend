@@ -277,7 +277,7 @@ async def test_async_message(token: str):
 async def get_subaccount_details_router(pix_key: str):
     result = get_subaccount_details(pix_key)
     print(result)
-    withdraw_from_subaccount(pix_key)
+    result = withdraw_from_subaccount(pix_key)
     return result
 
 

@@ -27,7 +27,7 @@ class PixPayment:
     value: int | float
     customer: dict
     correlationID: str
-    split: list[PixInfo]
+    splits: list[PixInfo]
     expiresIn: int = EXPIRE_TIME
     type: str = "DYNAMIC"
 

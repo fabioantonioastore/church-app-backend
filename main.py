@@ -231,7 +231,7 @@ async def create_payment_router(
         value=10,
         customer=create_customer(user),
         correlationID=str(uuid.uuid4()),
-        split=[pix_info]
+        splits=[pix_info]
     )
     pix_payment = make_post_pix_request(pix_payment)
     dizimo = complete_dizimo_payment(dizimo, pix_payment)

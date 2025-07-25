@@ -60,7 +60,7 @@ def get_subaccount_details(pix_key: str) -> dict:
 def withdraw_from_subaccount(pix_key: str, value: int | float = None) -> dict:
     if not value:
         subaccount = get_subaccount_details(pix_key)
-        value = subaccount["subAccount"]["balance"]
+        value = subaccount["SubAccount"]["balance"]
     data = {"value": value}
     result = requests.post(url=SUBACCOUNT_URL + f"/{pix_key}/withdraw", headers=header, json=data)
     return result.json()

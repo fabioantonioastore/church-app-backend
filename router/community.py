@@ -175,6 +175,16 @@ async def active_community(
     # raise unauthorized("You can't active this community")
 
 
+@router.patch(
+    "/community/registry/pix_key/{community_patron}/{pix_key}/{key_type}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(verify_user_access_token)]
+)
+async def registry_community_pix_key(community_patron: str, pix_key: str, key_type: str, user: dict = Depends(verify_user_access_token)):
+    community = await community_crud.get_community_by_patron(community_patron)
+    return await community_crud.update_community_pix_key(community.id, pix_key)
+
+
 @router.get(
     "/community/{community_patron}/councils",
     status_code=status.HTTP_200_OK,

@@ -14,6 +14,7 @@ class Community(Base):
     email = mapped_column(String, unique=True)
     image = mapped_column(String, nullable=True)
     active = mapped_column(Boolean, default=True)
+    pix_key = mapped_column(String, nullable=True)
     actual_month_total_payment_value = mapped_column(Float, default=0)
     last_month_total_payment_value = mapped_column(Float, default=0)
 

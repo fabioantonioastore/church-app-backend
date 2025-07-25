@@ -15,6 +15,7 @@ class CreateCommunityModel(BaseModel):
     location: str
     email: str
     image: str | None = None
+    pix_key: str
 
     model_config = ConfigDict(
         from_attributes=True,

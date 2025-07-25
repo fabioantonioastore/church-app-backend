@@ -23,6 +23,18 @@ class CommunityCrud(CRUD):
                 await session.rollback()
                 raise internal_server_error(f"A error occurs during CRUD: {error!r}")
 
+    async def update_community_pix_key(self, community_id: str, pix_key: str) -> str:
+        async with self.session() as session:
+            try:
+                statement = select(Community).filter(Community.id == community_id)
+                community = await session.execute(statement)
+                community = community.scalars().firts()
+                community.pix_key = pix_key
+                await session.commit()
+                return "pix key updated"
+            except Exception as error:
+                raise not_found(f"A error occurs during CRUD: {error!r}")
+
     async def get_community_image(self, community_id: str):
         async with self.session() as session:
             try:

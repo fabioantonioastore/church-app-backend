@@ -17,12 +17,20 @@ EXPIRE_TIME = 30 * 60
 
 
 @dataclass
+class PixInfo:
+    value: int | float
+    pix_key: str
+
+
+@dataclass
 class PixPayment:
     value: int | float
     customer: dict
     correlationID: str
+    split: list[PixInfo]
     expiresIn: int = EXPIRE_TIME
     type: str = "DYNAMIC"
+
 
     def __dict__(self) -> dict:
         return {

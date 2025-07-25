@@ -38,6 +38,8 @@ def create_community_data(community_data: dict) -> Community:
                 community.location = community_data["location"]
             case "email":
                 community.email = community_data["email"]
+            case "pix_key":
+                community.pix_key = community_data["pix_key"]
     community.id = str(uuid4())
     return community
 

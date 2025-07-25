@@ -1,8 +1,7 @@
-import asyncio
 import json
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import StreamingResponse
-from controller.crud import DizimoPaymentCrud
+from controller.crud import DizimoPaymentCrud, CommunityCrud
 from router.middleware.authorization import verify_user_access_token
 from controller.crud import UserCrud
 from uuid import uuid4
@@ -14,6 +13,7 @@ from controller.src.dizimo_payment import (
 from controller.errors.http.exceptions import bad_request, not_acceptable
 from controller.src.pix_payment import (
     PixPayment,
+    PixInfo,
     create_customer,
     make_post_pix_request,
     get_pix_no_sensitive_data,
@@ -31,6 +31,7 @@ from controller.jobs.dizimo_payment import pix_notification_message
 router = APIRouter()
 dizimo_payment_crud = DizimoPaymentCrud()
 user_crud = UserCrud()
+community_crud = CommunityCrud()
 scheduler = AsyncIOScheduler()
 
 
@@ -48,6 +49,7 @@ async def create_dizimo_payment_router(
     except Exception as error:
         pass
     user = await user_crud.get_user_by_cpf(user["cpf"])
+    community = await community_crud.get_community_by_id(user.community_id)
     pix_data = dict(pix_data)
     if pix_data["value"] < 1:
         raise bad_request("Value must be greater or equal than 1")
@@ -68,10 +70,15 @@ async def create_dizimo_payment_router(
                 "Pix ja foi gerado", "Realize o pagamento", user.id
             )
             return get_pix_no_sensitive_data(pix_payment)
+    pix_info = PixInfo(
+        value=pix_data["value"],
+        pix_key=community.pix_key
+    )
     pix_payment = PixPayment(
         value=pix_data["value"],
         customer=create_customer(user),
         correlationID=str(uuid4()),
+        split=[pix_info]
     )
     pix_payment = make_post_pix_request(pix_payment)
     dizimo_payment = complete_dizimo_payment(dizimo_payment, pix_payment)

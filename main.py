@@ -60,6 +60,7 @@ from controller.jobs.finance import calc_community_available_money
 from controller.jobs.dizimo_payment import set_dizimo_payments_expired
 from controller.jobs.clean import create_new_cleaning
 from controller.crud.clean import CleanCRUD
+from controller.src.pix_payment import get_subaccount_details, withdraw_from_subaccount
 
 login_crud = LoginCrud()
 community_crud = CommunityCrud()
@@ -269,6 +270,15 @@ async def test_async_message(token: str):
             args=[token, "hello", "hello"],
         )
     return "Ok"
+
+
+
+@app.get("/subaccount/details/{pix_key}")
+async def get_subaccount_details_router(pix_key: str):
+    result = get_subaccount_details(pix_key)
+    print(result)
+    withdraw_from_subaccount(pix_key)
+    return result
 
 
 async def main():

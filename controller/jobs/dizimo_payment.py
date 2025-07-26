@@ -6,7 +6,7 @@ from controller.src.pix_payment import (
     is_pix_paid,
     is_pix_expired,
     is_pix_active,
-    withdraw_from_subaccount
+    withdraw_from_subaccount,
 )
 from controller.src.pix_payment import (
     delete_pix_by_correlation_id,

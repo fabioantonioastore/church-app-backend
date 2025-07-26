@@ -73,7 +73,7 @@ async def create_dizimo_payment_router(
         value=pix_data["value"],
         customer=create_customer(user),
         correlationID=str(uuid4()),
-        subaccount=community.pix_key
+        subaccount=community.pix_key,
     )
     pix_payment = make_post_pix_request(pix_payment)
     dizimo_payment = complete_dizimo_payment(dizimo_payment, pix_payment)

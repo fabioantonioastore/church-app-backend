@@ -13,7 +13,11 @@ from controller.src.community import (
     get_community_list,
     get_community_patron,
 )
-from controller.src.pix_payment import create_subaccount, delete_subaccount, withdraw_from_subaccount
+from controller.src.pix_payment import (
+    create_subaccount,
+    delete_subaccount,
+    withdraw_from_subaccount,
+)
 from controller.src.finance import finance_crud
 from models import Finance
 from router.middleware.authorization import verify_user_access_token
@@ -181,7 +185,9 @@ async def active_community(
     "/community/registry/pix_key/{community_patron}/{pix_key}/{key_type}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def registry_community_pix_key(community_patron: str, pix_key: str, key_type: str):
+async def registry_community_pix_key(
+    community_patron: str, pix_key: str, key_type: str
+):
     community = await community_crud.get_community_by_patron(community_patron)
     withdraw_from_subaccount(pix_key)
     delete_subaccount(community.pix_key)

@@ -21,7 +21,7 @@ from controller.src.pix_payment import (
     make_post_pix_request,
     create_customer,
     PixPayment,
-    create_subaccount
+    create_subaccount,
 )
 from asyncio import run
 from models.community import Community
@@ -228,7 +228,7 @@ async def create_payment_router(
         value=10,
         customer=create_customer(user),
         correlationID=str(uuid.uuid4()),
-        subaccount=community.pix_key
+        subaccount=community.pix_key,
     )
     pix_payment = make_post_pix_request(pix_payment)
     dizimo = complete_dizimo_payment(dizimo, pix_payment)
@@ -270,7 +270,6 @@ async def test_async_message(token: str):
             args=[token, "hello", "hello"],
         )
     return "Ok"
-
 
 
 @app.get("/subaccount/details/{pix_key}")

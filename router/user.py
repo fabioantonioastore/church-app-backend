@@ -74,7 +74,8 @@ async def update_user(
         PhoneValidator(user_data["phone"])
         await number_crud.update_number_by_user_id(user.id, user_data["phone"])
     user_data["id"] = user.id
-    user_data["birthday"] = datetime.strptime(user_data["birthday"], "%Y-%m-%d")
+    if user_data["birthday"]:
+        user_data["birthday"] = datetime.strptime(user_data["birthday"], "%Y-%m-%d")
     login = await login_crud.get_login_by_cpf(user.cpf)
     await login_crud.delete_login(login)
     try:

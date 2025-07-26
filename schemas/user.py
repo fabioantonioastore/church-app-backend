@@ -5,7 +5,7 @@ class UserModel(BaseModel):
     id: str
     cpf: str
     name: str
-    birthday: str
+    birthday: str | None
     phone: str
     position: str
     image: str
@@ -23,7 +23,7 @@ class UpdateUserModel(BaseModel):
     name: str
     community_patron: str
     password: str
-    birthday: str
+    birthday: str | None
     image: str | None = None
 
     model_config = ConfigDict(

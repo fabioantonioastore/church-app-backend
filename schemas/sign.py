@@ -35,7 +35,7 @@ class SignUp(BaseModel):
     cpf: str
     name: str
     password: str
-    birthday: str
+    birthday: str | None
     community: str
     phone: str
 

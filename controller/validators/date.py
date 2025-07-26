@@ -5,8 +5,9 @@ from controller.errors.http.exceptions import bad_request
 class DateValidator:
     def __init__(self, date: str):
         self.date = date
-        self.is_correct_format()
-        self.is_actual_date()
+        if not date is None:
+            self.is_correct_format()
+            self.is_actual_date()
 
     def is_correct_format(self) -> None:
         try:

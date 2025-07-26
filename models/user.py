@@ -11,7 +11,7 @@ class User(Base):
     id = mapped_column(String, primary_key=True, default=generate_uuid4)
     cpf = mapped_column(String, unique=True)
     name = mapped_column(String)
-    birthday = mapped_column(Date)
+    birthday = mapped_column(Date, nullable=True)
     phone = mapped_column(String, unique=True)
     position = mapped_column(String, default="user")
     image = mapped_column(String, nullable=True)

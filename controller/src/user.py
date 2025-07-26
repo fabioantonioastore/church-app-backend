@@ -34,7 +34,10 @@ async def create_user(user_data: dict) -> User:
             case "position":
                 user.position = user_data["position"]
             case "birthday":
-                user.birthday = datetime.strptime(user_data["birthday"], "%Y-%m-%d")
+                if user_data["birthday"]:
+                    user.birthday = datetime.strptime(user_data["birthday"], "%Y-%m-%d")
+                else:
+                    user.birthday = None
             case "phone":
                 user.phone = user_data["phone"]
             case "image":
@@ -140,7 +143,10 @@ async def get_update_data(user: User, update_data: dict) -> dict:
         user.image = update_data["image"].encode("utf-8")
     if update_data.get("birthday"):
         DateValidator(update_data["birthday"])
-        user.birthday = datetime.strptime(update_data["birthday"], "%Y-%m-%d")
+        if update_data["birthday"]:
+            user.birthday = datetime.strptime(update_data["birthday"], "%Y-%m-%d")
+        else:
+            user.birthday = None
     if update_data.get("community_patron"):
         community = await community_crud.get_community_by_patron(
             update_data["community_patron"]

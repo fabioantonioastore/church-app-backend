@@ -280,6 +280,11 @@ async def get_subaccount_details_router(pix_key: str):
     return result
 
 
+@app.post("/webhook")
+async def test_webhook():
+    pass
+
+
 async def main():
     await create_new_cleaning()
 

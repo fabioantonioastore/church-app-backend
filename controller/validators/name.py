@@ -13,6 +13,7 @@ class NameValidator:
     def final_validation(self) -> None:
         regex_name = r"^[A-Za-z\s-]{2,}$"
         if not re.fullmatch(regex_name, self.name):
+            print("regex error")
             raise bad_request("Invalid name")
 
     def has_number(self) -> None:

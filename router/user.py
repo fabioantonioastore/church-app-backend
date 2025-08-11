@@ -116,7 +116,7 @@ async def patch_upgrade_user_position(
         await user_crud.upgrade_user(
             position_data.cpf, position_data.position, "faithful"
         )
-        await login_crud.update_position(position_data.cpf, position_data.position)
+        await login_crud.update_position(position_data.cpf, positigon_data.position)
         return
     if position_data.position == "council member":
         if position_data.responsibility:

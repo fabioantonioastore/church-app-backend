@@ -52,7 +52,7 @@ async def update_payment_and_push_notification(
             )
             await pix_notification_message(
                 "E-Igreja",
-                "Pagamento confirmado, obrigado pela a sua doacao",
+                "Pagamento confirmado, obrigado pela a sua doação",
                 user.id,
             )
             remove_jobs_by_function(

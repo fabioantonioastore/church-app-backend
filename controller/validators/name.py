@@ -8,13 +8,6 @@ class NameValidator:
         self.has_number()
         self.has_special_character()
         self.is_sort_name()
-        self.final_validation()
-
-    def final_validation(self) -> None:
-        regex_name = r"^[A-Za-z\s-]{2,}$"
-        if not re.fullmatch(regex_name, self.name):
-            print("regex error")
-            raise bad_request("Invalid name")
 
     def has_number(self) -> None:
         if re.search(r"[0-9]", self.name):

@@ -39,21 +39,32 @@ class CleanCRUD(CRUD):
             result = await session.execute(statement)
             return result.scalars().all()
 
-    async def upgrade_payed(self, id: str, value: bool) -> Cleaning:
+    async def upgrade_payed(self, id: str, value: int) -> Cleaning:
         async with self.session() as session:
             statement = select(Cleaning).filter(Cleaning.id == id)
             result = await session.execute(statement)
             clean = result.scalars().one()
-            clean.payed = value
+            clean.value = value
             session.add(clean)
             await session.commit()
             return clean
 
-    async def delete_clean(self, id: str) -> str:
+
+    async def delete_all(self) -> str:
+        async with self.session() as session:
+            statement = select(Cleaning)
+            result = await session.execute(statement)
+            cleaners = result.scalars().all()
+            for cleaner in cleaners:
+                await session.delete(cleaner)
+            await session.commit()
+            return "deleted"
+
+    async def delete_by_id(self, id: str) -> str:
         async with self.session() as session:
             statement = select(Cleaning).filter(Cleaning.id == id)
             result = await session.execute(statement)
-            clean = result.scalars().one()
-            await session.delete(clean)
+            cleaner = result.scalars().first()
+            await session.delete(cleaner)
             await session.commit()
             return "deleted"

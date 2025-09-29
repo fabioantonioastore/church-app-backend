@@ -24,11 +24,9 @@ async def clean_post_router(name: str, setor: int):
 
 @router.put("/clean/{id}/{value}")
 async def update_clean_payed(id: str, value: int):
-    if value >= 1:
-        value = True
-    else:
-        value = False
-    return await clean_crud.upgrade_payed(id, value)
+    if value >= 100:
+        return await clean_crud.upgrade_payed(id, value)
+    raise "Not value set, value must be greater or equal than 100"
 
 
 @router.get("/clean/by_setor/{setor}")
@@ -49,6 +47,11 @@ async def clean_test():
     return await clean_crud.get_all()
 
 
-@router.delete("/clean/{id}")
-async def clean_delete_router(id: str):
-    return await clean_crud.delete_clean(id)
+@router.delete("/clean/delete/{id}")
+async def clean_delete_by_id_router(id: str):
+    return await clean_crud.delete_by_id(id)
+
+
+@router.delete("/clean/delete_all")
+async def clean_delete_all_router():
+    return await clean_crud.delete_all()

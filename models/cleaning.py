@@ -10,6 +10,7 @@ class Cleaning(Base):
     id = mapped_column(String, primary_key=True, default=generate_uuid4)
     name = mapped_column(String)
     setor = mapped_column(Integer)
+    value = mapped_column(Integer, nullable=True)
     payed = mapped_column(Boolean)
     month = mapped_column(String)
     year = mapped_column(Integer)

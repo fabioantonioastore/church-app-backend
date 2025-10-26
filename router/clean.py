@@ -15,6 +15,7 @@ async def clean_post_router(name: str, setor: int):
     clean = Cleaning()
     clean.name = name
     clean.setor = setor
+    clean.payed = False
     date = datetime.now()
     clean.year = date.year
     clean.month = convert_to_month(date.month)

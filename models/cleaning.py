@@ -11,6 +11,6 @@ class Cleaning(Base):
     name = mapped_column(String)
     setor = mapped_column(Integer)
     value = mapped_column(Integer, nullable=True)
-    payed = mapped_column(Boolean)
+    payed = mapped_column(Boolean, default=False)
     month = mapped_column(String)
     year = mapped_column(Integer)

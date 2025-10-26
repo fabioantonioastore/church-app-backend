@@ -13,7 +13,6 @@ router = APIRouter()
 @router.post("/clean/{name}/{setor}")
 async def clean_post_router(name: str, setor: int):
     clean = Cleaning()
-    clean.payed = False
     clean.name = name
     clean.setor = setor
     date = datetime.now()
@@ -24,9 +23,7 @@ async def clean_post_router(name: str, setor: int):
 
 @router.put("/clean/{id}/{value}")
 async def update_clean_payed(id: str, value: int):
-    if value >= 100:
-        return await clean_crud.upgrade_payed(id, value)
-    raise "Not value set, value must be greater or equal than 100"
+    return await clean_crud.upgrade_payed(id, value)
 
 
 @router.get("/clean/by_setor/{setor}")
